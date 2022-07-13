@@ -1,0 +1,66 @@
+ <title>How_dijango_works</title>
+
+How Django Works
+
+
+    Modelo MVT (Medol View Controller)
+
+    Peticion HTTP/ URL 
+    
+    Mapeador URL (ej. urlpatterns)
+        Redirige petición a View adecuada según URL de peticion
+        
+        Lista de funciones path()
+    	Dentro de urls.py
+        1 parametro: URL
+    	2 parametro: Función (View) en modulo View.py
+            urlpatterns = [
+            path("index/", views.index),
+            path("page/", views.page),
+            ]
+    
+    View 
+        Gestiona petición, acceden a modelos necesarios, delegan formato/renderizacion a Templates	
+        Contienen la logica.
+
+        Funciones en Modulo View.py
+    	Recibe objeto HttpRequest Como Parámetro (request)  
+    	Devuelve objeto HttpResponse Como Return  (gral. con la función render())
+    	
+    Templates 
+    	Renderiza/representar pagina
+        Contienen la parte visual (html)
+    	
+        Fichero texto (ej .html)
+        Traida por función render() de la función view.
+
+    Modelo 
+        Acceden/modifica datos en BD	
+    
+        Objetos de python
+    	Class dentro de models.py
+        
+
+    
+        Bases de datos  
+   
+    Soporta nativamente: SQLite
+	Soporta: PostgreSQL, MySQL, Oracle y SQLite
+    
+   
+        Otras acciones Django:
+  
+	formularios (Cuestionario, etc.)
+	Autenticación y permisos de los usuarios
+	Cache (guarda renderización de pag para futuros reingresos)
+	Serialización de datos
+    
+        
+
+    
+
+
+
+
+</body>
+</html>

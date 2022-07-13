@@ -1,0 +1,202 @@
+
+    <title>GIT HUB</title>
+
+
+    Directory:              Nuestra proyecto en PC
+    Repository:             Git. Control de versiones en PC
+    Repositorio Remoto:     Git Hub. Nube/Server
+
+
+
+
+    git push                                                Sube commits de Repositio local (git) a Repositorio Remoto (GitHub)
+    git push origin master
+    git push origin BranchName                              Crea nueva rama en github/ Sube la rama y sus commits a github 
+    git push -u origin BranchName
+    git push --force                                        Sube tu repositorio a la fuerza. Problema muy comun por git commit --amend donde cambias comentario del ultimo commit pero parece que el branch se dividio en dos commits diferentes (pero en realidad debe ser el mismo).
+    
+    git fetch                                               Trae cambios desde Github a repositorio local (git)  (subidos por el equipo o nuestros desde otra pc)
+    git merge                                               Combina cambios descargados a git(repositorio) con nuestro Directorio (PC)
+    git pull origin main                                    Trae cambios desde Github, modifica a git y modifica el Directorio (PC)) (git fetch + git merge)
+    git pull   
+    git pull origin main   --allow-unrelated-histories      Permite unir dos projetos si hay confictos por ser completamente diferentes 
+                                                                (ej. git hub: abc.html abc.css  y  git: dfg.js dfg.py)
+                                                                
+
+    git tag NameTag -m "coment"                             Crear tag   --de ultimo commit                                                            
+    git tag -a NameTag -m "coment" #commit                  Crear tag   --de commit especifico 
+    git tag                                                 Muestra los tags
+    git show-ref --tags                                     Muestra los tags y su url de referencia   
+    git push origin --tags                                  Sube tag a Github
+    git tag -d NameTage                                     Elimina tag (repostorio local)
+    git push origin :refs/tags/NameTag                      Elimina tag en GitHub (le informamos)   
+    
+
+    git clone URL                                           Clonar repositorio (en Github) a una computadora. URL obtenida desde Github
+
+    git remote -v                                           ver conexion con github. Ver manera de conexion: Via https o Via llave SSH
+
+    git shortlog                                            Muestra que commit y la cantidad de commits hecos por cada usuario
+    git shortlog -s                                         Numero de Commits de cada Usuario        
+    git shortlog -sn                                        Numero de Commits de cada Usuario (mayor a menor)
+    git shortlog -sn --all
+    git shortlog -sn --all --no-merges                      Numero de Commits de cada Usuario excluyendo merges
+
+    git blame RelativeURL                                   Muestra los autores de cada linea de un file.
+                                                                -c          Le da mejor aspecto 
+                                                                -L150,160   Especifica los autores de lineas especificas.
+  
+
+
+
+
+    ---------------------------------------------------------------------------
+    Github                   Comenzar a subir de Git (local) a Github (nube) 
+    -------------------------------------------------------------------------
+
+    Crear nuevo repositorio en GitHub
+        Click en New
+        Darle un nombre
+        Seleccionar public/Private
+        Click en Create Repository
+
+    Subir repositorio (Git local) a GIT HUB
+        Copiar las instruccions GitHub:                                   
+        Pegarla en la Terminal                                  (Indica a Git (local) un servidor Remoto (URL del servidor))
+        **Hacer Push                                              
+        Escribir usuario                                        Usuario de log in
+        
+    ---------------------------------------------------------
+        (**)Git push 
+        Push sube 1 rama por cada push. El primer push crea la 1a Rama remota (main).
+                git push -u origin main 
+
+        Para subir otras ramas 
+            Crear la rama en GITHUB.
+            Movemos a la rama y hacemos push
+                git checkout BranchName
+                git push - u origin BranchName
+
+    --------------------------------------------------------------------------------------------------------------
+    key SSH                         SSH protocolo mas seguro que HTTPS. Crear llave privada para cada PC/Repositorio local
+    ----------------------------------------------------------------------------------------------------------------------
+        1.- Generar ssh key
+            https://docs.github.com/es/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+                Terminal home/        
+                    ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+                    >Enter
+                    Guardaran en /.shh
+                    >Enter                                      (se puede sobreagregar una contrasena para mayor seg. Sino solo enter)
+                    >Enter
+
+                id_rsa                  llave privada.
+                id_rsa.pub              llave pública.
+
+        2.- Corroborar (windows/linux) que gestor de llaves esta funcionando   
+                eval $(ssh-agent -s)
+        
+        3.- Agregar la llave
+                ir a /.shh
+                ssh-add ~/.ssh/id_rsa
+
+        
+        4.- Copiar a Server (GitHub)
+            -Abrir id_rsa.pub (cat, less, VSC)       ej.  cat ~/.ssh/id_rsa.pub
+                -Copiar el contenido
+
+            -GitHub
+                -Settings
+                    -SSH and GPG keys
+                        -New SSH key
+                            -Title: Nombre representativo del equipo al que se conecta
+                            -key: Pegar la llave id_rsa.pub
+                                Anadir y guardar
+        5.- Cambiar manera de conexion Un projecto/repositorio (https a ssh)
+                GitHub
+                    Entrar al Repositorio (projecto)
+                    clone or download
+                            Clone wit SSH (click Use SSH)
+                                Copiar URL git@github.com:...
+                PC
+                    Ir a projecto (repositorio)
+                            Coroborar estado actual de conexion. (git remote -v)
+                        Cambia a ssh
+                            git remote set-url origin (URL GitHub)
+
+        ---------------------------------------------------------------------
+        Generar Tokens                                         
+            Click en flecha a lado de foto perfil
+            Ir a  -Settings
+                    -Developer settings 
+                      -Personal access tokens
+                        -Generate new token
+                            Note - Escribir nombre
+                            Scope - selecionar repo
+                  Click Generate token
+
+    ---------------------------------------------------------------------------
+    TAGS
+    ---------------------------------------------------------------------------
+    Da etiquetas. Accesible en la seccion de Tags.
+    Funcion para uso en GitHub para Especificar versiones, etc. y encapsula el codigo para agrega posibilidad de descarga .zip
+    
+        git tag NombreTag -m "comentario de Tag"                    Crear tag.     
+        git push tags                                               Sube tag a Github
+
+
+
+    ---------------------------------------------------------------------------
+    Clone / Fork
+    ---------------------------------------------------------------------------
+
+    Clone
+        Clonar repositorio GitHub a una computadora
+        Instrucciones:
+            Click en boton verde Clonar
+            Copiar Url proporcionado
+            En terminal colocarte en donde quieres descargar el repositorio
+                git clone https://url.git 
+
+    Fork
+        Clonar un repositorio ajeno. Permite colaborar con otros Devs. 
+        PullRequest. Propone a Dev propietario tu modificaion. (puede ver, comparar, rechazar o jalar tu version a su projecto).
+
+        Instrucciones:
+            Ingreso a projecto de GitHub externo
+            Click en fork (Se copia a tu GitHub)
+            Clonar de tu GitHub a tu PC.
+                (seguir los pasos de Clone (arriba))
+
+        Hacer PullRequest
+            Verificar tus cambios subidos a GitHub
+            Click en Pull Request
+                click en New PullRequest
+                    click en create PullRequest
+
+        Aceptar un PullRequest
+            click en Pull Request(1)
+            --REvisar Modificacion click in Files changed(99)
+            --Click Review changes: Chat, opciones (comment(solo comenta en el chat sin aceptar), approve (merge), request changes)
+
+    Seguimiento de projecto Fork
+        Si no se hace, se tiene que Forkear el repositorio ajeno cada vez que se desee ver cambios hechos por su autor. 
+        (ya que en Github tenemos una copia de ese Fork, y solo actualiza los push nuestros, no sabemos los cambios en repositorio ajeno)
+
+        En Git Hub
+        ---------------------
+            Repository (this branch is XX commits BEHIND RepositoryAjeno: main) 
+                Click compare (Debajo de boton verde Clone)
+                    Click switching the base
+                        Click boton verde Create pull request
+                            Haceer merge al repositorio que tienes en tu Git Hub
+        
+        En Terminal
+        -----------------------
+            Crear rama que siga los cambios del repositorio ajeno
+            Ir al gitHub externo/repositorio ajeno
+                Click boton verde clone
+                    Copiar URL
+                        git remote add upstream URL           (el lugar de llamarlo origin -> lo llamaremos upstream)
+                            git pull upstream main            (pull de de rama upstream (git externo) a main en git)
+                                Guardar actualizaciones con commit y actualizar GitHub pusheando nuestro main.
+

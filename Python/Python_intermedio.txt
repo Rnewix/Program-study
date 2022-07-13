@@ -1,0 +1,433 @@
+
+List comprehensions
+Dictionary comprehensions
+Funcion anonima                         Lambda
+High order functions                    map(), reduce(), filter()
+Errors and debugging      
+Manejo de excepciones			try, except, else, finally, raise, assert
+Crear excepciones     			class Exception
+Persistencia de datos			r w x a r+ with open() 
+						.read() .readlines() .close() .seek() 
+						.write() .writeline()
+					rb wb xb ab rb+ .dump() .load()
+
+
+-------------------------------------------------------
+List comprehensions  
+-------------------------------------------------------
+                        Crea una lista basada en otra, en una única linea legible
+
+
+lista = [element for element in iterable if condition]
+
+            list = []       Lista
+            element         Output. Elemento a integrarse a la lista
+            for element in iterable
+                            Input. Ciclo para extraer elementos de lista (o iterable)
+            if condition    Condicion (ocional)
+
+
+                    Ejemplos
+                    -----------------------------------------------------------------
+                    Lista de numero del 1 al 100 al cuadrado con excepcion de los divisibles entre 3.
+                        squares = [1**2 for i in range (1,101) if i % 3 != 0]
+
+                    Lista de la longitud de cada palabra en una frase, sin la palabra "el"
+                        sentencia = "el rápido zorro marrón salta sobre el perro perezoso"
+                        palabras = sentencia.split()
+                        longitud_palabras = [len(palabra) for palabra in palabras if palabra != "el"]
+    
+
+-------------------------------------------------------
+Dictionary comprehensions  
+-------------------------------------------------------
+                        Crear un diccionario basada en un iterable, en una única linea legible
+
+
+dictionary = {key:value for element in iterable if condition}
+
+            dictionary = {} Diccionarion
+            Key: Value      Output. Elementos a integrarse al diccionario
+            for element in iterable
+                            Input. Ciclo para extraer elementos del iterable
+            if condition    Condicion (ocional)
+
+
+                    Ejemplos
+                    -----------------------------------------------------------------
+                    Dicionario con valores de numero del 1 al 100 al cuadrado con excepcion de los divisibles entre 3.
+                        diccionario = {i:i**2 for i in range(1, 101) if i % 3 != 0}
+
+
+
+-------------------------------------------------------
+Lambda              Funciones anonimas 
+-------------------------------------------------------
+                        Funciones sin nombre. Sin llamada.
+                        Una única linea
+                        Activacion automatica
+                        Un resultado inmediato. No return
+                        Dentro de variables como un objeto, se activa invocando esta variable con los argumentos entreparentesis.
+        
+
+variable = lambda argumentos: expresion
+
+                    Ejemplos
+                    -----------------------------------------------------------------
+                    cuadrado = lambda x: x**2
+                    print(cuadrado(3))
+                    .................................................................
+                    def multiplicacion (n):
+                        return lambda multipli_veces: multipli_veces * n
+
+                    doble= multiplicacion(2)
+                    triple= multiplicacion(3)
+                    cuadruple= multiplicacion(4)
+
+                    print(doble(7))
+                    print(triple(8))
+                    print(cuadruple(6))
+
+
+-------------------------------------------------------
+High order functions                   HOF and  map(), reduce(), filter()
+-------------------------------------------------------
+                        Funciones que reciben como parametro otra funcion
+HOF
+.                    
+                    Ejemplos
+                    -----------------------------------------------------------------
+                    def saludar(funcion):
+                        funcion()
+                    def hola():
+                        print("hola, como estas?")
+                    def adios():
+                        print("adion, hasta luego")
+
+                    saludar(hola)
+                    saludar(adios)
+
+
+    map
+    ..........................................................
+                        Funcion que le aplica a cada elemento de un iterable una funcion 
+                        Hace auto append de todos los resultados y regresa lista.
+                            (Como regresa lista como Objeto -> convertir con  list(), tuple(), etc.)
+
+    map(funcion, iterable)
+                     
+                        Ejemplos
+                        -----------------------------------------------------------------
+                        lista=[1,2,3,4]
+                        square = map(lambda x:x**2, lista)
+                        print(list(square))
+
+                        lista= [1,2,3,2]
+                        numero=list(map(lambda x: x == 2, lista))
+                        print(numero)
+                        >>> [False, True, False, True]
+
+
+    filter
+    ..........................................................
+                        Funcion que le aplica a cada elemento de un iterable una funcion 
+                        Filtra los False, y regresa una lista con solo los True
+                            (Como regresa lista como Objeto -> convertir con  list(), tuple(), etc.)
+
+    filter(funcion, iterable)
+                       
+                        Ejemplos
+                        -----------------------------------------------------------------
+                        lista=[1,2,3,4]
+                        pares = filter(lambda x:x**2 != 0, lista)
+
+                        print(list(pares))
+
+                        lista= [1,2,3,5,2,2,3,2]
+                        numero=list(filter(lambda x: x == 2, lista))
+                        print(numero)
+
+
+    reduce
+    ...........................................................
+                        Hace el calculo acumulativo de la aplicacion de una funcion a todos los elementos de un iterable.
+                        Toma 2 elementos del iterable, aplica la funcion, toma ese resultado y el siguiente elemento y le aplica la funcion. 
+                            Asi sucesivamente hasta acabar los elemetos del iterable.
+                        Reduce incluido en modulo functools.
+                        A diferencia de map() y filter(), resultado regresa puro (no se vuelve objeto)
+
+    reduce(funcion, iterable)
+                    
+                        Ejemplos
+                        -----------------------------------------------------------------
+                        from functools import reduce
+
+                        lista=[1,2,3,4]
+                        suma_total = reduce(lambda x,y: x+y, lista)
+
+                        print(suma_total)
+                        
+
+
+-------------------------------------------------------
+Errors and debugging                    
+-------------------------------------------------------
+
+	Python avisa	-	Manejarlos
+	Python no avisa	-	Buscarlos y manejarlos (Debugging)
+                        
+   
+    Debugging			Python no Avisa		
+    .......................................................................
+		        Busqueda activa de mal comportamiento de un programa. 
+		        Donde Python no identifica error o hay error no contemplado, el programa continua, y hay resultado innesperado.
+    			Debugging: ir linea a linea viendo el proceso, las variables y resultado que va lanzando
+    
+    			 
+    Errores			Python Avisa	
+    ......................................................................
+    	SyntaxError		No corre el programa. Problema de sintaxis (typo)
+    	Exception		Corre el programa hasta la linea con el error (>50)
+    	
+    	    Traceback		Mensaje de Exception de python (Se leen de fin a principio)
+				||	Traceback (xxxxx):				||
+				||	   File <"file.py">, line #line, in <Module>	||
+				||	Exception: Exception description		||
+
+    
+	    Lista jerarquia de Exceptions
+	    ....................................Documentacion excepciones = https://docs.python.org/3/library/exceptions.html
+		BaseException  
+			 +-- SystemExit
+			 +-- KeyboardInterrupt
+			 +-- GeneratorExit
+			 +-- Exception
+			      +-- StopIteration
+			      +-- StopAsyncIteration
+			      +-- ArithmeticError
+			      |    +-- FloatingPointError
+			      |    +-- OverflowError
+			      |    +-- ZeroDivisionError
+			      +-- AssertionError
+			      +-- AttributeError
+			      +-- BufferError
+			      +-- EOFError
+			      +-- ImportError
+			      |    +-- ModuleNotFoundError
+			      +-- LookupError
+			      |    +-- IndexError
+			      |    +-- KeyError
+			      +-- MemoryError
+			      +-- NameError
+			      |    +-- UnboundLocalError
+			      +-- OSError
+			      |    +-- BlockingIOError
+			      |    +-- ChildProcessError
+			      |    +-- ConnectionError
+			      |    |    +-- BrokenPipeError
+			      |    |    +-- ConnectionAbortedError
+			      |    |    +-- ConnectionRefusedError
+			      |    |    +-- ConnectionResetError
+			      |    +-- FileExistsError
+			      |    +-- FileNotFoundError
+			      |    +-- InterruptedError
+			      |    +-- IsADirectoryError
+			      |    +-- NotADirectoryError
+			      |    +-- PermissionError
+			      |    +-- ProcessLookupError
+			      |    +-- TimeoutError
+			      +-- ReferenceError
+			      +-- RuntimeError
+			      |    +-- NotImplementedError
+			      |    +-- RecursionError
+			      +-- SyntaxError
+			      |    +-- IndentationError
+			      |         +-- TabError
+			      +-- SystemError
+			      +-- TypeError
+			      +-- ValueError
+			      |    +-- UnicodeError
+			      |         +-- UnicodeDecodeError
+			      |         +-- UnicodeEncodeError
+			      |         +-- UnicodeTranslateError
+			      +-- Warning
+				   +-- DeprecationWarning
+				   +-- PendingDeprecationWarning
+				   +-- RuntimeWarning
+				   +-- SyntaxWarning
+				   +-- UserWarning
+				   +-- FutureWarning
+				   +-- ImportWarning
+				   +-- UnicodeWarning
+				   +-- BytesWarning
+				   +-- EncodingWarning
+				   +-- ResourceWarning
+		    
+-------------------------------------------------------
+Manejo de excepciones                 
+-------------------------------------------------------    
+    try				Engloba codigo con posibilidad de error
+    except			Si ERROR en try, el progama NO se interrumpe, el bloque try no corre y corre este codigo.
+    else			(OPCIONAL) Si NO ERROR, corre este codigo. 
+    finally			(OPCIONAL) Independientemente siempre correra este codigo, incluso antes de pararse por el error. 
+   
+    raise			Alsa un error si se cumple una condicion que nosotros estipulamos. Lanzar errores que de manera nativa python no lo lanzaria.
+    
+    assert                	Para validacion. Se da una afirmacion como condicion, si no se cumple levanta un AssertionError.
+   --------------------------------------------------------------------------------
+   
+		try:
+	   	    Codigo suceptible a error
+	   	except:
+		    Codigo si hay error
+		else:
+		    Codigo extra si no hay error
+		finally:
+		    Codigo que siempre se ejecuta.
+    
+    Except
+    -------------------------------------------------------------------------------
+    except:				Captura cualquier excepcion, inespecifico.    
+    except SyntaxError:			Captura solo excepcion especifico.
+    except Err1, Err2:			Captura multiples excepciones especificos
+    .........................
+    except SyntaxError:			Codigo a correr segun excepcion especifica
+    	Codigo1
+    except ValueError:
+    	Codigo2		
+    .........................
+    except Err as ErrName:		Renombrar excepcion, permite crear un alias al error.
+    					Exception es objeto, al renombrar podremos imprimir su __str__
+            
+            
+            
+    Raise
+    -------------------------------------------------------------------------------        
+    if condicion:			Raisea una excepcion si se cumple la condicion.
+    	raise Err ("mensaje"/parametro)
+    ..........................
+    try:				Raise dentro de un try.
+    	if condicion:		
+    	    raise Err1("msj")	
+    	codigo1_try
+    except Err1 as ErrName:		<--Exception es objeto, al renombrar podremos imprimir su __str__
+    	print(ErrName)
+    
+    				Ej. El ingresar lista vacia no causa error, pero nosotros la creamos
+				..............................................................................
+				  def palindrome(string):
+				  try:
+				    if len(string) == 0:
+				      raise ValueError('No se puede ingresar cadenas vacias')
+				    return string == string[::-1]
+				  except ValueError as ve:
+				    print(ve)
+				    return False   
+
+    Assert				Anidado en func() antes de return
+    -------------------------------------------------------------------------------
+    assert condicion			Si no se cumple raise AssertionError
+    assert condicion, "msj_de_err"	Si no se cumple raise AssertionError:"Msj"
+
+
+
+-------------------------------------------------------
+Crear excepciones                 	Generar nuestras propias excepciones.
+-------------------------------------------------------    
+					Se generan como una clase. Se sugiere ser simples y solo dar info de la exception.
+					Hereda de Clase padre Exception. Obtiene atributos para generar Traceback e interrumpir el Codigo
+					
+class NameErr(Exception):				-Clase
+    def __init__(self, parametro):			-Da posibilidad de recibir parametros de raise. (para hacer nice el mensajito)
+    	self.err_value = parametro			-Atributo con parametro de raise.                                        
+    def __str__(self): 					-Aparece en Traceback. (Solo str)	
+    	return "msj:" + " " + str(self.err_value)
+    	
+    	
+    	
+    	
+    	
+-------------------------------------------------------
+Persistencia de datos                	Guardar, leer, escribir, anadir texto plano y ficheros binarios.
+-------------------------------------------------------        		
+    					FICHEROS: guardan datos en disco que podrán ser leídos posteriormente.
+    					2 tipos: de texto y binarios.
+    					
+    					OBJETO FILE: contiene fichero, manera en que Python los maneja. 
+    	
+					PUNTERO: Rayita | que parpadea. Siempre estara al principio. Si se algun metodo read
+					lo mueve a x posicion. Si se vuelve a usar metodo read, leera desde donde haya estado elpuntero.
+					    	
+
+
+    	
+    	with				Context manager/Manejador de texto. Equivale a try:/finally: .close()
+
+    	open() 				Crea objeto file. Modulo io.
+    	
+    						From io import open
+					    	with open("ruta.txt", "Modo_lectura") as nombre:
+						    codigo...
+						    					    
+	    	Modos de lectura
+	    	..........................
+	    	    f. texto								    
+			r	Read. 	  	    Opens a file for reading. 			Error if file does not exist			
+			w	Write/Overwrite	    (Open> Clean data> Ready for write). 	Creates the file if it does not exist		
+			a	Append. 	    Opens a file for appending.			Creates the file if it does not exist	
+			x	Create.Write   	    Creates the specified file. 		Error if exist	
+		----------------------------				
+			r+	Read. Possibility W					
+			w+	Write/Overwrite. Possibility r			
+			a+	Append. Possibility r 				
+	
+		
+		encoding="utf-8"	Parametro extra en open(). Evita errores y caracteres extraños (sucede con ñ, tilde,etc)
+		
+						with open("ruta.txt", "r", encoding="utf-8") as f:
+						   
+						    
+						    
+								
+	Metodos utiles
+	--------------------------------------------------------------------------							
+    	.read()				Lee objeto file y lo vuelve string. Recomendado vaciar a una variable. 
+					Saltos de linea aplicados (No muestra \n). 
+					PUNTERO: hasta el final
+					MODO DE LECTURA: r, w+, a+
+
+						From io import open
+						with open('file.txt', 'r') as f:
+					    	    f.read()					
+					    		
+					    			
+	.read(#)	 		Lee # de bytes especificados. Al repetirse, continuara con los siguientes #bytes.
+					PUNTERO: hasta el # de bytes
+					
+	.readline()	 		Crea lista del texto. 
+					Cada linea es valor(tipo str)(incluyen \n)
+					    ["linea1\n", "l2\n", "l3\n", "lFinal"] 
+					PUNTERO: hasta el final
+
+	.seek(#)			Coloca el puntero en el indice indicado
+
+	
+	.write()			Escribir en fichero. Contenido debe ser string (No contenedores). Salto de linea \n
+					Multiples write, concatenara texto (pero sin espacio).
+					MODO DE LECTURA: w, a, x, r+
+					
+						From io import open
+						with open('file.txt', 'a') as f:
+						    f.write('str')
+
+	    
+	.writeline()			Escribir en fichero. Acepta Contenedores con valores str. 
+					Valores unidos sin espacios. Diccionario copia solo keys.
+					
+
+	.close() 			Guarda y cierra fichero abierto por open(). (NO necesario con with)
+						
+	del(var)			Borrar variable usada durante el manejo del fichero
+
+
+

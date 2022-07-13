@@ -1,0 +1,153 @@
+
+---------------------------------------------------------------------------
+Main commands
+---------------------------------------------------------------------------
+
+ls                          List
+                                -l     lista con detalles ord alphabetical
+                                -r     Reverse alphabetical
+                                -t     Ordena por fecha modif
+                                -S     Ord by bigger to smallest
+                                -h     human.+ entendible
+                                -a     (all)qver  ocultos
+                                -t     Ordena por fecha modif
+                                wildcards  Search archive in directory(see before)
+                                
+
+cd                          Change directory
+                                cd ..   Go up                     (absolute route)(relative route)
+
+pwd                         Actual route
+$HOME                       Dislay User's home route
+
+mkdir                       Make directory
+touch                       Make file                     
+                                touch newFile 
+
+cp                          Copy
+                                cp archive.txt archivo_v2.txt
+                                -r     copy directory & archive
+mv                          Move
+                                mv archive.html directory/
+                            Rename   
+                                mv archiv.html archivrename.html
+                                mv directory directoryrename
+rm                          Delete (remove)
+                                -d     Directory (nothing inside)
+                                -r     Remove directory & archive
+                                -rf    remove force (remove anything selected)
+                                -i     Interactive. Show what is removing and ask permision
+                            
+clear                       Clear Terminal
+(ctrl + l)
+
+(ctrl + c)                  Stop terminal process/loop
+       
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+Special commands
+---------------------------------------------------------------------------
+man                         command Manual
+info                            ''    ''
+help                            ''     ''
+
+history                     show given commands historial
+file                        Show data about file                 file archive.txt
+
+lsblk                       Ver los nombres y las particiones de los discos de almacenamiento
+df -Th                      Ver espacio libre en discos duros (TH - mas entendible)
+
+---------------------------------------------------------------------------
+File text
+---------------------------------------------------------------------------
+less                        show archive in terminal                       less archive.txt
+                                q - quit
+                                -n         Ennumerar lineas
+                                /word      Search word
+                                ?word      Search word (backward)
+        Less is mor faster than more, and have more utilities than cat
+        Cat puede abrir muliples archivos y concatenarlos.
+
+nano                        open & edit archive in terminal               nano archive.txt
+
+
+    Otras opciones lectura
+    ------------------------------------------------------------------------------------
+        head                        Show first archive's lines
+                                        -n 18     (show first 18 lines)
+        tail                        show last archive's lines (10lines default)    tail archive.txt 
+                                        -n 25     (show last25 lines)
+        cat                         show archive in terminal                       cat archive.txt     
+                                        -n         Ennumerar lineas
+                                    show multiple file in terminal    
+                                        cat file.txt file2.txt
+        more                        show archive in parts in terminal              more archive.txt
+                                        -5         (show 5 lines)
+                                        b          go before
+                                        Space      go next
+                                        +18        (show only line number 18)
+                                        /word      Search word
+    
+     Otras opciones de escritura
+    ------------------------------------------------------------------------------------
+        cat > file.txt              Escribir texto
+                                ctrl + d   Termina de escribir
+
+---------------------------------------------------------------------------
+Short cuts commands
+---------------------------------------------------------------------------
+
+xdg-open                    Open archive with default programm
+                                ctrl + c    stop process & can use terminal again
+code .                      Open directory/archive in VSC (Visual Studio Code)
+
+nautilus                    Open in window the actual or especified route
+
+
+alias                       Create a shortcut for some command
+                                alias aliasname=”command”
+
+
+
+---------------------------------------------------------------------------
+APP commands
+---------------------------------------------------------------------------
+sudo                        As a Master User
+sudo apt
+sudo apt install            Install something specified         sudo apt install spotify
+sudo apt-get update         Look for updates
+sudo apt-get upgrade        Install found updates
+
+
+
+---------------------------------------------------------------------------
+wildcards                (filtrar en busqueda)
+---------------------------------------------------------------------------
+
+*                           Todas las posibilidades 
+                                ls *.txt  -- Muestra Cualquier coincid con ".txt" al final
+                                ls data*  -- Muestra cualquier coincidenci "data" al inicio
+?                           Un caracter individual variable
+                                ls data?  -- Solo coincidancia con data + 1 caracter variable
+                                ls da???  -- Solo coincidancia con da + 3 caracteres variables
+[caracter]                  Un caracter individual especific con coincidencia con 1 de los caract especif
+                                ls [01]*  -- Coincidencias con 0 o 1 al inicio
+[!caracter]                 Todo menos lo que contenga al menos 1 de los caractes especificados
+                                ls ?[u]*  -- Coincidencias con u en su 2do caracter
+[[:clase:]]                 Un caracter individual especific con coincidencia con 1 clase   
+                                [:alnum:]   abc or number
+                                [:alpha:]   abc
+                                [:digit:]   number
+                                [:lower:]   Minuscula/lowercase
+                                [:upper:]   Mayuscula/uppercase
+
+
+
+
+

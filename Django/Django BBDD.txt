@@ -1,0 +1,10 @@
+
+ <title>Bases de Datos</title>
+
+
+    Bases de Datos
+
+    Cambio a PostgreSQL
+    >>>https://www.youtube.com/watch?v=jMPTz5NWIPY&list=PLU8oAlHdN5BmfvwxFO7HdPciOCmmYneAB&index=14
+
+

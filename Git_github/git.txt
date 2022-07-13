@@ -1,0 +1,277 @@
+
+    <title>GIT</title>
+
+    
+    Directory:              Nuestra proyecto en PC
+    Repository:             Git. Control de versiones en PC
+    Repositorio Remoto:     Git Hub. Nube/Server
+    
+    
+    
+    Zonas en GIT
+    -Directory                                  Nuestro workspace. Nuestro almacenamiento (untracked)
+    -Staging Area                               Zona temporal (tracked). seleccionar, agregar mas, visualizar differencias de archivos
+    -Repository/Commit                          Zona de guardado de GIT. (Guardado como versiones) 
+    -Repositorio Remoto                         Guardado ya en la nuve (GITHUB, etc.)
+
+    -Stash                                      Area guardado temporal
+
+
+                            Comandos
+---------------------------------------------------------------------------
+Generales
+---------------------------------------------------------------------------
+
+    git --version                           Ver version de git instalado
+
+    git --help                              Manual de comandos git                       
+
+        
+---------------------------------------------------------------------------
+Configuracion
+---------------------------------------------------------------------------
+
+    git config --global user.name "nombre a usar"                   Cambia o coloca Nombre de usuario (aparecera como autor en los commits)
+    git config --global user.email "email@email"                    Cambia o coloca email de usuario (aparecera en los commits)
+
+    git config --global core.editor "code --wait"                   Seleccionar editor de texto por defecto. (Visual code)
+    git config --global -e                                          Ver la configuracion de GIT
+
+    git config --list                                               Muestra la configuracion actual
+    git config -l                                                   ""          ""              ""
+
+    (Windows) git config --global core.autocrlf true                Windows true. Linux/Mac input. CR-Carriage Return LR- Line Feed
+
+---------------------------------------------------------------------------
+Comandos GIT
+---------------------------------------------------------------------------
+
+    git init                                                    Inicia repositorio local (Git)(crea carpeta .git).
+    git init NameRepositorui                                    Inicia nuevo repositorio local y Nuevo Projecto
+
+    git add file.py                                             Manda una archivo al Staging Area
+    git add file.html file.py                                   Multiples archivos al Staging Area, solo separar con comas
+    git add .                                                   Manda todo al Staging Area
+    git rm --cached file.py                                     Elimina archivo del repositorio local (git) y Staging Area. File -> untracked 
+                                                                    
+
+    git commit                                                  File de Staging area a Repositorio local. ///Abre editor para agregar comentario. Salir Esc + shift + z + z 
+    git commit -m "Comentario del commit"                       Commit con comentario. 
+    git commit -am "Comentario del commit"                      git add + git commit -m     (Directorio (PC) -> Repositorio local (Git))
+    git commit --amend                                          Corregir Comentario del commit y/o anexar cambio no agregado. 
+                                                                (Cambio debe de subirse a Staging area(add) antes de hacer --amend) 
+                                                                    ||
+                                                                    (Editor VIM)
+                                                                    :i   ENTER  Cualquier tecla --> Permite editar
+                                                                    Suprimir----------------------> Borrar comentario
+                                                                    Esc---------------------------> Salir (guardando)
+                                                                    :i   ENTER -------------------> Permite edicion. Escribir comentario
+                                                                    ENTER  -----------------------> Ingresa
+                                                                    Esc---------------------------> Salir (guardando)
+                                                                    :wq---------------------------> Salir de editor y guardar
+
+    git status                                                  Refleja todos los files y su estado de seguimiento/commit Y la RAMA
+    git status -s                                               Refleja resumidamente estado de las carpetas
+                                                                     ?? no segimiento   
+                                                                     RED no seguimiento  
+                                                                     Green En seguimiento
+                                                                     A Agregado staging area
+                                                                     M Modificado
+
+    git log                                                     Listado de los commits 
+                                                                    Q = exit
+    git log --all                                               Todos los commits (tuyos y ajenos)
+    git log --oneline                                           Listado id commit y comentario del commit (comprimidos).
+    git log --decorate                                          Muestra donde esta el Head
+    git log --stat                                              Listado de todos los commits especificando cantidad de cambios
+    git log --graph                                             Listado con lineas de colores que muestra las ramas
+    
+    git log --all --graph                                       Ramas representadas graficamente
+    git log --all --graph --decorate --oneline                  Ramas representadas graficamente comprimido
+
+    gitk                                                        Visualizador grafico de commits y de ramas
+
+    git reflog                                                  Listado de todas las acciones en orden, donde se encontraba el head y los #commit, etc.
+
+----------Busqueda avanzada en Git---------------   
+    git grep LoQueBuscamos                                      Busca coincidencias en archivos tracked dentro de la rama en la que nos localizamos.
+                                                                    Incluye conicidencias dentro de palabras mas largas.
+                                                                    Muestra archivo / linea con la coincidencia 
+    git grep -n LoQueBuscamos                                       Muestra archivo / #linea / linea                  
+    git grep -c LoQueBuscamos                                       Muestra archivo / Cantidad de veces usada en ese archivo
+
+    git log -S "LoQueBuscamos"                                      Busca coincidencia en el historial de commits
+
+
+
+----------Volver en el tiempo ------------------
+------------------------------------------------------------------------
+Posibilidad de volver al futuro.
+------------------------------------------------------------------------
+    git checkout #Commit                                    Volver a version previa (para ver o para modificar). No se borran los commits.
+
+    git checkout #Commit File.txt                           Volver a version previa de Solo 1 archivo especificado sin modificar otros files.     
+        ||
+    git checkout master/main File.txt                       Regresa a la ultima version comiteada de un file (Rama master o main)
+
+------------------------------------------------------------------------
+SIN posibilidad de volver al futuro.
+------------------------------------------------------------------------
+    git reset --soft #Commit                                Restaurar a una version previa. Mantiene los add realizados a Staging area. 
+    git reset --hard #Commit                                Restaurar a una version previa. Borra los commits posteriores al commit al que se regreso.    
+
+    
+
+
+----------Eliminar/Restaurar file----------------
+    git reset HEAD file.py                                  Eliminar archivo del Staging Area. File Staging a Unstaged
+    
+    git rm --cached file.py                                 Eliminar archivo del repositorio (Git) y Staging Area. File -> untracked 
+    
+    git rm --force file.html                                Eliminar archivo del repositorio (Git), Staging Area y del disco duro
+
+    git restore file.hmtl                                   Restaurar Archivo recien eliminado
+    
+    
+----------Comparaciones--------------------------
+
+    git show relativ_route/File.txt                         Comparando cambios del ultimo commit y su version previa de un archivo
+    
+    git diff #Commit_antiguo #Commit_reciente               Compara cambios de un File entre commits a elegir.
+                                                                    Ver codigos con git log
+    git diff                                                Compara cambios File added in staging, vs same file modif after being added  
+    
+       
+            Lectura de comparaciones
+            -----------------------------
+            1 ultimo commit num/rama
+            2 Autor y fecha
+            3       Comentario
+            4 Diff  a/viejo_file   b/Nuevo_file
+            5 @@ Cantidad de bits cambiados @@
+
+            6 Cambios   -blanco = sin cambio
+                        -rojo   = Eliminado o cambiado
+                        -Verde  = Nuevo
+
+
+---------------------------------------------------------------------------
+Evitar commit accidental de Archivo
+---------------------------------------------------------------------------
+    .gitignore      Evita Guardar en git archivos 
+                        (ej. datos de venv, ya que solo funcionan en nuestra pc)
+
+                    Pasos
+                        1 Crear en carpeta del proyecto archivo con nombre .gitignore 
+                        2 Abrirlo (VSC) y escribir rutas de archivos/carpetas a ignorar
+                            (ej.  venv/  *.png  *.jpg  etc)
+        
+        Razones de uso
+            Es un archivo con contraseñas (normalmente con la extensión .env)
+            Es un blob (binary large object, objeto binario grande), mismos que son difíciles de gestionar en git.
+            Son archivos que se generan corriendo comandos, por ejemplo la carpeta node_modules, que genera npm al correr el comando npm install
+
+
+
+
+---------------------------------------------------------------------------
+Ramas                           HEAD - indica la posicuin de en que rama y commit estamos trabajando
+---------------------------------------------------------------------------
+
+    git branch                                                  Muestra la rama en la que estamos
+                                                                    -r Las ramas repositorio remoto (github) (color ROJO)
+                                                                    -a todas las ramas (repositorio local y remoto)
+    
+    git branch BranchName                                       Crear rama
+    git branch -m BranchName NewBranchName                      Renombrar rama
+    git branch -d BranchName                                    Eliminar rama
+    git branch -D BranchName                                    Forzar la eliminación de una rama
+    
+    git checkout BranchName                                     Nos mueve a una rama
+    git checkout -b BranchName                                  Crear rama y te mueves a ella
+
+
+    git merge BranchNameExterna                                 Mezcla ramas. Combina una rama seleccionada a la rama donde esta el HEAD.
+                                                                        (Osea a la Rama donde nos encontremos)
+                                                                        (Crea un nuevo commit en la rama actual co el merge)
+
+    Conflictos merge
+    ---------------------------------------------------------
+    El merge se hace incompleto. 
+    Se Crea Commit agrega normalmente los cambios sin conflicto, y en las zonas con conflicto grava las dos 
+    versiones de codigo. La rama a cambia a rama/merging hasta la solucion de los conflictos. 
+        
+        >>>>>>>>>Rama principal (actual)
+                Codigo codigode rama principal
+        ==================
+                Codigo codigo rama incoming
+        >>>>> Rama incoming (incoming)
+
+    VSC te da opcion interactiva para borrar etiquetas y dejar el codigo deseado
+    Sino hay que borrar manualmente las etiquetas >>> , ==== y seleccionar codigo deseado (o cambiarlo por uno completamente diferente)
+
+    Al final hay que volver a hacer un segundo nuevo commit indicando que resolviste los conflictos.
+
+
+
+
+---------------------------------------------------------------------------
+Stash            
+---------------------------------------------------------------------------
+                Area donde puedes almacenar temporalmente una captura de tus cambios sin enviarlos al repositorio.
+                Util cuando has hecho cambios en una rama que no estas listo para realizarle commit, 
+                    pero necesitas cambiar a otra rama.
+    git stash                                                   Guarda cambios a Stash. Revierte el directorio de trabajo al último commit.
+                                                                (Archivos modificados o eliminados) Disponibles en cualquier rama del repositorio.   
+    git stash -u                                                Crea un stash con todos los archivos. 
+                                                                (icluye los Untracked)    
+    git stash save "msj_opcional" 
+
+    git stash list                                              Ver lista de lo guardado en Stash.
+                                                                    stash@{<num_stash>} 
+                                                                    stash@{<num_stash>} 
+
+    git stash show StashName                                    Ver version guardada en ese stash
+    git stash show -p StashName                                 Ver version guardada en ese stash como diff
+
+    git stash apply stash@{<num_stash>}                         Aplica cambios y deja copia en Stash    
+    git stash apply                                             Aplica cambios y deja copia del ultimo Stash    
+    git stash pop stash@{<num_stash>}                           Aplica cambios y elimina copia en Stash
+    git stash pop                                               Aplica cambios y elimina copia del ultimo Stash
+    git stash branch BramchName stash@{<num_stash>}             Crea rama aplcando stash especifico
+
+    git stash drop stash@{<num_stash>}                          Elimina copia en Stash  
+    git stash clear                                             Limpia todo el Stash area
+
+
+
+---------------------------------------------------------------------------
+Clean          
+---------------------------------------------------------------------------    
+    git clean --dry-run                                         Muestra archivos no trackeados que eliminara
+    git clean -f                                                Elimina archivos no trackeados 
+                                                                    (excepto carpetas y lo ignorado por .gitignore)
+    git clean -fd                                               Elimina archivos y Carpetas no trackeados 
+                                                                    (excepto carpetas y lo ignorado por .gitignore)
+
+
+---------------------------------------------------------------------------
+Rebase                                      Mala practica
+---------------------------------------------------------------------------
+                Unir los commits de dos ramas diferentes como si fueran una sola. 
+                Hace merge forzado al codigo conflictivo manteniendo el codigo de ambas ramas
+                Evitar. Mala practica por reconsturi la historia. No deja registro de existencia de un rama previa.
+
+
+
+---------------------------------------------------------------------------
+Cherry-pick                                 Mala practica          
+---------------------------------------------------------------------------    
+                Permite hacer merge solo de commits especifico de cualquier rama de cualquier tiempo a otra rama.
+                Commit(S) se agregaran a la rama como si fuera commit de ella, hace add-commit instantaneo.
+                Mala practica por reconstruir la historia. Finge un commit de una rama cuando fue hecha en otra rama. 
+    
+    git cherry-pick #commit                                 Merge se un commit especifico de otra rama hacia en la rama en donde estamos.
+
+
+

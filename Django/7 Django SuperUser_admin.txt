@@ -1,0 +1,12 @@
+
+ <title>Admin and Superuser</title>
+
+    Acceso
+        Se accede agregando al URL    
+        http://127.0.0.1:8000/admin/
+
+    Creación Superusuario
+        >>> python manage.py createsuperuser
+        Seguir los datos (nombre, contrase, correo@)
+
+
