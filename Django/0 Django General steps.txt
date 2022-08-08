@@ -1,61 +1,99 @@
+Django
 
-<title>Pasos Generales</title>
+python -m django --version
 
-        python -m django --version
-
-    •	$ django-admin startproject Project_name                     
-    •	>>> python manage.py startapp App_name              
-    •	>>> python manage.py runserver
+django-admin startproject Project_Name                  Crear proyecto (carpeta)    
+python manage.py startapp App_name                      Crear aplicaciones en el proyecto
+python manage.py runserver                              Iniciar el Servidos (dara Url para ingresar)
     
-    •	>>> python manage.py makemigrations 
-    •	>>> python manage.py migrate 
+python manage.py makemigrations 
+python manage.py migrate 
 
 
-<h3>Proyecto</h3>
-    Crear proyecto
-    	$ django-admin startproject myproject                     
-    Crear BD
-	    Migration
-    (Opcional) En settings.py 
-        Cambio BD
-	    Cambio Time_zone
 
-<h3>APP</h3>
-    Crear aplicaciones
-	    manage.py
-    Crear en apps Carpetas y archivos faltantes
-    	urls.py, Mapeador Url, carpeta templates.
-    Registrar apps al proyecto
-    	En settings.py
-        "Appname.apps.AppnameConfig"
-    Conectar Mapeadores URL.
-        URLs apps >>>>> URL proyecto
-	    Include
+
+-----------------------------------------------------------------------------------
+Pasos Generales
+-----------------------------------------------------------------------------------
+
+Iniciar un Proyecto
+    1   Crear proyecto                          django-admin startproject myproject  
+    2   Inicializar BD                          python manage.py makemigrations 
+                                                python manage.py migrate
+    2.  (Opcional)          
+            1- Cambio BD                        (En settings.py)
+	        2- Cambio Time_zone                 (En settings.py) 
+    2.. Checar buen funcionamiento de la APP    python manage.py check App_name 
+
+
+Creacion de Aplicaciones
+    1   Crear aplicacion                        python manage.py startapp App_name     
+    2   Crear Carpetas y archivos faltantes
+            1- urls.py 
+            2- Mapeador Url                     (En APP/urls.py)
+                                                    from django.urls import path
+            3- Carpeta templates
+    3   Registrar app al proyecto               (En settings.py)
+                                                    "AppName.apps.AppNameConfig"
+
+                                                    INSTALLED_APPS = [
+                                                        'django.contrib.admin',
+                                                        'django.contrib.auth',
+                                                        ----Aqui-----
+                                                    ]
+    4   Conectar Mapeadores URL.    
+        URLs apps <-> URL proyecto              Include
+                                                (En Project/url.py)
+                                                    from django.contrib import admin
+                                                    from django.urls import path, include
+
+                                                    urlpatterns = [
+                                                        path('admin/', admin.site.urls),
+                                                        path('', include('AppName.urls'))
+                                                    ]
 	    
 
-<h3>View</h3>
-    Crear Views
-	    En views.py
-    (opc) Importar Modelos
-	    En views.py
-    Importar Views
-	    En urls.py
-    Crear URL Views
-	    En urls.py
+Creacion de View
+    1   Crear Views                             (En views.py) 
+                                                    from django.shortcuts import render
+                                                    from django.http import HttpResponse
+                                                        def view(request):
+                                                            return render(request, 'app/template.html', {"Diccionario": opcional})
+    1.  Importar Modelos(opc)                   (En views.py)  
+                                                    from AppName.models import model_1, model_2
+    2   Crear URL de la View                    (En APP/urls.py)
+        1   Importar Views                          from AppName import views
+        2   Crear URL Views                         urlpatterns = [
+                                                        path('', views.index, name='index')
+                                                    ] 
 
 
-<h3>Template</h3>
+Creacion de Template
+    1   Creacion de series de Carpetas
+        1   Carpeta template                    (En APP/ )
+        2   Carpeta con nombre igual a la App   (En APP/templates/ )
+    2   Crear la template                       (En APP/templates/APP/ )            
+                                                    .html
+                                                    >>>>> Logica <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                                    >>>>> Herencia template/ incrustacion template<<<<<<<<<<<<<<<<<<
 
-<h3>Modelo</h3>
-    Crear Modelos
-	    En Models.py 
-    Importar modelos
-	    En admin.py
-    Registrar modelos
-        admin.site.register(Modelo)
-        En admin.py
-    Hacer y Migrar Modelos
-        Makemigratios
-        Migrate
+
+Creacion de modelos
+    1   Creacion del modelo                     (En APP/Models.py) 
+    2   Importar modelos                        (En APP/admin.py)
+                                                    from AppName.models import model_1, model_2
+    3   Registrar modelos                       (En APP/admin.py)
+                                                    admin.site.register(Model_1)
+                                                    admin.site.register(Model_2)
+
+                                                >>>>> Overdrive <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                                    class OVERRIDE(admin.ModelAdmin):
+                                                        Accion Override
+                                                    admin.site.register(Model_1, OVERRIDE)  
+    4   Hacer Migracion de los Modelos
+                                                python manage.py makemigrations 
+                                                python manage.py migrate 
+
+
 
 

@@ -1,8 +1,6 @@
 
-    <title>Models</title>
-
-
                         Modelos
+                        
 Para crear modelos, forzosamente se requiere crear application.
 No pueden crearse directemente en el project.
 Manipular Modelos es manipular BD
@@ -27,8 +25,9 @@ Crear Modelos
         >>> python manage.py sqlmigrate APP Num_migracion
 
 
+--------------------------------------------------------------------------------------
 Ejemplo
-    
+--------------------------------------------------------------------------------------    
     class Articulo(models.Model):
         date = models.DateField()
         name = models.CharField(max_length=200)
@@ -49,8 +48,9 @@ Ejemplo
 
 
 
-
+--------------------------------------------------------------------------------------
 USO de Shell (Terminal)
+--------------------------------------------------------------------------------------
     Inicio de Shell
         python manage.py shell
     Importar modelo a trabajar

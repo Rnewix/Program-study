@@ -1,0 +1,33 @@
+
+
+Administrador
+
+
+
+Tipo de usuarios
+    -Superuser     Permisos totales
+    -Staff         Pueden entrar a admin/
+                   (La pag admin/ solo mostrara opciones segun permisos otorgados)
+    -Activo        Puede entrar a todas las URL que requieren autentificacion
+
+Grupos
+    Usado para crear multiples usuarios que compartiran los mismos permisos
+    
+
+------------------------------
+Shell
+------------------------------
+    from django.contrib.auth.models  ---- User
+    dir(User)
+
+
+
+ ----------------------------
+ Superuser
+ ----------------------------
+    Acceso pagina de administrador 
+                                            http://127.0.0.1:8000/admin/
+
+    Creación Superusuario
+                                            python manage.py createsuperuser
+        

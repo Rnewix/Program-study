@@ -23,17 +23,14 @@ Actualmente se realiza con shortcut render()
 
 2   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     Project/Settings.py
-        Colocar direcc de las Templates en TEMPLATES=[]
+        Colocar direccion de las Templates en TEMPLATES=[]
         >>>Templates =[   
             “DIRS”: ["$/template", "$/template2",]  
             ]
 
-    App_views.py
-        from django.shortcuts import render
-        ?from django.http import HttpResponse?????????
 
-        def view(request):
-            return render(request, 'template.html', {"Diccionario": opcional})
+
+
 
 
 

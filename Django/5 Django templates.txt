@@ -1,0 +1,82 @@
+ 
+                        TEMPLATES
+   
+    Son archivos de texto (gral html)
+    Sirven para dividir el diseño (template) de la lógica (view).
+    Pueden Usar variables o Modelos que ingresemos al diccionario de la view.
+
+
+        1 Crear carpeta template
+            En cada App
+        2 Crear carpeta con mismo nombre de app
+            En cada carpeta template
+        3 Crear template 
+            En template/app/
+            archivo de texto.html
+        4 EditarTemplate
+            Con HTML
+            Ver templt_html_logic.html
+
+
+
+    ----------------------------------------------------------------------------------
+    HTML y logica en TEMPLATES
+    ----------------------------------------------------------------------------------
+
+    INCLUDE                             Incrustacion de Template en otra(s) 
+    
+                        {% include "plantilla.html" %}
+
+
+    EXTENDS                             Herencia de Templates (Colocarse all inicio de todo)
+            
+                        {% extends "Templ_padre.html" %}                
+                        {% block title %} {% endblock %}  
+                        {% block content%} {% endblock %}  
+
+
+
+
+    -----------------------------------------------------------------------------------
+    Python en HTML                              Evitar su USO
+    -----------------------------------------------------------------------------------
+    1   Variables 
+            {{variables}}                                   Usar de variables
+            {% with var='value' %} {% endwith %}            Declarar variable en template
+
+    2   Logica ==  {% %}
+
+            {% for i in iterable %}
+            {{variables}}
+            {% endfor %}
+
+            {% if %}
+            {% else %}
+            {% endif %}
+
+
+            {# or / and / not / in #}
+            {# ==, !=, <, >, <=, >= #}
+                    ----------------------------------
+                    {% if a > b and b > c %}
+                    % if a == b or c == d and e %}
+                    {% if somevar is not None %}
+                    {% if "hello" in greetings %}
+                    ----------------------------------
+
+    https://docs.djangoproject.com/en/4.0/ref/templates/builtins/
+
+
+    3   Comentarios ==  {# el comentario #}
+
+                    ==  {% comment %}
+                        Tu comentario multilinea
+                        {% endcomment %}
+
+    4   Filtros     Django Buscar template filter
+            {{variable|uper}}
+            {{variable|lower}}
+            {{variable|first|uper}}
+
+
+
