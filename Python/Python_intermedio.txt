@@ -30,7 +30,7 @@ lista = [element for element in iterable if condition]
                     Ejemplos
                     -----------------------------------------------------------------
                     Lista de numero del 1 al 100 al cuadrado con excepcion de los divisibles entre 3.
-                        squares = [1**2 for i in range (1,101) if i % 3 != 0]
+                        squares = [i**2 for i in range (1,101) if i % 3 != 0]
 
                     Lista de la longitud de cada palabra en una frase, sin la palabra "el"
                         sentencia = "el rápido zorro marrón salta sobre el perro perezoso"
@@ -404,7 +404,7 @@ Persistencia de datos                	Guardar, leer, escribir, anadir texto plan
 	.read(#)	 		Lee # de bytes especificados. Al repetirse, continuara con los siguientes #bytes.
 					PUNTERO: hasta el # de bytes
 					
-	.readline()	 		Crea lista del texto. 
+	.readlines()	 		Crea lista del texto. 
 					Cada linea es valor(tipo str)(incluyen \n)
 					    ["linea1\n", "l2\n", "l3\n", "lFinal"] 
 					PUNTERO: hasta el final
