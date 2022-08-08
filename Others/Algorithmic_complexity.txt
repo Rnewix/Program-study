@@ -1,0 +1,134 @@
+
+Algorithmic complexity 
+        And 
+Big O notation
+
+
+
+
+Complejidad algoritmica:
+-time complexity
+-space complexity
+
+
+Clases de complejidad algorítmica:
+Big O notation
+    O(1)        Constante:      Siempre demorara el mismo tiempo.
+    O(n)        Lineal:         la complejidad crecerá de forma proporcional a medida que crezca el input.
+    O(log n)    Logarítmica:    Inicio crecerá rápido, pero luego se estabilizara.
+    O(n log n)  Log lineal:     crecerá de forma logarítmica pero junto con una constante.
+    O(n²)       Polinominal:    crecen de forma Cuadrática. No son recomendables. Solo input de datos en pequeño.
+    O(2^n)      Exponencial:    crecerá de forma exponencial, por lo que la carga es muy alta. Nada recomendable en ningún caso, 
+    O(n!)       Factorial:      crece de forma factorial, jamas utilizar algoritmos de este tipo.
+
+
+
+
+Busqueda
+
+Busqueda lineal:    O(n)
+    Busca elemento por elemento en cada paso(iteracion) hasta encontrar objetivo.
+
+Busqueda binaria:   O(log n)                                      
+    Estrategia:divide y ganaras. Binary search
+    Consiste en dividir el problema en 2 en cada iteración, Continua sobre la seccion correcta y la vuelve a dividir en 2. Sucesivamente hasta encontrar objetivo.
+    Requiere lista ordenada.00
+        sorted(list)
+
+
+                    def binary_search(list, beginning, final, objetive):
+                        if beginning > final:
+                            return False
+
+                        medio = (beginning + final) // 2
+
+                        if list[medio] == objetive:
+                            return True
+                        elif list[medio] < objetive:
+                            return binary_search(list, medio + 1, final, objetive)
+                        else:
+                            return binary_search(list, beginning,, medio - 1, objetive)
+
+                    list = sorted(list_numbers)
+                    binary_search((list, 0, len(list), objetive)
+
+
+Ordenamiento
+Bubble Sort:    0(n^2)
+    Ordenamiento donde indice por indice compara el primer par de elementos y coloca al mas grande a la derecha y luego continua con el siguiente par.
+    Corre varias veces la lista hasta que se ordena completamente. 
+
+Insertion sort: 0(n^2)
+
+quick sort:     0(n^2)
+
+Merge sort:     0(n log(n))    
+    USA RECURSIVIDAD. Estrategia:divide y ganaras.   
+    Divide cada vez una lista hasta hacer listas de un elemento, luego va reuniendolos por orden.                                      
+
+                def merge_sort(lista):                                          ----------------
+                    if len(lista) > 1:
+                        medio = len(lista)//2
+                        list_izq = lista[medio:]                                Divide listas hasta ser listas de 1 elemento
+                        list_der = lista[:medio]
+
+                        merge_sort(list_izq)
+                        merge_sort(list_der)                                    ------------------
+
+                        while len(list_izq) > 0 and len(list_der) > 0:          -----------------       
+                            if list_izq[0] < list_der[0]:
+                                lista.append(list_izq.pop(0))                    mientras haya elementos en las listas
+                            else:                                                hara append del elemento pequeño entre las dos listas.   
+                                lista.append(list_der.pop(0))
+                                                                                -----------------
+                        while len(list_izq) > 0:                                -----------------
+                            lista.append(list_izq.pop(0))                       En caso de sobrar en elementos e n la lista derecha o izquierda
+                        while len(list_der) > 0:                                Se incluiran a la lista ordenada.
+                            lista.append(list_der.pop(0))
+
+                    return lista
+
+
+
+
+
+                    def ordenamiento_por_mezcla(lista):
+                        if len(lista) > 1:
+                            medio = len(lista) // 2
+                            izquierda = lista[:medio]
+                            derecha = lista[medio:]
+                            
+                            ordenamiento_por_mezcla(izquierda)                     #llamada recursiva en cada mitad
+                            ordenamiento_por_mezcla(derecha)
+
+                            i = 0                                                   # Iteradores para recorrer las dos sublistas
+                            j = 0
+                            k = 0                                                   # Iterador para la lista principal
+                                                                                    --------------------------------------
+                            while i < len(izquierda) and j < len(derecha):          # while termina cuando iterador llega a len de list der o izqu
+                                if izquierda[i] < derecha[j]:       
+                                    lista[k] = izquierda[i]                             
+                                    i += 1
+                                else:                                                #La nueva lista va agregando a cada nuevo indice (k) un nuevo elemento (list izq o der)
+                                    lista[k] = derecha[j]
+                                    j += 1
+
+                                k += 1
+                                                                                    --------    ------------    --------    -------
+                            while i < len(izquierda):                                 #si al final queda elementos de lista izq o lista der se agregaran con los while
+                                lista[k] = izquierda[i]
+                                i += 1
+                                k +=1
+
+                            while j < len(derecha):
+                                lista[k] = derecha[j]
+                                j += 1
+                                k += 1
+
+                        return lista
+
+
+
+  
+  
+
