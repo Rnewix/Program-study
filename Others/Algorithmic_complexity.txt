@@ -1,36 +1,133 @@
 
-Algorithmic complexity 
-        And 
-Big O notation
 
 
+				Algorithmic complexity 
 
+
+Algoritmos y estruturas de datos:
+    Buscar estrategias de optimizaciom.
 
 Complejidad algoritmica:
--time complexity
--space complexity
+    -time complexity
+    -space complexity
+
+ 
+        Clases de complejidad algorítmica:                               ------------------ Big O notation
+        Big O notation
+            O(1)        Constante:      Siempre demorara el mismo tiempo.
+            O(n)        Lineal:         la complejidad crecerá de forma proporcional a medida que crezca el input.
+            O(log n)    Logarítmica:    Inicio crecerá rápido, pero luego se estabilizara.
+            O(n log n)  Log lineal:     crecerá de forma logarítmica pero junto con una constante.
+            O(n²)       Polinominal:    crecen de forma Cuadrática. No son recomendables. Solo input de datos en pequeño.
+            O(2^n)      Exponencial:    crecerá de forma exponencial, por lo que la carga es muy alta. Nada recomendable en ningún caso, 
+            O(n!)       Factorial:      crece de forma factorial, jamas utilizar algoritmos de este tipo.
 
 
-Clases de complejidad algorítmica:
-Big O notation
-    O(1)        Constante:      Siempre demorara el mismo tiempo.
-    O(n)        Lineal:         la complejidad crecerá de forma proporcional a medida que crezca el input.
-    O(log n)    Logarítmica:    Inicio crecerá rápido, pero luego se estabilizara.
-    O(n log n)  Log lineal:     crecerá de forma logarítmica pero junto con una constante.
-    O(n²)       Polinominal:    crecen de forma Cuadrática. No son recomendables. Solo input de datos en pequeño.
-    O(2^n)      Exponencial:    crecerá de forma exponencial, por lo que la carga es muy alta. Nada recomendable en ningún caso, 
-    O(n!)       Factorial:      crece de forma factorial, jamas utilizar algoritmos de este tipo.
+
+------------------------------------------------------------------------------------------------------
+Temas		                       	https://www.programiz.com/dsa/dynamic-programming#:~:text=Dynamic%20Programming%20is%20a%20technique,subproblems%20and%20optimal%20substructure%20property.
+------------------------------------------------------------------------------------------------------
+    -Estructuras de datos (Linear y Non linear )
+    -Algorithms (estudiar mejores algoritmos, mejor Big O notation = mayor Escalabilidad)
+    -Asymptotic Notations (Big-O notation, Omega notation, Theta notation,etc.)
+    -Algorithms
+        -Divide and Conquer Algorithm
+        -Greedy Algorithms
+        -Dynamic Programming
+
+    -Sorting and Searching Algorithms
 
 
 
 
+---------------------------------------------------------------
+    Divide and Conquer Algorithm
+---------------------------------------------------------------
+    The divide and conquer approach divides a problem into smaller subproblems; these subproblems are further solved recursively. 
+    The result of each subproblem is not stored. Recursion is used.
+
+    Strategy of solving a large problem by:
+        1 Divide: Divide the problem into sub-problems using RECURSION.
+        2 Conquer: Solve the smaller sub-problems RECURSIVELY. Subproblem is small enough, can be easily solved directly.
+        3 Combine: Combine the solutions of the sub-problems that are part of the recursive process to solve the actual problem.
+
+    Divede and conquer use:
+        - Binary Search
+        - Merge Sort
+        - Quick Sort
+        - Strassen's Matrix multiplication
+        - Karatsuba Algorithm
+
+
+---------------------------------------------------------------
+    Greedy Algorithm
+---------------------------------------------------------------
+    Is an approach for solving a problem by selecting the best option/choice available in every step (local moment). The algorithm NO reverses the earlier decision even if the choice is wrong. It works in a top-down approach.
+
+    The major disadvantage of the algorithm: It doesn't always produce the optimal solution. 
+
+    A problem can be solved by Graddy Algorithm if:
+        1. Greedy Choice Property:   Optimal overall solution to the problem can be found by choosing the best choice at each step without reconsidering the previous steps.
+        2. Optimal Substructure:     Optimal overall solution to the problem corresponds to the optimal solution to its subproblems.
+
+        --------------------------------------------------------------------------------------------------------
+        Example of Good problem:
+        --------------------------------------------------------------------------------------------------------
+        Problem: You have to make a change of an amount using the smallest possible number of coins.
+        Amount: $18
+        Available coins are
+        $5 coin    	$2 coin     	$1 coin
+        There is no limit to the number of each coin you can use.
+        --------------------------------------------------------------------------------------------------------
+            
+    Greedy Algorithm used in:	
+        - Selection Sort
+        - Knapsack Problem
+        - Minimum Spanning Tree
+        - Single-Source Shortest Path Problem
+        - Job Scheduling Problem
+        - Prim's Minimal Spanning Tree Algorithm
+        - Kruskal's Minimal Spanning Tree Algorithm
+        - Dijkstra's Minimal Spanning Tree Algorithm
+        - Huffman Coding
+        - Ford-Fulkerson Algorithm
+
+
+
+---------------------------------------------------------------
+    Dynamic programming
+---------------------------------------------------------------
+    Dynamic programming works by storing subproblems's result, if their solutions are required, we do not need to recalculate them.
+    Divides a problem into smaller subproblems; there are overlapping subproblems that are solved with subproblems's result stored. 
+    Applied to recursive and memoization.
+    Memoization: technique storing the value of subproblems
+
+        Example: fibonacci, because every step recursively add a number to the result saved from the last calculation.
+        
+    Dynamic programming used in: 
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------
 Busqueda
+---------------------------------------------------------------
 
 Busqueda lineal:    O(n)
     Busca elemento por elemento en cada paso(iteracion) hasta encontrar objetivo.
 
-Busqueda binaria:   O(log n)                                      
-    Estrategia:divide y ganaras. Binary search
+Busqueda binaria:   O(log n)          ----Binary search                            
+    Estrategia:Divide and Conquer Algorithm. 
     Consiste en dividir el problema en 2 en cada iteración, Continua sobre la seccion correcta y la vuelve a dividir en 2. Sucesivamente hasta encontrar objetivo.
     Requiere lista ordenada.00
         sorted(list)
@@ -53,82 +150,55 @@ Busqueda binaria:   O(log n)
                     binary_search((list, 0, len(list), objetive)
 
 
+----------------------------------------------------------------
 Ordenamiento
+----------------------------------------------------------------
 Bubble Sort:    0(n^2)
     Ordenamiento donde indice por indice compara el primer par de elementos y coloca al mas grande a la derecha y luego continua con el siguiente par.
     Corre varias veces la lista hasta que se ordena completamente. 
 
-Insertion sort: 0(n^2)
-
-quick sort:     0(n^2)
 
 Merge sort:     0(n log(n))    
-    USA RECURSIVIDAD. Estrategia:divide y ganaras.   
+    USA RECURSIVIDAD. 
+    Estrategia: Divide and Conquer Algorithm
     Divide cada vez una lista hasta hacer listas de un elemento, luego va reuniendolos por orden.                                      
-
-                def merge_sort(lista):                                          ----------------
-                    if len(lista) > 1:
-                        medio = len(lista)//2
-                        list_izq = lista[medio:]                                Divide listas hasta ser listas de 1 elemento
-                        list_der = lista[:medio]
-
-                        merge_sort(list_izq)
-                        merge_sort(list_der)                                    ------------------
-
-                        while len(list_izq) > 0 and len(list_der) > 0:          -----------------       
-                            if list_izq[0] < list_der[0]:
-                                lista.append(list_izq.pop(0))                    mientras haya elementos en las listas
-                            else:                                                hara append del elemento pequeño entre las dos listas.   
-                                lista.append(list_der.pop(0))
-                                                                                -----------------
-                        while len(list_izq) > 0:                                -----------------
-                            lista.append(list_izq.pop(0))                       En caso de sobrar en elementos e n la lista derecha o izquierda
-                        while len(list_der) > 0:                                Se incluiran a la lista ordenada.
-                            lista.append(list_der.pop(0))
-
-                    return lista
-
-
-
 
 
                     def ordenamiento_por_mezcla(lista):
-                        if len(lista) > 1:
-                            medio = len(lista) // 2
+                        if len(lista) > 1:                                          #Subdivide la lista. Hacer pequeno el problema hasta la minima expresion
+                            medio = len(lista) // 2                                 #Divide and Conquer
                             izquierda = lista[:medio]
                             derecha = lista[medio:]
-                            
-                            ordenamiento_por_mezcla(izquierda)                     #llamada recursiva en cada mitad
+
+                            ordenamiento_por_mezcla(izquierda)                      #RECURSIVIDAD. Para Seguir dividiendo cada mitad hasta que sea solo un item.
                             ordenamiento_por_mezcla(derecha)
 
-                            i = 0                                                   # Iteradores para recorrer las dos sublistas
+                            i = 0                                                   # Iteradores para recorrer las dos sublistas (funcionaran como indice)
                             j = 0
-                            k = 0                                                   # Iterador para la lista principal
+                            k = 0                                                   # Iterador para la lista principal (funcionaran como indice)
                                                                                     --------------------------------------
-                            while i < len(izquierda) and j < len(derecha):          # while termina cuando iterador llega a len de list der o izqu
-                                if izquierda[i] < derecha[j]:       
-                                    lista[k] = izquierda[i]                             
+                            while i < len(izquierda) and j < len(derecha):          # while para ordenar los elementos, agregando a lista el elemento menor (de list izq o der)  
+                                if izquierda[i] < derecha[j]:       			    # anadiendolo por indice (list[])
+                                    lista[k] = izquierda[i]                         #    Fin del While cuando list izq y der fueron recorridas. = El indice ya es igual al len
                                     i += 1
-                                else:                                                #La nueva lista va agregando a cada nuevo indice (k) un nuevo elemento (list izq o der)
+                                else:                                                 
                                     lista[k] = derecha[j]
                                     j += 1
-
                                 k += 1
                                                                                     --------    ------------    --------    -------
-                            while i < len(izquierda):                                 #si al final queda elementos de lista izq o lista der se agregaran con los while
+                            while i < len(izquierda):                                 #Si al final queda elementos de lista izq o lista der se agregaran con un segundo while
                                 lista[k] = izquierda[i]
                                 i += 1
                                 k +=1
-
                             while j < len(derecha):
                                 lista[k] = derecha[j]
                                 j += 1
                                 k += 1
+                                                                                    --------------------------------------------
+                        return lista                                                # Regresa lista ordenada como resultado. 
+                                                                                    # Devuelve En RECURSIVIDAD si entro a llamada a si misma
 
-                        return lista
 
 
 
-  
-  
 

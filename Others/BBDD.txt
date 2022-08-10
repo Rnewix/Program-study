@@ -1,0 +1,195 @@
+
+Diseno de Base de Datos
+
+Pasos para el diseno de la BD, importante para el desarrollo Backend.
+	1o Entity–relationship model
+	2o Normalization 
+	3o Physical Diagrams
+
+
+
+Data Modeling
+-Conceptual and Logical Diagrams
+-Physical Diagrams
+
+--------------------------------------------------------------------------
+Entity–relationship model (ER model)
+--------------------------------------------------------------------------
+Provides a graphical view of structure of an information system, helps to identify the principal entities, their attributes, and the relationships between them. 
+
+
+
+Entity			Objeto. Posee atributos. Se escriben en Plural (Convencion)
+Attribute		Propiedades de Entidad
+Relationships		Union entre entidades. Son siempre verbos (convencion).
+Cardinalities		En una relationship Cuántos de un lado pertenecen a cuántos del otro lado. (1:1 1:N N:N)
+
+
+		
+
+
+Tipes Entity:
+	Fuertes: Existen por sí solas. 
+	Débiles: No pueden existir sin una entidad fuerte 
+	    Por identidad:  se diferencian entre sí solo por la clave de su identidad fuerte.
+	    Por existencia: se les asigna una clave propia.
+Tipes Attribute:
+	Llave: Identifican a la entidad y no se repiten.
+		Naturales: son inherentes al objeto (como No. de serie)
+		Clave artificial: Se asigna.
+	Compuestos:  desprenden otros atributos.
+	Derivados: Se derivan de otro atributo (fecha Nacimiento => Edad)
+	Multivaluados: Contienen varios valores ( hijos => Nombre de cada uno, Etiquetas=> Las etiquetas)
+
+
+
+	Chen's notation
+		Entity			Rectangulo
+		Attribute		Ovalo
+		Relationships		Rombo. Linea une a Entities.
+		Cardinalities	        (1:1 1:N N:N)
+
+		Weak entity		Doble Rectangulo
+		Key attibute		Ovalo, Palabra subrayada
+		Derived attribute	Ovalo punteado
+		Multivalue attribute	Doble ovalo
+		
+		CARDINALIDAD: 
+		Linea recta
+		Linea punteada		Opcional, puede o no haber relacion. 1:0 algunos dicen que no existe y realmente es 1:1 opcional
+		Linea perpendicular 	Ese lado tiene relacion a 1
+		Linea perpendicular 	Ese lado exclusivamente tiene relacion a 1 
+		Linea final triple 	Ese lado union multiple
+		Circulo 		Algunos dicen no existente.Ese lado relacion 0 o posibilidad de 0.
+
+
+
+
+
+--------------------------------------------------------------------------
+Physical Diagram
+--------------------------------------------------------------------------
+A physical data diagram provides a graphical view of your database structure, and helps you analyze its TABLES (including their columns, indexes, and triggers), views, and procedures, and the references between them.
+
+En Entity incluira nombre y englobara sus atributos los cuales incluiran los tipo de datos especificando numeros, y su constraints.
+Tendra sus relaciones.
+
+
+Tipos de datos: 
+	Texto: 			CHAR(n), VARCHAR(n), TEXT
+	Números: 		INTEGER, BIGINT, SMALLINT, DECIMAL(n,s), NUMERIC(n,s)
+	Fecha/hora: 		DATE, TIME, DATETIME, TIMESTAMP
+	Lógicos: 		BOOLEAN
+
+
+    	CHAR(n)			String. No. de caracteres especifico (EFICIENTE memoria) 
+    	VARCHAR(n)		Texto. Hasta 255 letras.
+    	TEXT			Texto. No limite.
+    	
+	INTEGER			Numero (sin decimal).
+		BIGINT			Para numero grandes
+		SMALLINT		Para numeros pequenos (<99)(EFICIENTE)
+	DECIMAL(n,s)		Numero con decimal (n =cantidad numeros, s =Cantidad de decimales)
+	NUMERIC(n,s)		;;;;;;;;;;;;;
+	
+	DATE			Ano-mes-dia
+	TIME			La hora
+	DATETIME		Fecha y hora (1970 a 2038)
+	TIMESTAMP		Fecha y hora (1 a 9999)
+	
+	BOOLEAN			1 o 0 (True, False)
+	
+	
+Constraints 				(Restricciones a los datos)
+	NOT NULL		No permite valores nulos.
+	UNIQUE			Valor unico en la columna.
+	PRIMARY KEY		Identifica entity. NOT NULL y UNIQUE.
+	FOREIGN KEY		Identifica de manera única una tupla en otra tabla. (Relacion entre tablas, algo de una viene de otra)
+	CHECK			Especificar condiciones de valor a aceptar.
+	DEFAULT			Coloca un valor por defecto cuando no hay un valor especificado.
+	INDEX			Permitir búsquedas más rápidas. DESVENTAJA: cada vez mas lento el ingreso de nuevo elemento (tiene que repasar todos los index previos para definir uno nuevo 0n) 
+
+
+PASO 2: Inclusion de Foreing Keys
+Con las Entities definidas, sus atributos definidos con el tipo de datos y sus constrains, se debe de graficar las relaciones.
+Segun la relaciones y su cardinalidad se debe agregar como Foreing Keys la ID de una Entity dentro de la otra. Esto Creara la relacion en la BD. (Si alguien hizo algo, tendra su id incrustado y podremos saber quien hizo que en un Blog).
+
+    Cardinalidad:			Foreing Key
+	Relacion 1 a 1:		Agregar Foreing Key a cualquier Entity (es indistinto)
+	Relacion 1 a N:         Agregar como Foreing key el id_Entinty de 1, al Entity multiple N. ("id de 1 en Muchos")
+					ej. Usuario -|---< Comentario. A Entinty Comentario agregar id_Usuario, asi logramos identificar en la BD facilmente 
+	Relacion N a N:		Caso especial. Romper relacion N:N creando tabla intermedia (Pivote). Esta tabla tendra las 2 ID de las 2 Entitys como FK
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+Normalization
+----------------------------------------------------------------------------------------
+Normalizacion es Aplicar "reglas de normalizacion" a una base de datos (BD relacional (Osea que tenga tablas)). 
+Debe hacerse al disenar una base de datos (grl posterior a conocer Data Modeling). Si se hace despues (porque la BD escalo) es tedioso y engorroso. 
+
+Funciones:  
+	-Minimizar redudancia de datos. (Cada tabla tiene lo indispensable y no repite datos de otra tabla o en si misma)
+	-BD Agil de actualizar. (Mas escalable, Modificar un dato significa solo agregarlo en una tabla y No ir a modificar mismo dato en multiples tablas)
+	-Proteger la integridad de datos. (borrar un elemento no afecta a otro)
+
+Formas:
+    1a forma normal (1FN): Atributos atómicos (Sin campos repetidos)
+    2a forma normal (2FN): Ademas cada campo de la tabla debe depender de una clave única.
+    3a forma normal (3FN): Ademas los campos que NO son clave, NO deben tener dependencias.
+    4a forma normal (4FN): Ademas campos multivaluados se identifican por una clave única.
+
+
+
+1a forma normal (1FN): Atributos atómicos. Single value.
+	Cada columna debe ser indivisible. 
+	    Ejemplo: Nombre ==> Nombre, Primer Apellido, Segundo Apellido.
+	    Ejemplo: Col Cerveza: Corona-Mexico/ Saporo-japon / Erdinger-Alemania ===> Col Pais, Col Marca.
+	Columnas de tabla no variantes. 
+	    Si quiero agregar nueva opcion, debe agregarse dentro de una columna y no requiero crear columna extra. 
+	    Ejemplo: col1 - Lata 300ml, col2- botella 500ml ==> (Nueva tabla) Presentacion: lata 300 / botella 500ml / Botellon 2litros/ Minilata 100ml.
+	
+
+2a forma normal (2FN): Ademas cada campo de la tabla debe depender de una clave única.
+	Debe haber Primary Key. 
+		Agregar una clave Unica e irrepetible.   
+	Todas las columnas deben depender de ese primary key. No hay campos repetibles.
+		Eliminar todos los campos que no dependan de la clave. 
+		creando otras tablas extras con los campos quitados dandoles su propias primary keys.
+		
+3a forma normal (3FN): Ademas los campos que NO son clave, NO deben tener dependencias.
+	No dependencia funcional entre dos campos.  Si modifico una columna de una tabla, no requiero modificar otra columna.
+	    Ejemplp: 1 factura 100, 
+					
+4a forma normal (4FN): Ademas campos multivaluados se identifican por una clave única.
+	Va a ver casos que un elemeto en una tabla, tiene 2 o mas valores de otra tabla. Tabla alumno, Tabla materia.
+	Crear una tabla que reune primary key de las tablas y ofrece propia primary key por cada opcion.
+		Ejemplo Persona: 1 y Materias: 1/2/3 ==> id_1: Persona1, materia2.  id2: Persona 1, materia 3.
+		
+		
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+
+RDB (relational database)
+
+RDBMS (Relational DataBase Management System) Sistema Manejador de Bases de datos relacionales.
+
+
+
+Instalacion
+
+	sudo apt update
+	sudo apt install mysql-server
+	mysql --version
+
+	2 Descargar ‘workbench’:
+	https://www.mysql.com/products/workbench/
+	sudo dpkg -i archivo.deb
+	sudo apt update
+
+	SI error de copatibilidad con ‘‘libpython2.7’’, lo corregí ejecutando:
+	sudo apt --fix-broken install
