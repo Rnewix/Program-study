@@ -1,6 +1,42 @@
 
-Diseno de Base de Datos
 
+Diseno de Base de Datos
+Instalacion MySQL
+Lenguaje SQL
+
+
+
+
+RDB (relational database)
+
+RDBMS (Relational DataBase Management System) Sistema Manejador de Bases de datos relacionales.
+Schemas (BBDD)
+Repositorio de datos (BBDD)
+
+Entinty	(Entidad, tabla, table, objeto que posee atributos)
+
+SQL (Structured Query Language)
+NoSQL (Structured Query Language)
+
+CRUD (CREATE, READ, UPDATE, DELETE)
+
+
+
+BBDD estan conformadas por:
+ 	Tablas/entidades.
+Tablas estan conformadas por:
+	Columns (Campos, Atributos)
+	Row (filas/registros/record)
+Conector
+	Necesarrio para que un programa/Pc se conecte a una BBDD (un servidor de bases de datos).
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+		Diseno de Base de Datos
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+		
 Pasos para el diseno de la BD, importante para el desarrollo Backend.
 	1o Entity–relationship model
 	2o Normalization 
@@ -8,9 +44,9 @@ Pasos para el diseno de la BD, importante para el desarrollo Backend.
 
 
 
-Data Modeling
--Conceptual and Logical Diagrams
--Physical Diagrams
+	Data Modeling
+	-Conceptual and Logical Diagrams
+	-Physical Diagrams
 
 --------------------------------------------------------------------------
 Entity–relationship model (ER model)
@@ -170,26 +206,143 @@ Formas:
 		Ejemplo Persona: 1 y Materias: 1/2/3 ==> id_1: Persona1, materia2.  id2: Persona 1, materia 3.
 		
 		
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-
-RDB (relational database)
-
-RDBMS (Relational DataBase Management System) Sistema Manejador de Bases de datos relacionales.
 
 
 
-Instalacion
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+				Instalacion MySQL
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	sudo apt update
-	sudo apt install mysql-server
-	mysql --version
+	1 Instalacion-------------------
+		sudo apt update
+		sudo apt install mysql-server
+		mysql --version					Know mysql version
+		sudo mysql                            		Open mysql in terminal
+		exit;						Close mysql
 
-	2 Descargar ‘workbench’:
-	https://www.mysql.com/products/workbench/
-	sudo dpkg -i archivo.deb
-	sudo apt update
+	2 workbench---------------------
+			https://www.mysql.com/products/workbench/
+			sudo dpkg -i archivo.deb
+			sudo apt update 
+			
+		or 
+			sudo apt update
+			sudo apt install mysql-workbench
 
-	SI error de copatibilidad con ‘‘libpython2.7’’, lo corregí ejecutando:
-	sudo apt --fix-broken install
+	3 Errores---------------------
+		
+		\\\\\\\\\\\\\\SI error de copatibilidad con ‘‘libpython2.7’’:\\\\\\\\\\\\\\\\\\
+			sudo apt --fix-broken install
+		
+		
+		\\\\\\\\Access Denied for User Root Error
+		0. Cambiar password para el usuario root. Tambien coloca meto de autentificacion tipo mysql_native_password.
+			sudo mysql -u root -p
+			ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Poner password';
+			exit;
+			service mysql restart
+
+		
+		1. set root user to mysql_native_password
+
+			sudo mysql -u root -p                  
+
+			USE mysql;
+			SELECT User, Host, plugin FROM mysql.user;
+			UPDATE user SET plugin='mysql_native_password' WHERE User='root';
+			FLUSH PRIVILEGES;
+			exit;
+
+			service mysql restart
+
+		2. Add new db_user with you system_user(recommended)
+			sudo mysql -u root 
+			USE mysql;
+			CREATE USER 'YOUR_SYSTEM_USER'@'localhost' IDENTIFIED BY '';
+			GRANT ALL PRIVILEGES ON * . * TO 'YOUR_SYSTEM_USER'@'localhost';
+			UPDATE user SET plugin='auth_socket' WHERE User='YOUR_SYSTEM_USER';
+			FLUSH PRIVILEGES;
+			exit;
+			service mysql restart
+			Remember that if you use option #2 you'll have to connect to mysql as your system username (mysql -u YOUR_SYSTEM_USER)
+
+
+			
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+				Lenguaje SQL
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Tiene  sublenguajes
+
+	DDL 		(Data Definition Language)	
+				CREATE, ALTER, DROP	, TRUNCATE
+	DML		(Data Manipulation Language)
+				SELECT, UPDATE, INSERT, DELECT
+
+
+CREATE DATABASE 			Crea una BBDD
+CREATE SCHEMA 				Crea una BBDD
+CREATE TABLE				Crear una Entidad/Tabla dentro de la BBDD
+CREATE VIEW 				Crea una vista. Tabla derivada de otras que muestra nuestra query. Se mantienen en Memoria. v_ Convension, identifica tabla de una view.
+					
+USE DATABASE 				Establecera la BBDD que se estara manipulado
+ 						
+ALTER TABLE				Inicia edicion de la tabla
+	ADD 					Agregar columna
+	ALTER COLUMN				Modificar columna
+	DROP COLUMN				BORRAR
+
+DROP 					ELIMINAR los especificado
+						   
+
+INSERT					Agrega Registro (fila)
+					
+					
+UPDATE					Modifica campo de registro especificado
+	SET					Especifica el campo y el valor que tendra
+	WHERE					Especifica en donde se modifica. Condiciones.	
+
+DELETE					ELIMINAR registros
+	FROM					Especifica la tabla 
+	WHERE					Especifica que se elimina. Condiciones. (SIN WHERE ELIMINA TODA LA TABLA)
+
+SELECT					Trae informacion seleccionada de BD. Selecciona columns
+	FROM					Especifica tabla
+	WHERE					Especifica condicion
+
+
+
+
+1		CREATE
+1.1	CREATE DATABASE BD_Name;
+1.2	CREATE SCHEMA BD_Name;
+1.3	CREATE TABLE Entity_name (Column Tipo(N) Constrains,); 		ej. CREATE TABLE personas (persona_id INTERGER PRIMARY KEY AUTOINCREMENT, last_name varchar(40)...);
+1.4	CREATE VIEW v_ViewName SELECT xxx FROM xxx WHERE xxx;
+2		USE
+2.1	USE DATABASE BD_Name;
+3 		ALTER TABLE
+3.1	ALTER TABLE Entity_name ADD Column Tipo(N) Constrains;
+3.2	ALTER TABLE Entity_name ALTER COLUMN Column New_Tipo(N) Constrains;
+3.3	ALTER TABLE Entity_name DROP COLUMN Column;
+4		DROP 
+4.1	DROP TABLE table_Name;
+4.2	DROP DATABASE BD_Name;
+5		INSERT
+5.1	INSERT INTO tabla(columnx,columny,columnz) VALUES ('valuex', 'valuey', 'valuez');
+5.2	INSERT INTO tabla(columnx,columny,columnz) VALUES ('valuex', 'valuey', 'valuez')('valuex2', 'valuey2', 'valuez2')('valuex3', 'valuey3', 'valuez3');
+5.3	INSERT INTO `My_first_BBDD`.`users` (`nickname`, `email`, `telephone`, `first_name`, `last_name`) VALUES ('pchan', 'abc@mail.com', '080', 'pepe', 'pecas');
+5.31  	insert into users (nickname, email, telephone, first_name, last_name) values ('ozqchan', 'oz91ail.com', '777', 'pepe', 'pecas');
+6		UPDATE
+6.1	UPDATE tabla SET column1 ='New_value1', column2 ='New_value2'; 
+6.2	UPDATE tabla SET column1 ='New_value1', column2 ='New_value2'; WHERE column = valueCondition;
+7		DELETE
+7.1	DELETE FROM table WHERE column = valueCondition;
+7.2	DELETE FROM table;  		
+8		SELECT
+8.1	SELECT column FROM table;  
+8.2	SELECT    *   FROM table; 
+8.3	SELECT column FROM table WHERE column= valueCondition;
+9
+10
+
+
