@@ -1,0 +1,66 @@
+
+
+Base de datos no relacionales
+Nacen para responder otras necesidades que SQL ya no lograba. Cada una responde a una necesidad especifica y diferente.
+
+Disposicion
+	
+	SQL = 	BBDD - Entity/Table - Rows/Tuples
+	
+	NoSQL= 	Depende del tipo
+	
+	
+	
+	
+Tipos de bases de datos no relacionales:
+
+Clave - valor 			Son ideales para almacenar y extraer datos con una clave única. Manejan los diccionarios de manera excepcional. 
+				Ejemplos: DynamoDB, Cassandra.
+				
+Basadas en documentos		Son una implementación de clave valor que varía en la forma semiestructurada en que se trata la información. Ideal para almacenar datos JSON y XML. 	
+				BBDD - Coleccion - Documentos. Despues de SQL son las mas utilizadas.		
+				Ejemplos: MongoDB, Firestore.
+				
+Basadas en grafos		Basadas en teoría de grafos, sirven para entidades que se encuentran interconectadas por múltiples relaciones. Ideales para almacenar relaciones complejas. Muy usadas en AI.
+				Ejemplos: neo4j, TITAN.
+				
+En memoria			Pueden ser de estructura variada, pero su ventaja radica en la velocidad, ya que al vivir en memoria la extracción de datos es casi inmediata. 
+				Ejemplos: Memcached, Redis.
+				
+Optimizadas para búsquedas 	Pueden ser de diversas estructuras, su ventaja radica en que se pueden hacer queries y búsquedas complejas de manera sencilla. Bueno para Machine Learning
+				Ejemplos: BigQuery, Elasticsearch.
+
+
+
+
+Firestore
+
+NoSQL Basadas en documentos. No pensada para hacer Querys. Pensada en el almacenamiento de datos y Mantener el estado de tu aplicación.
+
+Jerarquia:
+	BBDD  -   Coleccion     -   Documentos
+		(table/Entity)	   (Rows/Tuples)
+
+Tipos de datos:
+
+	String: 	Cualquier tipo de valor alfanumérico
+
+	Number: 	Soporta enteros y flotantes.
+
+	Boolenan: 	Los clásicos valores True y False
+
+	Map: 		Permite agregar un documento dentro de otro.
+
+	Array: 		Permite agregar un conjunto de datos (soporte multi type) sin nombre o identificador.
+
+	Null: 		Indica que no se ha definido un valor.
+
+	Timestamp: 	Permite almacenar fechas (guarda el año, mes, día y hora).
+
+	Geopoint: 	Guarda una localización geográfica (coordenadas latitud-longitud).
+
+	Reference: 	Permite relacion entre dos documentos AUNQUE sean de Colecciones diferenctes.
+	
+	
+	
+	

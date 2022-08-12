@@ -274,15 +274,50 @@ Formas:
 
 Tiene  sublenguajes
 
-	DDL 		(Data Definition Language)	
-				CREATE, ALTER, DROP	, TRUNCATE
-	DML		(Data Manipulation Language)
+	DDL 		(Data Definition Language)			Creacion y modificacion DB
+				CREATE, ALTER, DROP, TRUNCATE
+	DML		(Data Manipulation Language)			Manipulacion y query DB
 				SELECT, UPDATE, INSERT, DELECT
+	DCL		(Data Control Language) 			Seguridad DB
+				GRANT, REVOKE
+	TCL 		(Transaction Control Language) 			Gestion cambios de DB
+				COMMIT, ROLLBACK, SAVEPOINT
 
 
+Comandos
+	CREATE, ALTER, DROP, TRUNCATE
+	SELECT, UPDATE, INSERT, DELECT
+	GRANT, REVOKE
+	COMMIT, ROLLBACK, SAVEPOINT
+Clausulas
+	FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT  
+		FROM
+			LEFT JOIN, RIGHT JOIN, INNER JOIN
+		WHERE 
+			<  >  =  >= <= <> !=
+			BETWEEN, LIKE, IN, NOT IN
+			AND, OR , NOT, ALL, ANY, IS NULL, IS NOT NULL, EXIST
+			YEAR(), MONTH(), MONTHNAME()
+		   ===>>Nested Query
+		ORDER BY   
+			ASC  DESC
+
+	+    -    *    /
+	AVG(), COUNT(), SUM(), MAX(), MIN(), ROUND(), TRUNCATE
+	NOW(), DATEDIFF(), GROUP_CONCAT(), Date_format(), Concat()
+	AS
+	DISTINCT, DISTINCTROW
+	UNION, UNION ALL
+	
+
+
+Commands
+------------------------
 CREATE DATABASE 			Crea una BBDD
 CREATE SCHEMA 				Crea una BBDD
 CREATE TABLE				Crear una Entidad/Tabla dentro de la BBDD
+					VARCHAR(), INTEGER 
+					PRIMARY KEY,  AUTOINCREMENT, NULL, UNIQUE,
 CREATE VIEW 				Crea una vista. Tabla derivada de otras que muestra nuestra query. Se mantienen en Memoria. v_ Convension, identifica tabla de una view.
 					
 USE DATABASE 				Establecera la BBDD que se estara manipulado
@@ -345,4 +380,162 @@ SELECT					Trae informacion seleccionada de BD. Selecciona columns
 9
 10
 
+
+
+Foreing keys
+	ON UPDATE		Accion al actualizarse referenciada con la Foreing key
+		NO ACTION	No hace nada. Tabla pierde la relacion.
+		SET NULL	Coloca nulo. Y tabla pierde la relacion.
+		CASCADE		Si key tabla externa se modifica, tambien FK se modifica
+		RESTRICT	No permitirá cambio id de tabla externa hasta que no sean actualizados antes todos las tablas relacionadas
+
+	ON DELETE		Accion al Borrarse tabla referenciada con la Foreing key
+		NO ACTION	No hace nada
+		SET NULL	Coloca nulo. Y tabla pierde la relacion.
+		CASCADE		Si tabla externa se borra, esta entity tmb se borra
+		RESTRICT	No permitira borrar tabla externa, hasta que borre primero tabla relacionadas primero.
+
+
+
+Reverse Engineer		A partir de BD ya hecha, muestra el diagrama fisico de esta. Ayuda a comprender una BD de otra persona.
+
+
+
+-----------------------------------------------
+	QUERY
+-----------------------------------------------
+ INT = Sin comillas   VARCHART = Comillas  DATETIME = Comillas '2020-01-01'	
+
+ Basico: SELECT y FROM 
+ Comun: SELECT, FROM, WHERE
+ Extendido: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT
+
+	-SELECT 	Column.  Lo que quieres mostrar
+	
+				AS 
+				COUNT(), SUM(), MAX(), MIN(), AVG(), ROUND()
+				YEAR(), MONTH(), MONTHNAME()
+				NOW(), DATEDIFF(), GROUP_CONCAT()
+				
+	-FROM 		Table.	De dónde voy a tomar los datos
+	
+				LEFT JOIN, RIGHT JOIN, INNER JOIN
+			
+	-WHERE 		Column/value.	Los filtros de los datos que quieres mostrar
+	
+				<  >  =  >= <= <> !=			     
+				LIKE, BETWEEN, IN, NOT IN
+				AND, OR , NOT, ALL, ANY, IS NULL, IS NOT NULL, EXIST
+				YEAR(), MONTH(), MONTHNAME()
+				Nested Queries
+				
+	-GROUP BY	Column.	Los rubros por los que me interesa agrupar la información
+	
+	-HAVING		Column/value.	Los filtros que quiero que mis datos agrupados tengan
+	
+	-ORDER BY	Column.	El orden en que quiero presentar mi información
+	
+				ASC  DESC
+				
+	-LIMIT		Value.	Limite de cantidad de resultados para mostrar en el query
+	
+------------		-----------------------------------------------------------	
+AS			Renombra columna en la query. Colocarse posterior a columna a renombrar. 
+				SELECT column AS NewName, column2 AS NewName2 FROM table;
+COUNT()			Genera columna. Cuenta numero de registros. Regresa solo un Dato. 
+				SELECT COUNT(column);
+				SELECT COUNT(column) ThisColumnName;
+AVG() 			Genera columna. Calcula el promedio.
+SUM() 			Genera columna. Suma los valores.
+MAX() 			Genera columna. El maximo.
+MIN() 			Genera columna. El mínimo. 
+ROUND()			Genera columna. Redondea cantidad a decimales especificados
+				ROUND(column, #decimales)
+NOW()			Genera columna con el día y la hora actuales al momento de hacer la Query.
+				SELECT NOW() 
+				SELECT NOW() AS today_date
+DATEDIFF()		Genera columna con la diferencia de dos fechas especificadas.
+				SELECT birth_date, NOW(), DATEDIFF(NOW(), birth_date) FROM table;
+				SELECT birth_date, NOW(), DATEDIFF(NOW(), birth_date) AS age FROM table;
+GROUP_CONCAT()		Genera columna que agrupa en un solo campo de una columna (concatena con comas), varios resultados/campos de una columna.
+				SELECT column, GROUP_CONCAT(column) FROM xxx
+				Ej. SELECT titulo, GROUP_CONCAT(etiqueta) FROM xxx GROUP BY titulo_id ==>    Titulo1 | Etiqueta1, Etiqueta4, Etiqueta 18
+LEFT JOIN  ON		Datos de tabla A, esten o no en B	
+				SELECT * FROM Table1 LEFT JOIN Table2 ON table1.column = Tabla2.column;	 	ON Colocar la relacion.  key(tabla1) = Foreing key (tabla2)	
+				SELECT * FROM table1 LEFT JOIN table2 ON table1.id = table2.table1_id; 		
+			Datos de tabla A, sin incluir los que tambien esten en B	
+				SELECT * FROM table1 LEFT JOIN table2 ON table1.id = table2.table1_id WHERE table2.table1_id IS NULL;
+RIGHT JOIN  ON		Datos de tabla B, esten o no en A  // Datos de tabla B, sin incluir los que tambien esten en A
+INNER JOIN  ON		Datos que incluidos en A y en B (interseccion)		
+OUTER JOIN  ON		Datos que no incluyen interseccion (NO es SQL estandar y algunos no lo reconocen)
+
+UNION			Regresa tabla con la union de dos tablas. Preferentemente diferentes Entitys con similares columnas para evitar NULLS. Usado para simular OUTER JOIN
+				SELECT xxx 	UNION 	SELECT xxx;
+				SELECT x LEFT JOIN XXX 		UNION 		SELECT x RIGHT JOIN;
+LIKE			Regresa registros que tenga en columna especificada la condicion parcial escrita. Usa % para indicar que puede haber lo que sea antes/despues de la condicion escrita.
+				'Condicion_Parcial%'	Inicia con
+				'%Condicion_Parcial' 	Finaliza con
+				'%Condicion_Parcial%'	Tiene entremedio a
+				SELECT * FROM table WHERE column LIKE '%Condicion_Parcial%';
+BETWEEN  AND		Regresa registros con condicion de una columna dentro de rango.
+				SELECT * FROM table WHERE column BETWEEN '2010-01-01' AND '2020-01-01';
+IN			Regresa registros incluidos dentro de...
+NOT IN			Regresa registros NO incluidos dentro de... 
+				SELECT * FROM table WHERE YEAR(column)= '2020';
+				SELECT * FROM table WHERE YEAR(column) BETWEEN '2020' AND '2025';
+YEAR()			Regresa registros que cumplen condicion ano
+MONTH()			Regresa registros que cumplen condicion mes
+				SELECT * FROM table WHERE MONTH(column)= '04';
+MONTHNAME()		Igual a MONTH() pero por nombre de mes en ingles (January, May, October)
+IS NULL			Regresa registros con columna con campo nulo
+				SELECT * FROM table WHERE column IS NULL;
+				
+GROUP BY		Regresa resultado reagrupando las filas segun opciones de una columna especificada.  (ej: Agrupado en anos) 
+				SELECT YEAR(date) AS year, COUNT(*) FROM (blogs) GROUP BY year;  --> ano, conteo de registros ese ano
+				SELECT user_country, MONTHNAME(post_date) AS post_month, COUNT(*) AS post_number FROM blogs GROUP BY user_country, post_month; ---> Regresa row con Pais / mes / numero de post de ese pais en ese mes 
+
+HAVING			Lo mismo que WHERE, solo que en el orden de las acciones WHERE se ejecuta antes de GROUP BY y HAVING se ejecuta despues.
+			Se puede utilizar cuando condicion de busqueda es el resultado de lo obtenido de GROUP BY.
+				Ej. X COUNT(*) AS month_post WHERE month_post >2 GROUP BY post_month  	Ejecucion: 1o WHERE, 2o GROUP BY<->COUNT()
+				Ej. O COUNT(*) AS month_post GROUP BY post_month HAVING month_post >2 	Ejecucion: 1o GROUP BY<->COUNT() 2o HAVING
+
+ORDER BY  		Regresa ordenado segun columna especificada. (Default-Ascendente, alfabeticamente, de menor a MAYOR)
+				SELECT xxx ORDER BY column DESC;
+ORDER BY  DESC		Regresa	ordenado Descendentemente segun columna especificada (De MAYOR a menor)			
+				SELECT xxx ORDER BY column DESC;
+
+LIMIT			Especifica cantidad limite de resultados a mostrar.
+				SELECT xxx LIMIT 200;
+				
+				
+-----------------------------------------------
+	NESTED QUERIES
+-----------------------------------------------
+ Un SELECT (subquery) dentro de otro QUERY. 
+ No escalable: O(n^2)
+			SELECT xxx (SELECTxxx) xxx
+				
+	Dentro de FROM: Funcionara como tabla sobre la cual se realiza la query
+		SELECT * FROM Table (SELECT * FROM Table); 
+		SELECT new_table.date FROM Table (SELECT date FROM Table) AS new_table WHERE xxx;
+		
+	Dentro de WHERE: que funcionara como Criterio de busqueda de la QUERY superior.
+		SELECT * FROM Table WHERE column <= (SELECT AVG(column) FROM Table);
+		SELECT * FROM Table WHERE column NOT IN (SELECT xxx);
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+			MySQL Workbench
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Ingenieria reversa		A partir de BD ya hecha, muestra el diagrama fisico de esta. Ayuda a comprender una BD de otra persona.
+			
+				1 Database
+				2 Reverse Engineer
+				3 Seleccion Conexion. Continue
+				4 Continue (Se conecta)
+				5 Selecion de BD (schema). Continue
+				6 (modificar si especificar objetos). Execute
+				7 Close
+				
 
