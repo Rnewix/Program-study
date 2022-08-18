@@ -1,4 +1,7 @@
 
+
+Inicio Standar de proyectos
+Entry point
 List comprehensions
 Dictionary comprehensions
 Funcion anonima                         Lambda
@@ -10,6 +13,57 @@ Persistencia de datos			r w x a r+ with open()
 						.read() .readlines() .close() .seek() 
 						.write() .writeline()
 					rb wb xb ab rb+ .dump() .load()
+
+Modules
+Static Typing 				Type annotations
+Closures
+Generator
+Datetime
+
+
+-------------------------------------------------------
+Inicio Standar de proyectos
+-------------------------------------------------------
+
+	1  mkdir project_folder
+		>  cd project_folder
+	2  git init
+	3  python3 -m venv venv
+	4  touch .gitignore
+		>  .gitignore ---> venv
+	5  source venv/bin/activate 
+	6  pip install modules
+	
+	
+	7  Make your code!
+
+
+
+-------------------------------------------------------
+Entry point  
+-------------------------------------------------------
+
+if __name__ == '__main__'
+   
+Iniciara programa python, y evitara que otros modulos importados corran sus funciones, porque deben esperar llamados por el programa que ejecutamos.
+
+
+Ejemplo
+------------------------------	      ------------------------------
+file1.py				file2.py
+     from file.2py import *			def func2():
+     def func():				def func2():	
+     def run():					def run():
+     	Instruccion de inicio			    Instruccion_de_inicio
+     	
+     if __name__ == '__main__'			if __name__ == '__main__'
+     	run()					    run()
+-----------------------------          ----------------------------	
+
+cmd> python3 file1.py	 -->     Corre file1, y evita que corran file2 porque en la llamada no es el main
+
+
+
 
 
 -------------------------------------------------------
@@ -355,7 +409,7 @@ Persistencia de datos                	Guardar, leer, escribir, anadir texto plan
     					
     					OBJETO FILE: contiene fichero, manera en que Python los maneja. 
     	
-					PUNTERO: Rayita | que parpadea. Siempre estara al principio. Si se algun metodo read
+					PUNTERO: Rayita | que parpadea. Siempre estara al principio. Si se usa algun metodo read
 					lo mueve a x posicion. Si se vuelve a usar metodo read, leera desde donde haya estado elpuntero.
 					    	
 
@@ -429,5 +483,221 @@ Persistencia de datos                	Guardar, leer, escribir, anadir texto plan
 						
 	del(var)			Borrar variable usada durante el manejo del fichero
 
+
+-------------------------------------------------------
+Modulos                	
+-------------------------------------------------------        		
+    double-underscore: 	    __
+    dunder: 		    short name for “double-underscore
+    dunder init”: 		__init__.py
+
+    modules: 		    Archivo.py. Cualquier archivo Python.  
+    packages:		    Carpetas. Contienen Archivos.py (modulos) y un __Init__.py
+    __init__.py		    When a new object is made, it is initialized by calling the init method on the object.
+
+
+
+
+-------------------------------------------------------
+TYPE ANNOTATIONS          	
+------------------------------------------------------- 
+
+    Tenemos 4 clasificaciones:
+
+	Static: 	Detectan los errores de tipo en tiempo de compilación. No se ejecuta hasta corregir
+	Dynamic:  	Detectan el error en tiempo de ejecución. Nos dice el error cuando llega a la línea del código
+	Strong: 	Más severidad con los tipos de datos. Sumar un número + una letra arrojará error.
+	Weak: 		Menos severidad con los tipos de datos. Si quiero sumar número y letra, las concatenaría como strings.
+
+	   Java:	Estatico y Fuerte	
+	   Python: 	Dinamico y Fuerte
+	   JS:		Dinamico y Debil
+
+
+    Static Typing
+    --------------------------
+        Desde Python >3.6 	(Similar a TypeScript de JS)
+        Volver python tipo Static (que nos lance los problemas de tipo durante la compilacion y no se quede oculto hasta ser disparado durante la ejecucion)
+        
+        1o Escribir con type annotations
+        2o Instalar modulo mypy				python3 -m pip install mypy		https://mypy.readthedocs.io/en/stable/getting_started.html
+	3o Ejecutar mypy				mypy program.py				This command makes mypy type check your program.py file and print out any errors it finds. 
+							    --check-untyped-defs		Solo checa las funciones
+
+    
+    				====TYPE ANNOTATIONS (type hints)====		
+        ----------------------------------------------------------------------------------------------------------   				
+        VARIABLES						type annotations 
+        ----------------------------------------------------------------------------------------------------------
+      		variable: tipo = valor
+							    	a: int =  5
+							   	b: str = 'hola'
+						 		c: bool= True
+						 		
+        ----------------------------------------------------------------------------------------------------------
+	LISTAS/ DICCIONARIO					type annotations 
+	----------------------------------------------------------------------------------------------------------
+		Importar modulo typing.				from typing import Dict, List, Tuple
+		
+		Listas						listName: List[tipo] = [valores]
+								    ej. num_none: List[int] = [1, 3, 5, 7]
+				
+		Diccionarios					diccName: Dict[tipo, tipo] = {valores : valores}		
+								    ej. country_key: Dict[str, int] = ['mexico': 23, 'canada': 12]
+		
+		Tuplas						tuplName: Tuple[tipo,tipo,tipo...] = (valores)
+								    ej. code_ig: Tuple[int, float, int] = [2, 0.56, 2]
+								    
+		Multiples estructuras				Se anidan segun lo requerido.
+			Lista de diccionaros			name: List[Dict[tipo,tipo]] = [{values: values}]
+			List de dicc de tuplas			name: List[Dict[str, Tuple[tipo, tipo]]] = [{'value':(value, value)}]
+			
+		Guardar Typeo en variable para atajo		var = List[Dict[tipo,tipo]]
+								name: var = [{values: values}] 
+								
+        ----------------------------------------------------------------------------------------------------------
+	FUNCIONES						type annotations 
+	------------------------------------------------------------------------------------------------------------
+		Dar tipado a los argumentos			argumento: tipo
+		Dar tipado del return				-> tipo
+		
+	
+			Funcion					def name(arg1: tipo, arg2: tipo) -> tipo:       
+								    return 
+								
+			Argumentos con valor default		def name(arg1: tipo = value) -> tipo:       
+								    return 
+								
+			*args, **Kwargs				def name(*args: tipo, **kwargs: tipo) -> None:
+								    return 
+								
+								ej. def greeting(name, excited= False):
+    									message = f'Hello, {name}'
+   									if excited:
+        								    message += '!'
+    									return message
+    									         
+    										 V	V	V
+    										 
+								    def greeting(name: str, excited: bool = False) -> str:
+    									message = f'Hello, {name}'
+   									if excited:
+        								    message += '!'
+    									return message
+   
+-------------------------------------------------------
+Closures  
+-------------------------------------------------------
+Entorno global no puede usar variables creadas dentro de las funciones (global scope no puede usar ni ver el Local scope).
+Closures es una funcion anidada que es devuelta como return por otra funcion envolvente y esta funcion anidada porta un valor creado dentro de la(s) funcion(es) (Local scope), recuerda ese valor aunque la funcion envolvente sea eliminada, y ese valor (a pesar de ser de Local scope) puede ser usado en el global Scope.
+
+    Requisitos:
+	-Debe existir nested function
+	-Nested function hace referencia a valor de scope superior
+	-Nested function es retornada por la funcion que la anido
+	
+	
+	ejemplo
+	------------------------------------------------------------------------
+		def multiplicacion(x):                  1 veces10 = multiplicacion(10)    x=10
+		    def multiplicador(n):               2     def multiplicacion(x=10):
+		        return x * n			3 	  def multiplicador(n):  return x=10 * n
+		    return multiplicador		4        	return multiplicador     				Funcion anidada es regresada
+							5 veces10 = multiplicador   (def multiplicador(n):  return x=10 * n)    Variable se convierte a nested function con valor agregado por funcion envolvente
+		veces10 = Multiplicacion(10)		6 veces10 = (def multiplicador(n=3):  return x=10 * n=3)
+		print(veces10(3))			7 veces10 = 10 * 3
+		>>>30
+		veces30 = Multiplicacion(30)
+		priny(veces30(5))
+		>>>150
+	
+	ejemplo2
+	-------------------------------------------------------------------------
+		def make_division(n):	 or	def make_division(n):
+		    def division(x):		    return lambda x: x/n
+		    	return x/n
+		    return division
+		div_by_3 = make_division(3)
+		div_by_2 = make_division(2)
+		print(div_by_3(12))
+		print(div_by_2(24))
+	
+	ejemplo3
+	------------------------------------------------------------------------
+		import datetime
+		def execution_time(function):
+		    def wrapper(*arg, **Kwarg):
+		    	initial_time: datetime.now()
+		    	function(*arg, **Kwarg)
+		    	final_time: datetime.now()
+		    	time_elapsed = final_time - initial_time
+		    	print('this funtion last: ' + str(time_elapsed.total_seconds()) + ' seconds'
+		    retur wrapper
+		    
+		    
+-------------------------------------------------------
+Generetors
+-------------------------------------------------------
+
+
+
+
+yield
+next()
+
+-------------------------------------------------------
+Datetime
+-------------------------------------------------------
+import datetime
+
+datetime.datetime.now()			Regresa fecha yyyy-mm-dd 00:00:00.000000    hora:min:seg.miliseg
+			
+datetime.date.today()			Regresa fecha yyyy-mm-dd 
+
+		Obtener solo el ano, mes o el dia.
+	-----------------------------------------------	
+v = datetime.date.today()		Introduce info en variable. 
+	v.year				Regresa year  yyyy
+	v.month				Regresa mes   mm
+	v.day   			Regresa dia   dd
+	
+		Dar formato a la fecha
+	----------------------------------------------
+v = datetime.datetime.now()		Introduce info en variable	
+v.strftime('%d/%m/%Y')			Regresa dd/mm/yyyy
+v.strftime('Estamos en el ano %Y')
+
+	%Y	Ano
+	%m	Mes	(m minuscula)
+	%d	Dia
+	%H	Hora
+	%M 	Minutos (M MAYUSCULA)
+	%S	Segundos
+	
+	
+	  Zona horaria. Colocar fehca y hora segun pais
+	------------------------------------------------
+import datetime
+import pytz
+	
+	cdmx_timezone = pytz.timezone(America/Mexico_City)
+	fecha_cdmx = datetime.now(cdmx_timezone)
+	print('Fecha en Mexico: ' + fecha_cdmx.strftime('%d/%m/%Y')
+
+	  Lista zonas horarias
+	------------------------
+		Etc/GMT+0
+		Etc/GMT+1
+		Etc/GMT-1
+
+		America/Mexico_City
+		America/Vancouver
+		America/Los_Angeles
+		Asia/Hong_Kong
+		Asia/Seoul
+		Asia/Shanghai
+		Asia/Tokyo
+		Australia/Sydney
+		Europe/Moscow
 
 
