@@ -1,0 +1,105 @@
+
+														-------------------------------------
+									========================Tipado Estatico //Static Typing======================
+														-------------------------------------
+
+
+Tenemos 4 clasificaciones:
+
+Static: 	Detectan los errores de tipo en tiempo de compilación. No se ejecuta hasta corregir
+Dynamic:  	Detectan el error en tiempo de ejecución. Nos dice el error cuando llega a la línea del código
+Strong: 	Más severidad con los tipos de datos. Sumar un número + una letra arrojará error.
+Weak: 		Menos severidad con los tipos de datos. Si quiero sumar número y letra, las concatenaría como strings.
+
+	Java:	Estatico y Fuerte	
+	Python: 	Dinamico y Fuerte
+	JS:		Dinamico y Debil
+
+
+
+-------------------------------------------------------
+Static Typing
+------------------------------------------------------- 
+    Desde Python >3.6 	(Similar a TypeScript de JS)
+    Volver python a tipo Static (forzar a que lance los problemas de tipo durante la compilacion y no se quede oculto hasta ser disparado durante la ejecucion)
+        
+        1o Escribir con type annotations
+        2o Instalar modulo mypy							https://mypy.readthedocs.io/en/stable/getting_started.html
+		3o Ejecutar mypy												 
+							    							
+
+	python3 -m pip install mypy								Instalar modulo mypy	
+    mypy file.py											Makes mypy type check file.py file and print out any errors it finds.
+																--check-untyped-defs		Solo checa las funciones
+
+
+
+-------------------------------------------------------
+TYPE ANNOTATIONS          	(type hints)
+------------------------------------------------------- 
+    
+	var : type 												Declarar variable con tipado estatico
+	var : type = value										Declarar variable con valor
+																var: int =  5
+																var: str = 'hola'
+																var: bool= True
+
+
+		---------------------------------------------					
+
+
+	from typing import List									Declarar lista con tipado estatico
+	list1 : List[type] = [values]									ej. num_none: List[int] = [1, 3, 5, 7]
+
+	from typing import Dict									Declarar diccionarios con tipado estatico
+	dicc1: Dict[type, type] = {value : values}						ej. country_key: Dict[str, int] = ['mexico': 23, 'canada': 12]
+
+	from typing import Tuple								Declarar tupla con tipado estatico
+    tuple1: Tuple[type,type,...] = (values)							ej. code: Tuple[int, float, int] = [2, 0.56, 2]
+
+
+		---------------------------------------------
+	
+
+	from typing import Dict, List							Anidacion. Lista de diccionarios
+	ID: List[Dict[type, type]] = [{values: values}]	
+
+	from typing import Dict, List, Tuple					Anidacion. Lista de diccionarios con tuplas anidadas.
+	ID: List[Dict[type, Tuple[type, type]]] = [{'value':(value, value)}]		
+
+	
+	var = List[Dict[type,type]]								Guardar tipeo en una variable para luego usar esta variable como atajo.
+	var2 : var = [{values: values}] 							=> var2 : List[Dict[type,type]] = [{values: values}]
+
+
+		---------------------------------------------
+	
+									
+	def func1(arg1: type, arg2: type) -> type:       		Declarar funcion con tipado estatico. -> type indica el tipo de valor que regresara en el return.
+		return
+
+	def func1(arg1: type = value) -> type:       			Funcion con argumento con valor default
+		return 
+
+	def name(*args: type, **kwargs: type) -> type:			Funcion con argumentos infinitos
+		return 
+
+	def func1(paramet1: type = None):       				Funcion con parametro con valor opcional (Python>3.9)
+		return 
+																/////python >3.5////////
+																	from typing import optional
+																	def func1(par1: optional[type] = None:
+																		return
+
+																/////python >3.10///////
+																	from typing import Union
+																	def func1(par1: type | None = None:
+																		return
+
+																/////python <3.10///////
+																	from typing import Union
+																	def func1(par1: Union[type, None] = None:
+																		return
+   
+		---------------------------------------------
+
