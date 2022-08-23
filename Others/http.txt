@@ -1,0 +1,61 @@
+HTTP: Hypertext Transfer Protocol
+IP: Internet Protocol 
+TCP: Transmision Control Protocol 
+UDP: User Data Protocol 
+DNS: Domain Name Server
+Cliente: El que consume la informacion
+Server: El que "sirve" los datos pedidos por el cliente.
+            
+
+
+HTTP
+
+Protocolo basado en el principio de cliente-servidor.
+Protocolo sin estado: no guarda ningún dato entre dos peticiones. (HTTP cookies si las guarda, usado en cesta de compras)
+Tipos de mensajes HTTP:
+    Request 
+    Response
+
+
+
+Campos de http:
+
+-URL:           La dirección del recurso pedido
+                -El protocolo   (http://), 
+                -El dominio     (google.com)
+                -El puerto TCP  (gral 80)(no necesario colocalo, web lo autoinfiere).           
+-Metodo:        Define la operación que el cliente quiera realizar. 
+                Verbo: GET, POST, PUT, DELETE, HEAD, MOVE, TRACE, CONNECT, PATCH, MERGE, UPDATE, OPTIONSetc.
+-La versión del HTTP.
+-Headers:       Son metadatos. Let the client and the server pass additional information with an HTTP request or response.
+                (Content-Type, Content-Length, Content-Range, Content-Encoding, Content-Language, Content-Location.)
+                (Host, Connection, Expires, Last-Modified, Accept-Language, User-Agent, Server, Allow...ETC)
+-Body:          Optional. Contiene la info que intercambian cliente-servidor (segun método)
+
+-Status code:   En Response.
+
+
+HTTP ayuda a transmitir: HTML, CSS, JS, WebAPI...
+
+Status code 
+200 – OK. 
+301 – Moved Permanently. 
+302 – Moved Temporarily.
+401 – No existe autorización (No tienes token)
+403 – Forbidden
+404 – Not Found
+500 – Internal Server Error
+503 ­– Service Unavailable
+
+1.- Respuestas informativas (100–199).
+2.- Respuestas satisfactorias (200–299).
+3.- Redirecciones (300–399).
+4.- Errores de los clientes (400–499).
+5.- Errores de los servidores (500–599).
+
+
+Conexion from Frontend to backend
+GET         A traves de URL. (datos atravez de URL)
+POST        A traves de formularios (datos atravez de Header)
+AJAX        asyncronus javascript anex... Intercambio de info sin cambiar URL/Sin recargar pagina. (agregar coment en FB)
+Sockets     Intercambio de datos tiempo real (videojuegos)

@@ -3,6 +3,7 @@ https://fastapi.tiangolo.com/tutorial/
 
 Definiciones
 ----------------------------
+	JSON		Mensaje  usado por HTTP como medio de comunicacion. Es un diccionario.
 	Path		Also called Route or Endpoint. last part of the URL. Todo aquello que vaya después de nuestro Dominio URL
 	Operation	HTTP "methods"
 	OPEN API 	Especificación que define como describir, crear y visualzar API’s. Permite reconocer si una API está definida adecuadamente
@@ -11,9 +12,23 @@ Definiciones
 	Request: 	Peticion del cliente al servidor.
 	Response: 	Respuesta del servidor al cliente.
 	Entidad     Cualquier objeto 
-	Modelo      Representación de una entidad en código de manera descriptiva
+	Modelo      Molde/clase para crear objeto. Representación en codigo de un objeto(entidad). Requiere importar framework Pydantic (clase BaseModel)
 	Pydantic	Framework para crear modelos. Se requiere en FastAPI
+
+	Parameters
+	.	Path parameter: Variables dentro del Path, que modificara el url de maneda dinamica. Ingreso Obligatorio. Pasara a la funcion como argumento.
+						Estructura:  '{}'					 					
+	.	Query Parameters: Parametros opcional al final del URL. ingreso no obligatorio.
+						Estructura:  '/url?paramet=value'  // 	'/url?par1=val1&par2=val2&...' 
+	.	Query Parameters1:  Parametros dentro de funcion y no parte del path. (no descrita en Path en decorador)	
+
+
+	Response: 		Respuesta del servidor/API al cliente. ALWAYS sended.
+	Response body:	Continene el body de un HTTP response. Realizada con GET. Contiene la info de la consulta o solicitud de informacion
+	Request: 		Peticion del cliente al servidor/API. Not always needed.
+	Request Body: 	Contiene el body de una HTTP request. Realizada con POST (principalmente). Contiene la info de la peticion. (Crear modelos / modificar o eliminar)
 	
+
 Ecosistema para FastAPI
 --------------------------------------------
 	Uvicorn: 	librería de Python que funciona de servidor (cualquier cpu se convierta en un servidor)
@@ -23,24 +38,11 @@ Ecosistema para FastAPI
 
 
 
-//////////////////===============FastAPI===============////////////////////
-
-
-Temas
-----------------------------
-
-
-
-
-
-
-
-
-
+						//////////////////===============FastAPI===============////////////////////
 
 
 -------------------------------------------------------------------------------
-			-------------First Steps-------------
+First Steps
 ------------------------------------------------------------------------------
     1 Crear Carpeta projecto
     2 Inicializar y activar Git y Venv
@@ -55,153 +57,232 @@ Temas
     6 Run code 
     
     
-    
-------------------------------------------------------------------------------
-Instalacion										||Instalar en una venv
-------------------------------------------------------------------------------
-									
-    pip install fastapi uvicorn					Instala FastAPI y el servidor a usar (en este caso Uvicorn.)
-    pip install "fastapi[all]"					Instala FastAPI y el servidor Uvicorn    
-    
-    
---------------------------------------------
-Run the code
---------------------------------------------
+.	    |-----------------------------------------------------------------------------------------------------------
+.		|		Basic estructure
+.    	|-----------------------------------------------------------------------------------------------------------
+.    	|  	
+.    	| 			from fastapi import FastAPI						Class FastAPI imported 
+.    	|						
+.    	|			app = FastAPI()									Var que instancia(objeto) de FastAPI (clase). Sera nuestra APP de FastAPI.  
+.    	|				
+.    	|			@app.get("/")									Path operation Decorator
+.    	|			async def root():								Path operation Function
+.    	|				return {"message": "Hello World"}			Respuesta {JSON}
+.    	|
+.    	-----------------------------------------------------------------------------------------------------------
+.
+.
+.	------------------------------------------------------------------------------
+.			Install and Run  
+.   	-------------------------------
+.
+.	pip install fastapi server1						Instalar FastAPI y el servidor a usar			
+.   pip install fastapi uvicorn						Instalar FastAPI y el servidor Uvicorn
+.   pip install "fastapi[all]"						Instalar FastAPI y el servidor default (Uvicorn)
+.
+.	
+.	uvicorn module:appname --reload 				Correr servidor. (Uvicorn)    		ej. uvicorn main:my_app --reload
+.		        										--reload 	make the server restart after code changes. Only use for development.
+.	CTrl + C										Cerrar servidor.											
+.														
+.	http://127.0.0.1:8000							Ver respuesta del server. (JSON response) (after activation)
+.	http://127.0.0.1:8000/docs						Ingresar a Interactive API documentation (by Swagger)  	->docs
+.	http://127.0.0.1:8000/redoc						Ingresar a Interactive API documentation (by ReDoc) 	-redoc
+.	
+.
+.	------------------------------------------------------------------------------
+.
+.	@app.get("/URL")								Decorador (Path operation Decorator) que indica a FastAPI que la funcion debajo manejara las solicitudes y metodo HTTP (operation) con el quelo hara.
+.														.get()		Read data.
+.														.post()		Create data.
+.														.put()		Update data.
+.														.delete()	Delete data.
+.							
+.  	async def func():								Funcion Asincronica (Path operation Function).  
+.	    return {"" : ""}							Return un JSON (Un diccionario en Python). 		Cualquier cosa sera automaticamente convertida a JSON
+.	    
+.	def func(var1, var2:):     						Funcion con Parametros 
+.	def func(var1: type, var2: type):    	 		Funcion con Parametros con Tipado estatico (no requiere ->)
+.
+.	
+.	------------------------------------------------------------------------------
+.			Variables y parametros.  
+.   	-------------------------------
+.
+.	@app.get('/url/{var}')							Path parameter.   { } Variable definida dentro del path. URL variable.
+.	@app.get('/url/{var}/url/{var}')				Path parameter multiples.
+.
+.	@app.get('/url?paramet=value')					Query Parameters.                 ?= query begin
+.	@app.get('/url?par1=value1&par2=value2')		Query Parameters multiples.       &= query separator
+.
+.
+.	@app.get("/URL")								
+.	def func(par1: type, par2: type):				Query Parameters. Variables con tipado estatico.
+.
+.	def func(par1: type):							Query Parameters. Variable de funcion obligatorio 	(not declare any default value-> query parameter required)
+.	
+.	def func(par1: type = default_value):  			Query Parameters. Variable de funcion Opcional con valor default
+.	
+.	def func(par1: type = None):					Query Parameters. Variable de funcion opcional con valor None 	 (Python>3.9)
+.															(python >3.5)	-from typing import optional
+.																			-def root(par1: optional[type] = None:
+.															(python >3.10)	-from typing import Union
+.																			-def root(par1: type | None = None:
+.															(python <3.10) 	-from typing import Union
+.																			-def root(par1: Union[type, None] = None:
+.	
+				
+. 	...												Especificar "explicitamente" que valor de variable/parametro/atributo es requerido/OBLIGATORIO 
+.															Normally, when something is required, you can simply omit a default parameter
+.
+.
+.	from fastapi import  Path						Especificar que parametro es Path parameter. OBLIGATORIO. Gana funcionalidades de la Path.
+.	@app.get('/url/{var1}')
+.	def func(var1 : type = Path()): 	
+.
+.	from fastapi import Query                      	Especificar que parametro es Query Parameters. Response body / GET. OPCIONAL. Gana funcionalidades de la Query. 
+.	def func(var : type = Query()):              		   
+.
+.	from fastapi import Body						Especificar que parametro es Body parameter. Request Body / POST, PUT... Gana funcionalidades de la clase Body.
+.	def func(var : type = Body()): 
+.
+.
+.				Parameter Validation and Metadata.  
+.   	--------------------------------------------------------
+.
+.	from fastapi import Path						Especificar Path parameter. 
+.	var : type = Path(value, instruction) 				Agregar resticciones, validaciones y metadatos a los path parametros.  
+.															@app.get('/url/{var1}')
+.															def func(var1: int = Path(instruction)):
+.	from fastapi import Query                      	Especificar Query Parameters. 
+.	var : type = Query(value, instruction)         		Agregar resticciones, validaciones y metadatos a los query parametros.    
+.	
+.		   												=====================INSTRUCTIONS======================
+.														...					Colocar Valor requerido "explicito" (called Ellipsis). Normally, when something is required, you can simply omit a default parameter. var: str = Query(default=...)
+.														default=None		Colocar Valor Default explicto. None -> valor opcional
+.		 													===Validation str====
+.														max_length=50		Restringir longitud maxima 
+.														min_length=3		Restringir longitud minima 
+.														regex="reg_ex"		Restringir parametro con Expresion regular. Regular expression. Debe coincidir.
+.	 														====Metadatos=====	
+.														alias="alias1"		Create alias of parameter. When need to name with a NOT valid Python variable name. ej. var: str = Query(default=None, alias="item-query")
+.														title = "title1" 	Agregar Metadato titulo. Visible en Documentación interactiva.
+.														description="descr"	Agregar Metadato descripcion. Visible en Documentación interactiva.
+.														deprecated=True		Indicar que variable ya es obsoleta (ya no la quieres). Se mostrara para que usuarios tomen medidas antes de borrarla.
+.	 														===Validation Number===
+.														gt=666				Greather than
+.														ge=999				Greather or Equal
+.														le=333				Less or Equal 
+.	  													lt=000				Less than
+.	
+.
+.													Validaciones de valores ingresados por el cliente.
+.	from pydantic import Exotic_Type					1.- Importacion de Tipos de datos exóticos desde pydantic (https://pydantic-docs.helpmanual.io/usage/types/#pydantic-types)
+.	var : Exotic_Type = None							2.- Ingresarlos como type (de tipado estatico)
+.
+.														================Tipos de datos exóticos de Pydantic===========================
+.															HttpUrl 			Valida si una URL es valida 
+.															FilePath 			Valida si la ruta ingresada es un archivo 	(c:/windows/system32/432.dll)
+.															DirectoryPath		Valida si la ruta ingresada es un directorio (c:/windows/Desktop/Folder)
+.															EmailStr			Valida si lo ingresado es un email 					( XYZ@email.com)
+.																				Requiere instalacion: pip install pydantic[email]  ??? 
+.																				Requiere instalacion: pip install email-validator  ???
+.															PaymentCardNumber 	Valida si lo ingresado es un número de tarjeta
+.															IPvAnyAdress 		Valida si lo ingresado es una dirección IP
+.															NegativeInt 		Valida si lo ingresado es un número entero negativo
+.															PositiveInt 		Valida si lo ingresado es un número entero positivo
+.															NegativeFloat 		Valida si lo ingresado es un número negativo de tipo flotante
+.															PositiveFloat 		Valida si lo ingresado es un número positivo de tipo flotante
+.																etc.
+.
+.
+.													Definir opciones validas de strings. Especificar y limitar conjunto de strings que seran opciones validas para una variable que acepta str. 
+.	from enum import Enum							 	1.- Importa Enum. (viene modulo enum de python)
+.	class Enum_str(Enum):								2.- Heredar de clase Enum
+.		str1 = 'str1'									3.- Crear como atributos, los str que funcionaran como opciones disponibles
+.		str2 = 'str2'									|
+.		str3 = 'str3'									|		
+.														|	
+.		var : Enum_str = None							4.- Ingresar clase creada como Type de variable. Equivale tambien a type "str".
+.		
+.															Enum				checks that the value is a valid Enum instance
+.															IntEnum				checks that the value is a valid IntEnum instance
+.
+.
+.	------------------------------------------------------------------------------	
+.			Model  
+.   	-------------------------------
+.
+.	
+.	from pydantic import BaseModel					Importacion de BaseModel de pydantic para crear modelos
+.
+.	class Model1(BaseModeL):						Creacion de modelo. Una clase que hereda de BaseModel.
+.		atribute1 : type							Atributos con tipado estatico
+.		atribute2 : type
+.		opt_atrib1 : type = value					Atributos Opcionales, con tipado estatico
+.
+.	@app.post("/URL/"new_model")					Create Request: POST
+.	def create_object(var_model: Model1):				Def para creacion de objeto a partir de un modelo. Query parameter -> var_model : Type -> Model1
+.		return 
+.
+.
+.				Model Validation and Metadata.  
+.   	---------------------------------------------------
+.	from pydantic import Field						Clase para validaciones en Modelos (similar a clases Body, Query y Path de fastapi)
+.	class Model1(BaseModeL):							Mismas instrucciones  y validaciones que  Path  y Query. Ver arriba (==INSTRUCTIONS==) 
+.		atrib1: type = Field(value, INSTRUCTIONS)
+.		   												
+.				
+.
+.	------------------------------------------------------------------------------	
+.			Automatic examples 						Valores automaticos para Verificar con Interactive API documentation (by Swagger or ReDoc)
+.   	-------------------------------			
+.
+.	var: type = Path(value, example= value) 		Valores automaticos para Path parameter.  
+.															
+.	var: type = Query(value, example= value)  		Valores automaticos para Query parameter. 
+.
+.
+.	class Model1(BaseModeL):						Valores automaticos para request Body(modelos). 	
+.		atrib1: type = Field(None, example= value)		Especificada directamente en el atributo.
+.
+.
+.	class Model1(BaseModeL):						Valores automaticos para request Body(modelos).   
+.	|	atrib1: type = Field(value)						Creacion subclase dentro del modelo que tiene todos los atributos y sus valores.
+.	|	atrib2: type = Field(value)
+.   |   
+.	|	class Config:								
+.	|	|	schema_extra = {
+	|	|		"example" : {"atrib1": "value",	"atrib2": int}
+.	|	|		}
+.
+.
+.
+.
+.
+.
 
-	uvicorn main:app --reload					Inicializar Uvicorn indicando tu file (main.py) con la app desarrollada (app)
-	uvicorn module:appname --reload 	        	--reload 	make the server restart after code changes. Only use for development.
 
-	http://127.0.0.1:8000						See the JSON response (after activation)
-	http://127.0.0.1:8000/docs					Interactive API documentation (by Swagger)
-	http://127.0.0.1:8000/redoc.				Alternative Interactive API documentation (by ReDoc)    
-    
-    
-    
----------------------------------------------------------------
-			-------------Basic estructure-------------
----------------------------------------------------------------
-  
-    from fastapi import FastAPI					Class FastAPI 
-    	
-    app = FastAPI()								app es Variable con instancia(objeto) de FastAPI (clase)  
-    	  
-    @app.get("/")								Path operation decorator
-   	async def root():							Path operation function
-	    return {"message": "Hello World"}			||  {JSON}
-    
-    
-    
-    
-    
-    
---------------------------------------------
-Path operation
---------------------------------------------
-"Path" refers the last part of the URL  /
-
-
-	@app.get("/URL")							Path operation Decorator. 
-												Decorador que indica a FastAPI que la funcion debajo manejara las solicitudes y metodo HTTP (operation) con el quelo hara.
-													.get()		Read data.
-													.post()		Create data.
-													.put()		Update data.
-													.delete()	Delete data.
-								
-   	async def root():							Path operation Function.  
-	    return {"" : ""}						Funcion Asincronica. 
-												Retorna dict, list, str, int, Pydantic models, etc. They will be automatically converted to JSON
-	    
-
-	async def root(var1, var2:):     			Funcion con Parametros 
-	async def root(var1: type, var2: type):     Funcion con Parametros con Tipado estatico (no requiere ->)
-	
-	------------------------------------------------------------------------------
-	
-		
-	Path operation Decorator. 
-	-------------------------
-	@app.get('/url/{var}')						Path parameter.   { } Variable definida dentro del path. Automaticamente creara URL, segun variable indicada.
-	@app.get('/url/{var}/url/{var}')			Path parameter multiples.
-
-	@app.get('/url?paramet=value')				*Query Parameters.                 ?= query begin
-	@app.get('/url?par1=value1&par2=value2')	*Query Parameters multiples.       &= query separator
-
-
-	Path operation Function.  
-	--------------------------
-	@app.get("/URL")							**Query Parameters 
-	async def root(par1: type, par2: type):		
-
-	async def root(par1: int):					**Query Parameters obligatorio (not declare any default value-> query parameter required)
-	
-	async def root(par1: int = default_value):  **Query Parameters Opcional con valor default
-	
-	async def root(par1: type = None):			**Query Parameters opcional con valor None (como si no tuviera valor) (Python>3.9)
-													(python >3.5)
-														-from typing import optional
-														-async def root(par1: optional[type] = None:
-													(python >3.10)
-														-from typing import Union
-														-async def root(par1: type | None = None:
-													(python <3.10)
-														-from typing import Union
-														-async def root(par1: Union[type, None] = None:
-
-
-					Path parameter
-					-----------------
-						Variable dentro del path. 			'/url/{var}'
-						Estructura: 						'{}'
-						Ingreso:							Obligatorio.						
-						Value: 						 		Pasara a la funcion como argumento.		
-
-					Query Parameters
-					-----------------
-						*Parametros opc al final del URL	'/url?paramet=value'	
-						Ingreso:							 Opcionales	 
-						Estructura:	? =						'?paramet=value	
-									? = & =					'?par1=val1&par2=val2'
-
-						**Parametros de funcion no parte del path.		@app.get('/url')
-																		async def root(var1: str = XYZ, var2: int = 123):
-
-
---------------------------------------------
-Request Body y Response Body
---------------------------------------------
-
-Response: 		Respuesta del servidor/API al cliente. Always sended.
-Response body:	El body de una Respuesta.	
-					Realizada con GET.
-					-Consulta o solicitud de niformacion
-
-Request: 		Peticion del cliente al servidor/API. Not always needed.
-Request Body: 	El body de una Petición HTTP. 
-					Realizada con PUT (principalmente)(Usarse otras, but except GET)
-					-Crear modelos / modificar o eliminar
+.	------------------------------------------------------------------------------
+.
+.	var = object.dict()								Regresar 2 JSON unificados(regresar 2 Request body unficados). Poco Comun. 
+.	var.update(object2.dict())							Unificar los 2 JSON antes de returnarlos (convertirlos en dicc)
+.	return var
 
 
 
---------------------------------------------
-Model
---------------------------------------------
-	Representacion en codigo de un objeto(entidad) / 	Requiere importar framwork Pydantic (clase BaseModel)
-	Crear un modelo es crear una clase.
-
-
-	---------------------------------------------
-	Estructura basica de modelo 
-	---------------------------------------------	
-	from pydantic import BaseModel					Importacion de BaseModel de pydantic para crear modelos
-
-	class Model1(BaseModeL):						Creacion de modelo. Una clase que hereda de BaseModel.
-		aribute1: str								Atributos con tipado estatico
-		aribute2: int
-		opt_atrib1: str = None						Atributos Opcionales, con tipado estatico
 
 
 
-	opt_atrib1: Optional[type] = default_value		
+
+
+
+
+
+
+
+
+
 
 
 
@@ -209,20 +290,56 @@ Model
 	---------------------------------------------
 		#importaciones#
 #Python
-from typing import Optional
+from enum import Enum
+
 #Pydantic
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
+
 #FastAPI
 from fastapi import FastAPI
 from fastapi import Body
 
-class Model1(BaseModeL):
-	aribute1: str
-	aribute2: int
-	opt_atrib1: Optional[str] = None
-	opt_atrib2: Optional[bool] = None
+app= FastAPI()
 
+						 	
+class Grade_Univ(Enum):							
+	primer grado = 'primer grado'									
+	segundo grado = 'segundo grado'
+	tercer grado = 'tercer grado'
 
-@app.post("/URL/new")
-def create_object(person: Person = Body(...)):
-	return person
+class Student(BaseModeL):
+	student_id: int Field(..., gt=0, le= 1000000, title= "Studen ID", description= "This ID is Unique for every student)
+	apellido_paterno: str = Field(..., min_length=1, max_length=15)
+	apellido_materno: str = Field(..., min_length=1, max_length=15)
+	nombres: str = Field(..., min_length=1, max_length=20)
+	grado_universitario: Grade_Univ = Field(...)
+	calificacion_ingreso: float = Field(..., gt=60.00, le= 100.00)
+	email: EmailStr = Field(..., max_length=50)
+	hobby: str = Field(default = None, max_length=30)	
+	
+	class Config:								
+		schema_extra = {
+			"example" : {
+				"student_id": 666,	
+				"apellido_paterno": "Roca", 
+				"apellido_materno": "Dono", 
+				"nombres": "Carlos"
+				"grado_universitario": tercer grado",
+				"calificacion_ingreso": 97.55,
+				"email": "roca@gmail.com",
+				}
+			}
+							
+	
+
+@app.get("/URL/estudiantes/{student_id}")
+asyc def get_student(
+	student_id: int = Path (...)
+	):
+	return student
+
+@app.post("/URL/new_student")
+def create_student(
+	student: Student = Body(...)
+	):
+	return student

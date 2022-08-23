@@ -41,8 +41,11 @@ TYPE ANNOTATIONS          	(type hints)
 	var : type 												Declarar variable con tipado estatico
 	var : type = value										Declarar variable con valor
 																var: int =  5
+																var: float = 0.5
 																var: str = 'hola'
-																var: bool= True
+																var: bool = True
+																var: Clase 				<-Clase que creamos, o de python/librerias. (ej. clase Optional, List, Dict, etc. del modulo typing)
+																
 
 
 		---------------------------------------------					
