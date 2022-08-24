@@ -15,19 +15,24 @@ Definiciones
 	Modelo      Molde/clase para crear objeto. Representación en codigo de un objeto(entidad). Requiere importar framework Pydantic (clase BaseModel)
 	Pydantic	Framework para crear modelos. Se requiere en FastAPI
 
-	Parameters
-	.	Path parameter: Variables dentro del Path, que modificara el url de maneda dinamica. Ingreso Obligatorio. Pasara a la funcion como argumento.
-						Estructura:  '{}'					 					
-	.	Query Parameters: Parametros opcional al final del URL. ingreso no obligatorio.
-						Estructura:  '/url?paramet=value'  // 	'/url?par1=val1&par2=val2&...' 
-	.	Query Parameters1:  Parametros dentro de funcion y no parte del path. (no descrita en Path en decorador)	
-
+	Parameters:
+	Path parameter: Variables dentro del Path, que modificara el url de maneda dinamica. Ingreso Obligatorio. Pasara a la funcion como argumento.
+					Estructura:  '{}'					 					
+	Query Parameters: Parametros opcional al final del URL. ingreso no obligatorio.
+					Estructura:  '/url?paramet=value'  // 	'/url?par1=val1&par2=val2&...' 
+	Query Parameters1:  Parametros dentro de funcion y no parte del path. (no descrita en Path en decorador)	
 
 	Response: 		Respuesta del servidor/API al cliente. ALWAYS sended.
 	Response body:	Continene el body de un HTTP response. Realizada con GET. Contiene la info de la consulta o solicitud de informacion
 	Request: 		Peticion del cliente al servidor/API. Not always needed.
 	Request Body: 	Contiene el body de una HTTP request. Realizada con POST (principalmente). Contiene la info de la peticion. (Crear modelos / modificar o eliminar)
-	
+
+	Response Model: Es parametro del path operation (decorator), regresa como respuesta (en lugar del modelo real) un modelo (response model) con atributos que determinamos seran mostrados.	
+	Input model:	Deeds to be able to have a password.
+	Output model:	Should not have a password.
+	Database model: Would probably need to have a hashed password.
+
+
 
 Ecosistema para FastAPI
 --------------------------------------------
@@ -92,11 +97,15 @@ First Steps
 .
 .	------------------------------------------------------------------------------
 .
-.	@app.get("/URL")								Decorador (Path operation Decorator) que indica a FastAPI que la funcion debajo manejara las solicitudes y metodo HTTP (operation) con el quelo hara.
+.	@app.get("/URL")								Decorador (Path operation Decorator) que indica el path y le dice a FastAPI que la funcion debajo manejara las solicitudes y metodo HTTP (operation) con el quelo hara.
 .														.get()		Read data.
 .														.post()		Create data.
 .														.put()		Update data.
 .														.delete()	Delete data.
+.														----------------------------
+.														path= "/"							Especificar el path.
+.														satus_code= status.HTTP_###_XXX		Definir un staus code (default >200). Requiere importar status. Ver abajo.
+.														response_model=  Model_Out			Ver abajo. Response Model.
 .							
 .  	async def func():								Funcion Asincronica (Path operation Function).  
 .	    return {"" : ""}							Return un JSON (Un diccionario en Python). 		Cualquier cosa sera automaticamente convertida a JSON
@@ -112,10 +121,19 @@ First Steps
 .	@app.get('/url/{var}')							Path parameter.   { } Variable definida dentro del path. URL variable.
 .	@app.get('/url/{var}/url/{var}')				Path parameter multiples.
 .
+.	@app.get(path= '/url/{var}')					Definir "explicitamente" el path. Normamente se puede evitar pasando URL como primer parametro.
+.
 .	@app.get('/url?paramet=value')					Query Parameters.                 ?= query begin
 .	@app.get('/url?par1=value1&par2=value2')		Query Parameters multiples.       &= query separator
 .
+.	@app.get('/url', response_model=model_out)		Crear response model. (Ver abajo en ressponsse model)
 .
+.							
+.	@app.get('/url', status_code=200)				Retornar/responder con un status code.	
+.														(ver status code en http.txt)
+.	from fastapi import status						Retornar/responder con un status code.
+.	@app.get('/url', status_code=status.HTTP_200_OK)	(ver status code en http.txt)
+.														
 .	@app.get("/URL")								
 .	def func(par1: type, par2: type):				Query Parameters. Variables con tipado estatico.
 .
@@ -136,7 +154,7 @@ First Steps
 .															Normally, when something is required, you can simply omit a default parameter
 .
 .
-.	from fastapi import  Path						Especificar que parametro es Path parameter. OBLIGATORIO. Gana funcionalidades de la Path.
+.	from fastapi import Path						Especificar que parametro es Path parameter. OBLIGATORIO. Gana funcionalidades de la Path.
 .	@app.get('/url/{var1}')
 .	def func(var1 : type = Path()): 	
 .
@@ -147,7 +165,7 @@ First Steps
 .	def func(var : type = Body()): 
 .
 .
-.				Parameter Validation and Metadata.  
+.				Parameter Validation and Metadata.       Todos iguales = Path, Query, Body, Field, Form, Cookie.
 .   	--------------------------------------------------------
 .
 .	from fastapi import Path						Especificar Path parameter. 
@@ -156,7 +174,8 @@ First Steps
 .															def func(var1: int = Path(instruction)):
 .	from fastapi import Query                      	Especificar Query Parameters. 
 .	var : type = Query(value, instruction)         		Agregar resticciones, validaciones y metadatos a los query parametros.    
-.	
+.
+. 
 .		   												=====================INSTRUCTIONS======================
 .														...					Colocar Valor requerido "explicito" (called Ellipsis). Normally, when something is required, you can simply omit a default parameter. var: str = Query(default=...)
 .														default=None		Colocar Valor Default explicto. None -> valor opcional
@@ -216,7 +235,7 @@ First Steps
 .	
 .	from pydantic import BaseModel					Importacion de BaseModel de pydantic para crear modelos
 .
-.	class Model1(BaseModeL):						Creacion de modelo. Una clase que hereda de BaseModel.
+.	class Model1(BaseModel):						Creacion de modelo. Una clase que hereda de BaseModel.
 .		atribute1 : type							Atributos con tipado estatico
 .		atribute2 : type
 .		opt_atrib1 : type = value					Atributos Opcionales, con tipado estatico
@@ -243,26 +262,21 @@ First Steps
 .	var: type = Query(value, example= value)  		Valores automaticos para Query parameter. 
 .
 .
-.	class Model1(BaseModeL):						Valores automaticos para request Body(modelos). 	
+.	class Model1(BaseModel):						Valores automaticos para request Body(modelos). 	
 .		atrib1: type = Field(None, example= value)		Especificada directamente en el atributo.
 .
 .
-.	class Model1(BaseModeL):						Valores automaticos para request Body(modelos).   
-.	|	atrib1: type = Field(value)						Creacion subclase dentro del modelo que tiene todos los atributos y sus valores.
-.	|	atrib2: type = Field(value)
-.   |   
-.	|	class Config:								
-.	|	|	schema_extra = {
-	|	|		"example" : {"atrib1": "value",	"atrib2": int}
-.	|	|		}
+.	class Model1(BaseModel):						Valores automaticos para request Body(modelos).   
+.		atrib1: type = Field(value)						Creacion subclase dentro del modelo que tiene todos los atributos y sus valores.
+.		atrib2: type = Field(value)
+.      
+.		class Config:								
+.		|	schema_extra = {
+.		|		"example" : {"atrib1": "value",	"atrib2": int}
+.		|		}
 .
 .
 .
-.
-.
-.
-
-
 .	------------------------------------------------------------------------------
 .
 .	var = object.dict()								Regresar 2 JSON unificados(regresar 2 Request body unficados). Poco Comun. 
@@ -272,8 +286,56 @@ First Steps
 
 
 
+.	------------------------------------------------------------------------------	
+.			Response Model  
+.   	-------------------------------
+.
+.													Response Model: Es parametro del path operation (decorator), regresa como respuesta (en lugar del modelo real) un modelo (response model) con atributos que determinamos seran mostrados.
+														Usos: 	Limitar datos que saldran como respuesta (evitara filtrarse/mostra dato sensibles ej. password)
+																Convertir el tipo de datos que saldra
+																Validar datos
+																Adjuntar un JSON como respuesta
+																Sera usado por el Interactive API documentation
 
-
+1 Tener Modelo y su Path Operator
+2 Crear Response Model (tendra lo que se mostrara en el return)
+3 En el Decorador (fuera del path) poner la instruccion response_model y pasar como valor el Response Model 
+	Ej. -> En este caso aunque se retorne "user" que vale: "Model_IN", se enviara como respuesta: "Model_Out"
+.
+.											Ejemplo 1
+.								--------------------------------
+.	from pydantic import BaseModel, Field						<- Metodo Bruto. Hace duplicidad de codigo.
+.	|
+.	class Model_Input(BaseModel):									<-Modelo principal con datos sensibles
+.	|	atributes1 : type = Field(...)	
+.	|	atributes2 : type = Field(...)							
+.	|	password: str = Field(...)
+.   |
+.	class Model_Output(BaseModel):									<-Modelo copia sin datos sensibles que sera regresado en la respuesta.
+.	|	atributes1 : type = Field(...)	
+.	|	atributes2 : type = Field(...)							
+.   |
+.	@app.post("/URL/"new_model", response_model = Model_Output)	<- En decorador -> response_model = Model_OUT			
+.	def create_user(user: Model_Input):				
+.	|	return user
+.
+.											Ejemplo 2  (mejorcito)
+.								--------------------------------
+.	from pydantic import BaseModel, Field						<- Metodo con herencia (no duplicidad)
+.	|
+.	class ModelBase(BaseModeL):									<-Padre con atibutos generales.
+.	|	atributes1 : type = Field(...)	
+.	|	atributes2 : type = Field(...)							
+.   |
+.	class Model_INPUT(ModelBase):									<-Modelo principal. hereda Padre y adiciona datos sensibles sobreagregados			
+.	|	password: str = Field(...)
+.	|
+.	class Model_OUTPUT(ModelBase):									<-Modelo respuesta. hereda de Padre. Aunque pass, mostrara lo atrib de padre.
+.	|	pass						
+.   |
+.	@app.post("/URL/"new_model", response_model = Model_OUTPUT)	<- En decorador -> response_model = Model_OUT			
+.	def create_user(user: Model_INPUT):				
+.	|	return user
 
 
 
@@ -334,13 +396,13 @@ class Student(BaseModel):
 async def root():								
     return {"message": "Hello World"}				
 
-@app.get("/URL/estudiantes/{student_id}")
+@app.get(path="/URL/estudiantes/{student_id}")
 async def get_student(
 	student_id: int = Path (...)
 	):
 	return {"message": "The student is..."}
 
-@app.post("/URL/new_student")
+@app.post(path="/URL/new_student")
 def create_student(
 	student: Student = Body(...)
 	):

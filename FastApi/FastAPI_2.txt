@@ -1,0 +1,24 @@
+
+
+------------------------------------------------------------------------------	
+		Formularios.  
+   	-------------------------------
+
+Datos no se recibiran de un JSON, sino de un formulario. Recbiran de HTML forms (<form></form>).
+
+
+
+pip install python-multipart                    Instalar libreria requerida. (verificar estar en Venv)
+
+from fastapi import Form                        Importar Form (mismas validaciones y metadatos que path, query)
+
+@app.post(                                      Decorador con path al formulario
+    path= "/login",
+    response_model= login_Output,
+    status_code= status.HTTP_200_OK
+    )
+asyc def login(                                 Funcion con parametros con nombre igual a las label de HTTP.
+    username: str = Form(...), 
+    password: str = Form(...)
+    ):
+    return
