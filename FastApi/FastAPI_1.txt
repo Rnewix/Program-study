@@ -128,7 +128,7 @@ First Steps
 	path='/url/'										Definir "explicitamente" el path. 						(Normamente no se usa, el primer parametro pasado sera el Path (URL)).
 .															@app.get(path='/url/{var}')	
 
-	'/url?para=value'									Query Parameters.                 ?= query begin
+	'/url?param=value'									Query Parameters.                 ?= query begin
 .															@app.get('/url?paramet=value')	
 	
 	&													Query Parameters multiples.       &= query separator
@@ -144,17 +144,17 @@ First Steps
 .															from fastapi import status
 .															@app.get('/url', status_code=status.HTTP_200_OK)		
 														
-	para: type = value									Query Parameters. Variables con tipado estatico.
+	param: type = value									Query Parameters. Variables con tipado estatico.
 .															@app.get("/URL")								
 .															def func(par1: type, par2: type):
 
-	para: type											Query Parameters. Variable de funcion con valor obligatorio 	(not declare any default value-> query parameter required)
+	param: type											Query Parameters. Variable de funcion con valor obligatorio 	(not declare any default value-> query parameter required)
 .															def func(par1: type):
 
-	para: type = default_value			 				Query Parameters. Variable de funcion con valor Opcional (con valor default)
+	param: type = default_value			 				Query Parameters. Variable de funcion con valor Opcional (con valor default)
 .															def func(par1: type = default_value):
 
-	para: type = None									Query Parameters. Variable de funcion opcional con valor None 	 (Python>3.9)
+	param: type = None									Query Parameters. Variable de funcion opcional con valor None 	 (Python>3.9)
 .															def func(par1: type = None):
 .															---------------------------------------------------------------
 .																(python >3.5)	-from typing import optional
@@ -167,31 +167,31 @@ First Steps
  	var : type = ...									Especificar "explicitamente" que valor de variable/parametro/atributo es requerido/OBLIGATORIO 
 .															Normally, when something is required, you can simply omit a default parameter
 
-
-
+									
 	var1 : type = Clase()								Especificar clase de parametro.  REQUIERE IMPORTACION de la clase.
-
-.		Path()												-Path parameter. 	OBLIGATORIO. 
+.															Clase de param		Tipo de entrada		
+.															--------------		-----------------
+.		Path()												-Path parameter. 		-URL y OBLIGATORIO. 
 .																	from fastapi import Path														 
 .																	@app.get('/url/{var1}')
 .																	def func(var1 : type = Path(value)): 	
-.		Query()												-Query parameter. 	Response body / GET. OPCIONAL. 
+.		Query()												-Query parameter. 		-URL yOPCIONAL. 			Response body / GET.  
 .																	from fastapi import Query                     	 	 
 .																	def func(var : type = Query(value)):              		   
-.		Body()												-Body parameter. 	Request Body / POST, PUT... 
+.		Body()												-Body parameter. 		-JSON.						Request Body / POST, PUT... 
 .																	from fastapi import Body
 .																	def func(var : type = Body(value)): 
-.		Header()											-Header parameters (ver en Header)
+.		Header()											-Header parameters. 	-Cabeceras HTTP 			(ver en Header)
 .																	from fastapi import FastAPI, Header
 .																	def func(var : type = Header(value)):
-.		Cookie()											-Cookie parameters (ver en Cookies)
+.		Cookie()											-Cookie parameters.		-Data from PC 				(ver en Cookies)
 .																	from fastapi import Cookie
 .																	def func(var : type = Cookie(value)):
-.		Form()												-Formularios. Requiere install python-multipart (ver en formularios)
+.		Form()												-Formularios. 			-Data from front_End		REQUIERE install python-multipart (ver en formularios)
 .																	from fastapi import Form 
 .																	def func(var : type = Form(value)):
-			     
-
+		File	   											-File parameters		-Files(imágenes, audio, vídeo, etc.)  
+		
 	------------------------------------------------------------------------------
 .		Parameter Validation and Metadata.  		 	Todos iguales = Path, Query, Body, Header, Cookie, Form, Field.
   	------------------------------------------

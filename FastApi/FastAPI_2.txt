@@ -1,3 +1,18 @@
+------------------------------------------------------------------------------	
+	Tipos de entradas de datos en FastAPI: 
+-------------------------------
+
+    Path Parameters         ->      URL y obligatorios
+    Query Parameters        ->      URL y opcionales
+    Request Body            ->      JSON
+    Formularios             ->      Campos en el frontend
+    Headers                 ->      Cabeceras HTTP que pueden ser de cliente a servidor y viceversa
+    Cookies                 ->      Almacenan información
+    File                    ->      Archivos como imágenes, audio, vídeo, etc.
+    Upload File                     (3 parámetros:)
+            Filename        ->      Nombre del archivo
+            Content_Type    ->      Tipo/Formato de archivo
+            File            ->      El File
 
 
 ------------------------------------------------------------------------------	
@@ -8,18 +23,70 @@
 .                                Datos no se recibiran de un JSON, sino de un formulario. (de HTML forms (<form></form>)).
 
 
+    pip install python-multipart                         Instalar libreria requerida. (verificar estar en Venv)
 
-pip install python-multipart                    Instalar libreria requerida. (verificar estar en Venv)
+    from fastapi import Form                             Importar Form (mismas validaciones y metadatos que path, query)
 
-from fastapi import Form                        Importar Form (mismas validaciones y metadatos que path, query)
+    @app.post(                                           Decorador con path al formulario
+        path= "/login",
+        response_model= login_Output,
+        status_code= status.HTTP_200_OK
+        )
+    asyc def login(                                      Funcion con parametros con nombre  exactamente igual a las label de HTTP.
+        username: str = Form(...), 
+        password: str = Form(...)
+        ):
+        return
 
-@app.post(                                      Decorador con path al formulario
-    path= "/login",
-    response_model= login_Output,
-    status_code= status.HTTP_200_OK
-    )
-asyc def login(                                 Funcion con parametros con nombre  exactamente igual a las label de HTTP.
-    username: str = Form(...), 
-    password: str = Form(...)
-    ):
-    return
+
+
+
+------------------------------------------------------------------------------	
+		Files.                          En Server se guarda File/ En BBDD se guarda la ruta para acceder a ella.
+   	-------------------------------
+
+.                                          |  File:
+.                                          |     Clase, similar a = Path, Query, etc.
+.                                          |  UploadFile:
+.                                          |     Tipo de dato. Objeto con 3 atributos principales:
+.                                          |         .filename       ->      Nombre del archivo
+.                                          |         .conten_type    ->      Tipo/Formato de archivo
+.                                          |         .file           ->      El File
+
+    var: UploadFile = File(value)                       Especificar parametro como file.        REQUIERE IMPORTACION
+.                                                       Especificar tipo de dato UploadFile     REQUIERE IMPORTACION
+
+.                                                           from fastapi import UploadFile, File
+.                                                           @app.post(path=/URL/post-image)
+.                                                           def post_image(var1: UploadFile = File(...)):
+.                                                               return{
+.                                                                   'File_name': var1.filename,
+.                                                                   'Format': var1.content_type,
+.                                                                   'Size(bytes)' : len(var1.file.read())
+.                                                                   "Size(kb)": round(len(image.file.read())/1024, ndigits=2)
+.                                                               }
+    var1.filename,                                      Entrega el file name
+    var1.content_type                                   Entrega tipo de archivo
+    len(var1.file.read())                               Entrega los bytes. Lee el file y cuenta los bites
+    round(len(image.file.read())/1024, ndigits=2)       Entrega los kilobites. Lee el file, cuenta los bites, los divide en 1024, permite 2 numeros posterior al punto, y hace redondeo.
+
+
+------------------------------------------------------------------------------	
+		Otros parametros especiales.  
+   	-------------------------------
+.                                               Header.  
+.                                               -------------------
+.                                               Validacion y metadatos = Path, Query, etc.
+.                                               Los Headers poseen "-" que No es valido en Python. Esta clase las convierte hacia y desde "_"
+.                                               -------------------
+	Header()											-Header parameters (
+.																from fastapi import FastAPI, Header
+.																def func(var : type = Header(value)):
+.                                               Cookie.  
+.                                               --------------------
+.                                               Validacion y metadatos = Path, Query, etc.
+.                                               Al manejar cookies, si no se declaran como tal, seran manejadas como query parameters
+.                                               --------------------
+	Cookie()											-Cookie parameters (ver en Cookies)
+.																from fastapi import Cookie
+.																def func(var : type = Cookie(value)):
