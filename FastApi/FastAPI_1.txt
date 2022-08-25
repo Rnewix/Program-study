@@ -32,6 +32,7 @@ Definiciones
 	Output model:	Should not have a password.
 	Database model: Would probably need to have a hashed password.
 
+	Docstring:		Es un String literal de toda la vida que ocurre como el primer statement en el módulo, función, clase o método definido. En este caso con fastApi automáticamente podemos ver los docstrings en la documentación interactiva.
 
 
 Ecosistema para FastAPI
@@ -103,15 +104,21 @@ First Steps
 .															.put()		Update data.
 .															.delete()	Delete data.
 .														----------------------------
+.															'{}'								Variables en Path. 
+.															'?=&'								Variable opcionales.
 .															path= "/URL"						Especificar el path.
 .															satus_code= status.HTTP_###_XXX		Definir un staus code (default >200). Requiere importar status. Ver abajo.
 .															response_model=  Model_Out			Ver abajo. Response Model.
+.															tags=["tag"]						Etiquetar
+.															summary= ""							Titulo personalizado
+.															deprecated=True 					Deprecar funcion. Dejarla sin uso sin borrarla.
 
   	def func():											Funcion (Path operation Function).  
+		'''Docstring'''									Docstring
 	    return {"" : ""}								Return un JSON (Un diccionario en Python). 		Cualquier cosa sera automaticamente convertida a JSON
 
   	async def func():									Especificar Funcion Asincronica   	    
-	def func(var1, var2:):     							Funcion con Parametros 
+	def func(var1, var2):     							Funcion con Parametros 
 	def func(var1: type, var2: type):    	 			Funcion con Parametros con Tipado estatico (no requiere ->)
 
 	
@@ -128,11 +135,13 @@ First Steps
 	path='/url/'										Definir "explicitamente" el path. 						(Normamente no se usa, el primer parametro pasado sera el Path (URL)).
 .															@app.get(path='/url/{var}')	
 
-	'/url?param=value'									Query Parameters.                 ?= query begin
+	?param=value										Query Parameters.                 ?= query begin
 .															@app.get('/url?paramet=value')	
 	
-	&													Query Parameters multiples.       &= query separator
+	?param=value&param=value							Query Parameters multiples.       &= query separator
 .															@app.get('/url?par1=value1&par2=value2')
+
+.															------------------------------------------
 
 	response_model=model_out							Crear response model. (Ver abajo en response model)
 .															@app.get('/url', response_model=model_out)	
@@ -142,8 +151,16 @@ First Steps
 
 	status_code= status.HTTP_###_Msg 					Especificar un status code. REQUIERE IMPORTACION		(ver status code en http.txt)
 .															from fastapi import status
-.															@app.get('/url', status_code=status.HTTP_200_OK)		
-														
+.															@app.get('/url', status_code=status.HTTP_200_OK)
+
+	tags=["tag"]										Dar una etiqueta. Visible en Interactive API documentation
+.															@app.get('/url', tags=["tag"]
+
+	summary = " "										Otorgar titulo personalizado
+. 															@app.get('/', summary = "Home page")	
+
+.															--------------------------------------------
+
 	param: type = value									Query Parameters. Variables con tipado estatico.
 .															@app.get("/URL")								
 .															def func(par1: type, par2: type):

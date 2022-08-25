@@ -45,26 +45,32 @@
 		Files.                          En Server se guarda File/ En BBDD se guarda la ruta para acceder a ella.
    	-------------------------------
 
-.                                          |  File:
-.                                          |     Clase, similar a = Path, Query, etc.
-.                                          |  UploadFile:
-.                                          |     Tipo de dato. Objeto con 3 atributos principales:
-.                                          |         .filename       ->      Nombre del archivo
-.                                          |         .conten_type    ->      Tipo/Formato de archivo
-.                                          |         .file           ->      El File
+.                                |  File:
+.                                |------------------------------------
+.                                |     Clase, similar a = Path, Query, etc.
+.                                |
+.                                |  UploadFile:
+.                                |------------------------------------
+.                                |     Tipo de dato. Objeto con 3 atributos principales:
+.                                |         .filename       ->      Nombre del archivo
+.                                |         .conten_type    ->      Tipo/Formato de archivo
+.                                |         .file           ->      El File
+
 
     var: UploadFile = File(value)                       Especificar parametro como file.        REQUIERE IMPORTACION
 .                                                       Especificar tipo de dato UploadFile     REQUIERE IMPORTACION
 
-.                                                           from fastapi import UploadFile, File
-.                                                           @app.post(path=/URL/post-image)
-.                                                           def post_image(var1: UploadFile = File(...)):
-.                                                               return{
-.                                                                   'File_name': var1.filename,
-.                                                                   'Format': var1.content_type,
-.                                                                   'Size(bytes)' : len(var1.file.read())
-.                                                                   "Size(kb)": round(len(image.file.read())/1024, ndigits=2)
-.                                                               }
+                                                        ej....................................
+                                                            from fastapi import UploadFile, File
+                                                            @app.post(path=/URL/post-image)
+                                                            def post_image(var1: UploadFile = File(...)):
+                                                                return{
+                                                                    'File_name': var1.filename,
+                                                                    'Format': var1.content_type,
+                                                                    'Size(bytes)' : len(var1.file.read())
+                                                                    "Size(kb)": round(len(image.file.read())/1024, ndigits=2)
+                                                                }
+
     var1.filename,                                      Entrega el file name
     var1.content_type                                   Entrega tipo de archivo
     len(var1.file.read())                               Entrega los bytes. Lee el file y cuenta los bites
@@ -74,19 +80,90 @@
 ------------------------------------------------------------------------------	
 		Otros parametros especiales.  
    	-------------------------------
-.                                               Header.  
-.                                               -------------------
-.                                               Validacion y metadatos = Path, Query, etc.
-.                                               Los Headers poseen "-" que No es valido en Python. Esta clase las convierte hacia y desde "_"
-.                                               -------------------
+
+.                                   Header.  
+.                               -------------------
+.                               |    Validacion y metadatos = Path, Query, etc.
+.                               |    Los Headers poseen "-" que No es valido en Python. Esta clase las convierte hacia y desde "_"
+
 	Header()											-Header parameters (
-.																from fastapi import FastAPI, Header
-.																def func(var : type = Header(value)):
-.                                               Cookie.  
-.                                               --------------------
-.                                               Validacion y metadatos = Path, Query, etc.
-.                                               Al manejar cookies, si no se declaran como tal, seran manejadas como query parameters
-.                                               --------------------
+.															from fastapi import FastAPI, Header
+.															def func(var : type = Header(value)):
+
+
+
+.                                   Cookie.  
+.                                --------------------
+.                               |    Validacion y metadatos = Path, Query, etc.
+.                               |    Al manejar cookies, si no se declaran como tal, seran manejadas como query parameters
+
 	Cookie()											-Cookie parameters (ver en Cookies)
-.																from fastapi import Cookie
-.																def func(var : type = Cookie(value)):
+.															from fastapi import Cookie
+.															def func(var : type = Cookie(value)):
+
+
+                                                              
+
+
+
+------------------------------------------------------------------------------	
+	HTTPException / Manejo de Errores                           Clase HTTPException. Controlar funcionamiento de los errores
+-------------------------------
+
+
+    HTTPException()                                     Clase para errores. REQUIERE IMPORTACION desde FastAPI. 
+                                                            Validaciones y Metadatos = Path, Query, etc.
+
+    raise                                               Levantar un error. Especificar error en la path operator function
+                                                            raise HTTPException()
+
+.                                                       ej....................................
+.                                                           from fastapi import HTTPException 
+
+.                                                           @app.get(path='/URL/{person_id}', status_code=status.HTTP_200_OK)
+.                                                           def search_person(person_id: int = Path(..., INSTRUCTIONS)):
+.                                                               if person_id not in BBDD_var:
+.                                                                   raise HTTPException(
+.                                                                       status_code = status.HTTP_404_NOT_FOUND,
+.                                                                       detail = 'Person not found'
+.                                                                   )
+.                                                               return {person_id: 'it exists!'}
+
+
+
+------------------------------------------------------------------------------	
+	Docstring                                       String que describe módulo/función/clase en python. Con fastApi automátic visible en la documentación interactiva. “Markdown friendly”
+-------------------------------
+
+    '''  '''                                        Crear docstrings
+
+
+    '''                                             Orden de docstrings en las funciones
+    Título                                              -título o nombre de la función
+    Descripción                                         -cómo se usa y qué es lo que hace
+    Parámetros                                          -parámetros de la función
+    Resultado                                           -lo que devuelve la función
+    '''
+                                                        ej. ----------------------------------------------
+                                                            @app.post()
+                                                            def create_person(person: Person = Body(...)):
+                                                                '''
+                                                                    Create Person
+
+                                                                    This path operation creates a person in the app and save the information in the database
+                                                                    
+                                                                    Parameters:
+                                                                    - Request body parameter:
+                                                                        - person: Person -> A person model with first name, last name, age, hair color and marital status
+                                                                    
+                                                                    Returns a person model with first name, last name, age, hair color and marital status
+                                                                '''
+                                                                return person
+
+------------------------------------------------------------------------------	
+	deprecated                                       Dejar funcion inusable para remplazarla por otra, pero sin borrar el codigo.
+-------------------------------
+
+
+deprecated=True                                     Deprecar una funcion. 
+                                                         @app.get('/URL/', deprecated=True) 
