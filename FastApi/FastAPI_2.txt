@@ -4,7 +4,8 @@
 		Formularios.  
    	-------------------------------
 
-Datos no se recibiran de un JSON, sino de un formulario. Recbiran de HTML forms (<form></form>).
+.                                Used when receive form fields instead of JSON. 
+.                                Datos no se recibiran de un JSON, sino de un formulario. (de HTML forms (<form></form>)).
 
 
 
@@ -17,7 +18,7 @@ from fastapi import Form                        Importar Form (mismas validacion
     response_model= login_Output,
     status_code= status.HTTP_200_OK
     )
-asyc def login(                                 Funcion con parametros con nombre igual a las label de HTTP.
+asyc def login(                                 Funcion con parametros con nombre  exactamente igual a las label de HTTP.
     username: str = Form(...), 
     password: str = Form(...)
     ):
