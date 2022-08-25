@@ -107,7 +107,7 @@ First Steps
 .															'{}'								Variables en Path. 
 .															'?=&'								Variable opcionales.
 .															path= "/URL"						Especificar el path.
-.															satus_code= status.HTTP_###_XXX		Definir un staus code (default >200). Requiere importar status. Ver abajo.
+.															status_code= status.HTTP_###_XXX	Definir un status code (default >200). Requiere importar status. Ver abajo.
 .															response_model=  Model_Out			Ver abajo. Response Model.
 .															tags=["tag"]						Etiquetar
 .															summary= ""							Titulo personalizado
@@ -317,10 +317,10 @@ First Steps
 .		atrib1: type = Field(value)							Creacion subclase dentro del modelo que tiene todos los atributos y sus valores.
 .		atrib2: type = Field(value)
       
-.		class Config:								
-.		|	schema_extra = {
-.		|		"example" : {"atrib1": "value",	"atrib2": int}
-.		|		}
+		class Config:								
+			schema_extra = {
+				"example" : {"atrib1": "value",	"atrib2": int}
+				}
 
 
 

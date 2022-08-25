@@ -167,3 +167,17 @@
 
 deprecated=True                                     Deprecar una funcion. 
                                                          @app.get('/URL/', deprecated=True) 
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------	
+	Faltantes.
+-------------------------------
+
+-Autentificacion

@@ -593,7 +593,7 @@ v.strftime('Estamos en el ano %Y')
 import datetime
 import pytz
 	
-	cdmx_timezone = pytz.timezone(America/Mexico_City)
+	cdmx_timezone = pytz.timezone('America/Mexico_City')
 	fecha_cdmx = datetime.now(cdmx_timezone)
 	print('Fecha en Mexico: ' + fecha_cdmx.strftime('%d/%m/%Y')
 
@@ -603,14 +603,14 @@ import pytz
 		Etc/GMT+1
 		Etc/GMT-1
 
-		America/Mexico_City
-		America/Vancouver
-		America/Los_Angeles
-		Asia/Hong_Kong
-		Asia/Seoul
-		Asia/Shanghai
-		Asia/Tokyo
-		Australia/Sydney
-		Europe/Moscow
+		'America/Mexico_City'
+		'America/Vancouver'
+		'America/Los_Angeles'
+		'Asia/Hong_Kong'
+		'Asia/Seoul'
+		'Asia/Shanghai'
+		'Asia/Tokyo'
+		'Australia/Sydney'
+		'Europe/Moscow'
 
 
