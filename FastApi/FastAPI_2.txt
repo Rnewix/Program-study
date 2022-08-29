@@ -2,10 +2,10 @@
 	Tipos de entradas de datos en FastAPI: 
 -------------------------------
 
-    Path Parameters         ->      URL y obligatorios
-    Query Parameters        ->      URL y opcionales
+    Path Parameters         ->      URL ('str') (bligatorios)
+    Query Parameters        ->      URL ('str') (opcionales)
     Request Body            ->      JSON
-    Formularios             ->      Campos en el frontend
+    Formularios             ->      Campos del frontend (No JSON)
     Headers                 ->      Cabeceras HTTP que pueden ser de cliente a servidor y viceversa
     Cookies                 ->      Almacenan información
     File                    ->      Archivos como imágenes, audio, vídeo, etc.
@@ -18,76 +18,52 @@
 
 ------------------------------------------------------------------------------	
 	Predefined values en Path param/ Query param                    Valores predefinidos
-   	-------------------------------
+-------------------------------
 
 
-from enum import Enum                           1.- Importacion ENUM
+    from enum import Enum                           1.- Importacion ENUM
 
-class Model1(str, Enum):                        2.- Crear modelo con opciones predefinidas
-    azul = "azul"                                       -especificar type  -heredar de Enum
-    rojo = "rojo"
+    class Model1(str, Enum):                        2.- Crear modelo con opciones predefinidas
+        azul = "azul"                                       -especificar type  -heredar de Enum
+        rojo = "rojo"
 
-@app.get("/{option}")                           
-async def get_model(option: Model1):            3.- Path parametro poner como type al Modelo creado.
-    if option is Model1.azul:                   
-    if option.value == "rojo":
-    return
-
-
-
-
-
-
-
-
-------------------------------------------------------------------------------	
-		Formularios.  
-   	-------------------------------
-
-.                                Used when receive form fields instead of JSON. 
-.                                Datos no se recibiran de un JSON, sino de un formulario. (de HTML forms (<form></form>)).
-
-
-    pip install python-multipart                         Instalar libreria requerida. (verificar estar en Venv)
-
-    from fastapi import Form                             Importar Form (mismas validaciones y metadatos que path, query)
-
-    @app.post(                                           Decorador con path al formulario
-        path= "/login",
-        response_model= login_Output,
-        status_code= status.HTTP_200_OK
-        )
-    asyc def login(                                      Funcion con parametros con nombre  exactamente igual a las label de HTTP.
-        username: str = Form(...), 
-        password: str = Form(...)
-        ):
+    @app.get("/{option}")                           
+    async def get_model(option: Model1):            3.- Path parametro poner como type al Modelo creado.
+        if option is Model1.azul:                   
+        if option.value == "rojo":
         return
 
 
 
-
 ------------------------------------------------------------------------------	
-		Files.                          En Server se guarda File/ En BBDD se guarda la ruta para acceder a ella.
-   	-------------------------------
+	Files/ file parameters                         
+-------------------------------
 
-.                                |  File:
-.                                |------------------------------------
-.                                |     Clase, similar a = Path, Query, etc.
-.                                |
-.                                |  UploadFile:
-.                                |------------------------------------
-.                                |     Tipo de dato. Objeto con 3 atributos principales:
-.                                |         .filename       ->      Nombre del archivo
-.                                |         .conten_type    ->      Tipo/Formato de archivo
-.                                |         .file           ->      El File
+    param: type = File(...)                         Ingreso de File segun tipo indicado (bytes, etc)
+    param: UploadFile = File(...)			        Ingreso de File segun tipo UploadFile (tipo especial que agrega mas caracteristicas y ventajas vs bytes)
+                                                            
+                                                    Caracteristicas
+                                                    ----------------------------
+                                                        Files herada de Form (que hereda de Body)
+                                                        Receive Files from forms HTML fields (<form></form>) instead of JSON (Body).    
+                                                        Request body/ POST, PUT, DELETE.  Recepcion de informacion desde el cliente
+                                                            BBDD guarda ruta para acceder al file/ Server guarda el File
+
+                                                        Identificacion por FastAPI:  Requiere declarar clase Files
+                                                        Valor: 	HTML special encoding data (part HTTP protocol). 
+                                                                    (application/x-www-form-urlencoded or multipart/form-data)
+
+                                                        ----------------------------------------------------------------------
+                                                            1.- Instalar libreria requerida
+                                                            2.- Importar clase 
+                                                            3.- Declarar type - UploadFile, ingresar como valor la clase File.
 
 
-    var: UploadFile = File(value)                       Especificar parametro como file.        REQUIERE IMPORTACION
-.                                                       Especificar tipo de dato UploadFile     REQUIERE IMPORTACION
-
-                                                        ej....................................
-                                                            from fastapi import UploadFile, File
-                                                            @app.post(path=/URL/post-image)
+                                                            pip install python-multipart                         
+                                                                -------------
+                                                            from fastapi import File, UploadFile
+                                                            
+                                                            @app.post('/post-image')
                                                             def post_image(var1: UploadFile = File(...)):
                                                                 return{
                                                                     'File_name': var1.filename,
@@ -96,15 +72,59 @@ async def get_model(option: Model1):            3.- Path parametro poner como ty
                                                                     "Size(kb)": round(len(image.file.read())/1024, ndigits=2)
                                                                 }
 
-    var1.filename,                                      Entrega el file name
-    var1.content_type                                   Entrega tipo de archivo
-    len(var1.file.read())                               Entrega los bytes. Lee el file y cuenta los bites
-    round(len(image.file.read())/1024, ndigits=2)       Entrega los kilobites. Lee el file, cuenta los bites, los divide en 1024, permite 2 numeros posterior al punto, y hace redondeo.
+    files: list[UploadFile] = File()                Upload several files at the same time. Recibir varios files al mismo tiempo     
+                                                        Se guardaran como listas. Manipular files con metodos list.
+                                                        [file1, file 2, file 3]
+
+
+
+    UploadFile
+    -----------------------------------------------  
+        Attributes
+        -------------------------
+            .filename,                                      Da un str con el nombre original del File
+            .content_type                                   Da un str con el formato del File (e.g. image/jpeg)                          
+            .file:                                          Da el file como Python object (file-like  object)(SpooledTemporaryFile). Can pass directly to other functions or libraries that expect a python object.
+
+        Methods  (Async)
+        --------------------------
+            .write(inf)                                     Writes inf (str or bytes) to the file. Async method
+            .read(size#)                                    Reads # size bytes/characters of the file. Async method
+            .seek(#)                                        Goes to the byte position  in the file. Async method
+            .close():                                       Closes the file.
+
+                                                            Async method
+                                                            -----------------------------------------------
+                                                            Para usar beneficio declarar await. (solo si funcion es tmb asincronica)
+                                                            
+                                                                def xxx ():
+                                                                    var =  file.read()
+
+                                                                    ||
+                                                                    VV
+
+                                                                async def xxx ():
+                                                                    var = await file.read()
+
+
+        len(image.file.read())                              Contar los bytes de un archivo
+        round(len(image.file.read())/1024, ndigits=2)       Contar los kilobites de un archivo. 
+                                                                1kb = 1024bytes
+                                                                round       Redondea
+                                                                ndigits     Decimales a mostrar. 
+
+
+
+
+
+
+
+
 
 
 ------------------------------------------------------------------------------	
-		Otros parametros especiales.  
-   	-------------------------------
+	Otros parametros especiales.  
+-------------------------------
 
 .                                   Header.  
 .                               -------------------
@@ -136,23 +156,34 @@ async def get_model(option: Model1):            3.- Path parametro poner como ty
 -------------------------------
 
 
-    HTTPException()                                     Clase para errores. REQUIERE IMPORTACION desde FastAPI. 
-                                                            Validaciones y Metadatos = Path, Query, etc.
+    HTTPException()                                         Clase para errores. REQUIERE IMPORTACION desde FastAPI. 
+                                                                from fastapi import HTTPException
 
-    raise                                               Levantar un error. Especificar error en la path operator function
-                                                            raise HTTPException()
+    raise                                                   Levantar un error. Especificar error en la path operator function
+                                                                raise HTTPException()
 
-.                                                       ej....................................
-.                                                           from fastapi import HTTPException 
+    HTTPException(
+        status_code =                                       Muestra un status code deseado (mas comun 404)
 
-.                                                           @app.get(path='/URL/{person_id}', status_code=status.HTTP_200_OK)
-.                                                           def search_person(person_id: int = Path(..., INSTRUCTIONS)):
-.                                                               if person_id not in BBDD_var:
-.                                                                   raise HTTPException(
-.                                                                       status_code = status.HTTP_404_NOT_FOUND,
-.                                                                       detail = 'Person not found'
-.                                                                   )
-.                                                               return {person_id: 'it exists!'}
+        detail = ''                                         Regresa al cliente un JSON con un str con texto que deseamos sea retornado. 
+        detail = Objet                                      Regresa al cliente un JSON con cualquier cosa que deseemos. Automaticamente sera transformado a JSON
+
+        headers={"": ""}                                    Regresar un custom headers to the HTTP error.
+
+        
+                                                            ....................................
+                                                                from fastapi import HTTPException 
+
+                                                                @app.get(path='/URL/{person_id}', status_code=status.HTTP_200_OK)
+                                                                def search_person(person_id: int = Path(..., INSTRUCTIONS)):
+                                                                    if person_id not in BBDD_var:
+                                                                        raise HTTPException(
+                                                                        status_code = status.HTTP_404_NOT_FOUND,
+                                                                        detail = 'Person not found'
+                                                                        )
+                                                                    return {person_id: 'it exists!'}
+
+    Advance handling Errores                                https://fastapi.tiangolo.com/tutorial/handling-errors/
 
 
 
@@ -160,38 +191,45 @@ async def get_model(option: Model1):            3.- Path parametro poner como ty
 	Docstring                                       String que describe módulo/función/clase en python. Con fastApi automátic visible en la documentación interactiva. “Markdown friendly”
 -------------------------------
 
-    '''  '''                                        Crear docstrings
+    '''  '''                                            Crear docstrings
 
 
-    '''                                             Orden de docstrings en las funciones
-    Título                                              -título o nombre de la función
-    Descripción                                         -cómo se usa y qué es lo que hace
-    Parámetros                                          -parámetros de la función
-    Resultado                                           -lo que devuelve la función
+    '''                                                 Orden de docstrings en las funciones
+    Título                                                  -título o nombre de la función
+    Descripción                                             -cómo se usa y qué es lo que hace
+    Parámetros                                              -parámetros de la función
+    Resultado                                               -lo que devuelve la función
     '''
-                                                        ej. ----------------------------------------------
-                                                            @app.post()
-                                                            def create_person(person: Person = Body(...)):
-                                                                '''
-                                                                    Create Person
+                                                            ej. ----------------------------------------------
+                                                                @app.post()
+                                                                def create_person(person: Person = Body(...)):
+                                                                    '''
+                                                                        Create Person
 
-                                                                    This path operation creates a person in the app and save the information in the database
-                                                                    
-                                                                    Parameters:
-                                                                    - Request body parameter:
-                                                                        - person: Person -> A person model with first name, last name, age, hair color and marital status
-                                                                    
-                                                                    Returns a person model with first name, last name, age, hair color and marital status
-                                                                '''
-                                                                return person
+                                                                        This path operation creates a person in the app and save the information in the database
+                                                                        
+                                                                        Parameters:
+                                                                        - Request body parameter:
+                                                                            - person: Person -> A person model with first name, last name, age, hair color and marital status
+                                                                        
+                                                                        Returns a person model with first name, last name, age, hair color and marital status
+                                                                    '''
+                                                                    return person
 
 ------------------------------------------------------------------------------	
-	deprecated                                       Dejar funcion inusable para remplazarla por otra, pero sin borrar el codigo.
+	Tags                                      
 -------------------------------
 
+                                                        Multiples tags con Enum
+                                                        -------------------------------------
+    from enum import Enum                               Importar Enum
 
-deprecated=True                                     Deprecar una funcion. 
-                                                         @app.get('/URL/', deprecated=True) 
+    class My_Tags(Enum):                                Clase que hereda de Enum, con los tags enumerados
+        items = "items"
+        users = "users"
+
+    @app.get("/items/", tags=[Tags.items])              Pasar como valor la clase.atrib (representa la Tag)
+    @app.get("/users/", tags=[Tags.users])
 
 
 
@@ -201,41 +239,108 @@ deprecated=True                                     Deprecar una funcion.
 -------------------------------
 Un objeto JSON 
     Forma similar a diccionario de python. 
-    Keys son strings.
     { "name":"John", "age":30, "city":"New York"}
 
+Datos compatibles con JSON
+    str, dict, list,
+Datos compatibles con JSON
+    datetime objects
 
 
 
+    import json
 
-import json
+    json.loads(JSON_type)                               Trasformar un JSON string a Python object 
+                                                                "{:}" => {:}
 
-json.loads(JSON_type)                               Trasformar un JSON string a Python object 
-                                                            "{:}" => {:}
-json.load()
+    json.dumps(py_obj)                                  Transformar un Python object a JSON string 
+                                                            indent=4        Transformar un Python object a JSON string preservando identacion de 4. Sino sera todo en linea.
+                                                            sort_keys=True  Al transformar, ordena claves por orden alfabetico (a,b,c,d...)
 
-json.dumps(py_obj)                                  Transformar un Python object a JSON string 
-                                                        indent=4        Transformar un Python object a JSON string preservando identacion de 4. Sino sera todo en linea.
-                                                        sort_keys=True  Al transformar, ordena claves por orden alfabetico (a,b,c,d...)
+                                                            Python object ------> Result= JSON string (javascript) equivalent
+                                                            ------------------------------------------------------------------
+                                                                dict	=>  Object          {:} => {:}      
+                                                                list	=>  Array           [,] => [,]      
+                                                                tuple	=>  Array           (,) => [,]  
+                                                                str	    =>  String          ""  => ""   
+                                                                int	    =>  Number          42  => 42   
+                                                                float	=>  Number          0.6 => 0.6      
+                                                                True	=>  true            True => true 
+                                                                False	=>  false           False => false
+                                                                None	=>  null            None => null 
 
-                                                        Python object ------> Result= JSON string (javascript) equivalent
-                                                        ------------------------------------------------------------------
-                                                            dict	=>  Object          {:} => {:}      
-                                                            list	=>  Array           [,] => [,]      
-                                                            tuple	=>  Array           (,) => [,]  
-                                                            str	    =>  String          ""  => ""   
-                                                            int	    =>  Number          42  => 42   
-                                                            float	=>  Number          0.6 => 0.6      
-                                                            True	=>  true            True => true 
-                                                            False	=>  false           False => false
-                                                            None	=>  null            None => null 
-
-
-
+    json.load()                                         Convertir JSON formateado por .read() a python Object 
+    json.dump()                                         Convertir objeto python a JSON formateado a file-like object (Para .write())
 
 
+    jsonable_encoder(obj)                               Convertir a JSON compatible data. Requiere Importacion.
+                                                            from fastapi.encoders import jsonable_encoder
+                                                            var = jsonable_encoder(item) 
 
-json.dump()
+                                                        Returns a Python standard data structure (e.g. a dict) with values and sub-values that are all compatible with JSON.
+                                                                Python object ------> Result= JSON string (javascript) equivalent
+                                                                ------------------------------------------------------------------
+                                                                    dict	=>  Object          {:} => {:}      
+                                                                    list	=>  Array           [,] => [,]      
+                                                                    tuple	=>  Array           (,) => [,]  
+                                                                    str	    =>  String          ""  => ""   
+                                                                    int	    =>  Number          42  => 42   
+                                                                    float	=>  Number          0.6 => 0.6      
+                                                                    True	=>  true            True => true 
+                                                                    False	=>  false           False => false
+                                                                    None	=>  null            None => null 
+
+
+
+------------------------------------------------------------------------------	
+	Updates / Partial updates.                                     
+-------------------------------
+
+
+Actualizar data stored as JSON (e.g. NoSQL database). (file.JSON, texto plano, etc.)
+
+    Complete Update 
+                                                        HTTP PUT
+                                                        Todos los datos se actualizan)
+                                                            => Atributos no actualizados se trasformara a none o ganara el valor default aunque previamente ya tenian un valor)
+
+                                                        --------------------------------------------------------------------------------------------
+                                                            itemsList = {
+                                                                "item1": {"name": "Foo", "price": 50.2},
+                                                                "item2": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+                                                                "item3": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+                                                            }
+                                                            @app.put("/{item_id}")                                                                              <----Comprender que si viene de otro modulo, debe usar metodo WITH, y hacer conversiones necesarias.
+                                                            async def update_item(item_id: str, item: ItemModel):
+                                                                update_item_encoded = jsonable_encoder(item)
+                                                                itemsList[item_id] = update_item_encoded
+                                                                return update_item_encoded
+
+
+    Partial Update 
+                                                        HTTP PATH                               (Aunq la mayoria usa erroneamente PUT. FastAPI comprende el error y puedes usar cualquiera de los dos)
+                                                        Se actualizan datos deseados.
+                                                            =>Los demas no actualizados se mantendran sin cambio
+
+                                                        exclude_unset
+                                                        item.dict(exclude_unset=True)           generate a dict with only the data that was set when creating the item model, excluding default values
+
+                                                        --------------------------------------------------------------------------------------------
+                                                            itemsList = {
+                                                                        "item1": {"name": "Foo", "price": 50.2},
+                                                                        "item2": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+                                                                        "item3": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+                                                                    }
+                                                            @app.patch("/items/{item_id}", response_model=Item)                                                 <----Comprender que si viene de otro modulo, debe usar metodo WITH, y hacer conversiones necesarias.
+                                                            async def update_item(item_id: str, item: Item):
+                                                                stored_item_data = items[item_id]
+                                                                stored_item_model = Item(**stored_item_data)
+                                                                update_data = item.dict(exclude_unset=True)
+                                                                updated_item = stored_item_model.copy(update=update_data)
+                                                                items[item_id] = jsonable_encoder(updated_item)
+                                                                return updated_item
+
+
 
 ------------------------------------------------------------------------------	
 	Faltantes.

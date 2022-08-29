@@ -14,15 +14,6 @@ Definiciones
 	Entidad     Cualquier objeto 
 	Modelo      Molde/clase para crear objeto. Representación en codigo de un objeto(entidad). Requiere importar framework Pydantic (clase BaseModel)
 	Pydantic	Framework para crear modelos. Se requiere en FastAPI
-
-	Parameters:
-	Path parameter:   Variables dentro del Path, que pasara como argumento a la funcion. Ingreso Obligatorio. 
-					Estructura: 
-						@app.get("/{user_id}")	
-						async def func(user_id: type):						 					
-	Query Parameters: Parametros de Funcion, no parte de path parameter. Aunque Ingresan por medio del URL (parte final del URL en forma de key-value). ingreso no obligatorio.
-					Estructura de ingreso: 	
-						Cliente => '/url?par1=val1&par2=val2&...' 
 	Response: 		Respuesta del servidor/API al cliente. ALWAYS sended.
 	Response body:	Continene el body de un HTTP response. Realizada con GET. Contiene la info de la consulta o solicitud de informacion
 	Request: 		Peticion del cliente al servidor/API. Not always needed.
@@ -64,22 +55,22 @@ First Steps
     6 Run code 
     
     
-.	    |-----------------------------------------------------------------------------------------------------------
-.		|		Basic estructure
-.    	|-----------------------------------------------------------------------------------------------------------
-.    	|  	
-.    	| 			from fastapi import FastAPI						Class FastAPI imported 
-.    	|						
-.    	|			app = FastAPI()									Var que instancia(objeto) de FastAPI (clase). Sera nuestra APP de FastAPI.  
-.    	|				
-.    	|			@app.get("/")									Path operation Decorator
-.    	|			async def func():								Path operation Function
+	    |-----------------------------------------------------------------------------------------------------------
+		|		Basic estructure
+    	|-----------------------------------------------------------------------------------------------------------
+    	|  	
+    	| 			from fastapi import FastAPI						Class FastAPI imported 
+    	|						
+    	|			app = FastAPI()									Var que instancia(objeto) de FastAPI (clase). Sera nuestra APP de FastAPI.  
+    	|				
+    	|			@app.get("/")									Path operation Decorator
+    	|			async def func():								Path operation Function
 		|			'''Docstring'''									Documentacion de la funcion
-.    	|				return {"message": "Hello World"}			Respuesta {JSON}
-.    	|
-.    	-----------------------------------------------------------------------------------------------------------
-.
-.
+    	|				return {"message": "Hello World"}			Respuesta {JSON}
+    	|
+    	-----------------------------------------------------------------------------------------------------------
+
+
 ------------------------------------------------------------------------------
 	Install and Run  
 -------------------------------
@@ -118,8 +109,10 @@ First Steps
 															'{}'								Variables en Path.  Pueden ser multiples variables en el path.
 															status_code= 						Definir un status code (default >200). Requiere importar status. Ver abajo.
 															response_model= 					Ver abajo. Response Model.
-															tags=["tag"]						Etiquetar
+															response_description=""				Describe al response_model
+															tags=["tag"]						Etiquetar (Mas info ver TAGS)
 															summary= ""							Titulo personalizado
+															description=""						Describe a la funcion (Pero se usa mejor el ==docstrings==)
 															deprecated= True 					Deprecar funcion. Dejarla sin uso sin borrarla.
 															include_in_schema=False				No mostrarse en la Interactive API documentation /docs /redoc
 															response_model_exclude_unset=True	No mostrar los atributos no llenados de un response_model al regresarlo.
@@ -211,7 +204,7 @@ First Steps
 															Valor: 	JSON  {:}
 																	Usado para la recepcion de informacion desde el cliente. Seran recibidos como JSON. Toda la informacion pasara a un modelo.
 
-															Mas especifico
+															Mas especifico (forma del JSON)
 															------------------------------
 																class Model1(BaseModel):
 																	name:str = Field(...)
@@ -229,14 +222,14 @@ First Steps
 																		{ 'name' : 'ABC', 'price': 20 }	
 
 																....................................................
-																async def func(AAA : Model1 = Body(..., embed=True)):		
+																async def func(AAA : Model1 = Body(..., embed=True)):	<--- JSON con llave	
 																....................................................
 																	JSON body expected:     Body directly with key
 
 																		{AAA: {'name' : 'ABC', 'price': 20} }		
 
 																....................................................
-																async def func(AAA : Model1,  BBB : Model2):      <--- Dos bodies / dos Modelos o mas en una funcion
+																async def func(AAA : Model1,  BBB : Model2):      		<--- Dos bodies / dos Modelos o mas en una funcion
 																....................................................
 																	JSON body expected:     Body directly with key
 
@@ -271,6 +264,56 @@ First Steps
 																		from fastapi import Form 
 																		def func(var: type = Form(value)):
 			File()	   											-File parameters		-Files(imágenes, audio, vídeo, etc.)  
+
+	Formularios	/ Form parameters						
+	------------------------------------							
+		@app.get("/")									Formulary =  Form(...)
+		async def func(param: str = Form(...) ):							
+			return {}										  
+														Caracteristicas
+														----------------------------
+															Used to receive form HTML fields (<form></form>) instead of JSON (Body).
+															Forms hereda de BODY
+                                                            Request body/ POST, PUT, DELETE.  Recepcion de informacion desde el cliente
+
+															Identificacion por FastAPI:  Requiere declarar clase Form
+															Valor: 	HTML special encoding data (part HTTP protocol). 
+                                                                        (application/x-www-form-urlencoded or multipart/form-data)
+
+															Una funcion PUEDE recibir multiples Form y files de multiples form fields (mismo formato HTTP), pero no pueden combinarse Forms/Files con Query param (ya que Query llega como JSON)
+
+                                                            ----------------------------------------------------------------------
+                                                                1.- Instalar libreria requerida (ayudara a entender codificacion de http protocolo). 
+                                                                2.- Importar clase Form 
+                                                                3.- Funcion con parametros con nombre igual a las label de HTTP.
+
+
+                                                                pip install python-multipart                         
+                                                                    -------------
+                                                                from fastapi import Form                             
+
+                                                                @app.post('/')                                                              
+                                                                asyc def login(                                     
+                                                                    username: str = Form(...),  
+                                                                    password: str = Form(...)
+                                                                    ):
+                                                                    return
+
+	Files / file parameters								(Ver en formularios)
+	------------------------------------										
+
+        param: type = File(...)                         Ingreso de File segun tipo indicado (bytes, etc)
+        param: UploadFile = File(...)			        Ingreso de File segun tipo UploadFile (tipo especial que agrega mas caracteristicas y ventajas vs bytes)
+                                                                
+														Caracteristicas
+														----------------------------
+                                                            Files herada de Form (que hereda de Body)
+															Receive Files from forms HTML fields (<form></form>) instead of JSON (Body).    
+                                                            Request body/ POST, PUT, DELETE.  Recepcion de informacion desde el cliente
+                                                                BBDD guarda ruta para acceder al file/ Server guarda el File
+
+															Una funcion PUEDE recibir multiples Form y files de multiples form fields (mismo formato HTTP), pero no pueden combinarse Forms/Files con Query param (ya que Query llega como JSON)
+
 
 ------------------------------------------------------------------------------
 	Variables / parametros en FastAPI.  
@@ -415,21 +458,21 @@ First Steps
 		var : Enum_str = None								4.- Remplazar el type normal con la clase creada. Equivalen a type "str"/ type "int" (Enum/IntEnum respectivamente)
 	
 
-
 ------------------------------------------------------------------------------	
 	Model  
 -------------------------------
-														Creacion de modelo.
-	from pydantic import BaseModel						1.-Importacion de BaseModel de pydantic 
-	----------------
-	class Model1(BaseModel):							2.-Creacion de modelo. Una clase que hereda de BaseModel.
-		atribute1 : type								3.-Atributos con tipado estatico
-		atribute2 : type
-		opt_atrib1 : type = value						3.1.-Atributos Opcionales, con tipado estatico
-	----------------
-	@app.post("/URL/"new_model")						4.- Create Path operation que manipulara modelo.	Tipo = Request:POST / PUT / DELETE / etc.
-	def create_object(var_model: Model1):				5.- Funcion con parametro que tendra como type nuestro modelo. El nombre del parametro, sera el nombre de la variable donde se instanciara el objeto desde modelo (clase). 
-		return 
+	Creacion de modelo.
+	-------------------------------------
+		from pydantic import BaseModel						1.-Importacion de BaseModel de pydantic 
+	
+		class Model1(BaseModel):							2.-Creacion de modelo. Una clase que hereda de BaseModel.
+			atribute1 : type								3.-Atributos con tipado estatico
+			atribute2 : type
+			opt_atrib1 : type = value						3.1.-Atributos Opcionales, con tipado estatico
+	
+		@app.post("/URL/"new_model")						4.- Create Path operation que manipulara modelo.	Tipo = Request:POST / PUT / DELETE / etc.
+		def create_object(var_model: Model1):				5.- Funcion con parametro que tendra como type nuestro modelo. El nombre del parametro, sera el nombre de la variable donde se instanciara el objeto desde modelo (clase). 
+			return 
 
 
 	Field()												Especificar una variable como atributo de un modelo. REQUIERE IMPORTACION la clase desde pydantic
@@ -439,10 +482,16 @@ First Steps
 																atrib1: type = Field(value)
 		   														atrib2: type = Field(value)
 
- 	atrib1: type = Field(value, INSTRUCTIONS)			Para validaciones de parametros de un Modelos (similar a clases Body, Query, Path, etc de fastapi).
-														Ver arriba (==INSTRUCTIONS==) 	
+ 	atrib:type = Field(value, INSTRUCTIONS)				Para validaciones de parametros de un Modelos (similar a clases Body, Query, Path, etc de fastapi).
+															Ver arriba (==INSTRUCTIONS==) 	
 
-	.dict()												Convertir datos a diccionario (python dicc) (Pydantic method)
+	.dict()												Convertir datos de un modelo a diccionario (Pydantic method)
+															entity/JSON/datos de modelo = > python dicc
+
+	Model1(**Model2.dict())								Pasar datos de un modelo como argumentos de otro modelo
+															.dict() 	Convierte datos de modelos a diccionarios
+															** 			Informa a funcion que ingresan valores key-value. Como llega {'':''} hace Unwrapping de dic para mandar solo '':''
+															
 
 	var = object.dict()									Regresar 2 JSON unificados(regresar 2 Request body unficados). Poco Comun. 
 	var.update(object2.dict())								Unificar los 2 JSON antes de returnarlos (convertirlos en dicc)
@@ -504,46 +553,54 @@ First Steps
 	-	3 En el Decorador (fuera del path) ingresar la instruccion: "response_model" y como su valeu el -Response Model- creado.
 			Ej. -> En los siguientes casos aunque se retorne "user" que vale: "Model_Input", se enviara como respuesta: "Model_Output"
 
-											Ejemplo 1
-								--------------------------------
-	from pydantic import BaseModel, Field						Metodo Bruto. Hace duplicidad de codigo.
-	|
-	class Model_Input(BaseModel):									<-Modelo principal con datos sensibles
-	|	atributes1 : type = Field(...)	
-	|	atributes2 : type = Field(...)							
-	|	password: str = Field(...)
-    |
-	class Model_Output(BaseModel):									<-Modelo copia sin datos sensibles que sera regresado en la respuesta.
-	|	atributes1 : type = Field(...)	
-	|	atributes2 : type = Field(...)							
-    |
-	@app.post("/URL/"new_model", response_model = Model_Output)	<- En decorador -> response_model = Model_OUT			
-	def create_user(user: Model_Input):				
-	|	return user
+	Ejemplo 1
+	--------------------------------
 
-											Ejemplo 2  (mejorcito)
-								--------------------------------
-	from pydantic import BaseModel, Field						Metodo con herencia (no duplicidad)
-	|
-	class ModelBase(BaseModeL):										<-Padre con atibutos generales.
-	|	atributes1 : type = Field(...)	
-	|	atributes2 : type = Field(...)							
-	|
-	class Model_INPUT(ModelBase):									<-Modelo principal. hereda Padre y adiciona datos sensibles sobreagregados			
-	|	password: str = Field(...)
-	|
-	class Model_OUTPUT(ModelBase):									<-Modelo respuesta. hereda de Padre. Aunque pass, mostrara lo atrib de padre.
-	|	pass						
-  	|
-	@app.post("/URL/"new_model", response_model = Model_OUTPUT)		<- En decorador -> response_model = Model_OUT			
-	def create_user(user: Model_INPUT):				
-	|	return user
-
+		from pydantic import BaseModel, Field							Metodo con herencia (no duplicidad)
+		
+		class ModelBase(BaseModeL):										<-Padre con atibutos generales.
+			atributes1 : type = Field(...)	
+			atributes2 : type = Field(...)							
+		
+		class Model_INPUT(ModelBase):									<-Modelo principal. hereda Padre y adiciona datos sensibles sobreagregados			
+			password: str = Field(...)
+		
+		class Model_OUTPUT(ModelBase):									<-Modelo respuesta. hereda de Padre. Aunque pass, mostrara lo atrib de padre.
+			pass						
+		
+		@app.post("/URL/"new_model", response_model = Model_OUTPUT)		<- En decorador -> response_model = Model_OUT			
+		def create_user(user: Model_INPUT):				
+			return user
 	---------------------------------------------------------------------------------
 
 
+	response_model=Union[Model1, Model2])			Responder con diferentes modelos en un solo response model segun caso presentado. 
+													Requiere importer Union. La respuesta puede ser cualquiera de los dos.
+														from typing import Union
+														class Resp_Model1
+														class Resp_Model2
+														@app.get("/", response_model=Union[Resp_Model1, Resp_Model2])
 
 
+	response_model=list[Model]						Responder con una lista de objetos. 
+														1.- Un modelo creado. 
+														2.- Una lista donde se depositaran las instancias de ese modelo. 
+														3.- Regresar esa lista de objetos.
+														-----------------------------------------------------------------
+															class Item(BaseModel):
+																name: str
+																description: str
+
+															items = [
+																{"name": "Foo", "description": "There comes my hero"},
+																{"name": "Red", "description": "It's my aeroplane"},
+															]
+
+															@app.get("/items/", response_model=list[Item])
+															async def read_items():
+    															return items
+
+	response_model=dict[type, type]					Responder con un diccionario y no con un modelo
 
 
 
