@@ -291,6 +291,209 @@ Datos compatibles con JSON
                                                                     None	=>  null            None => null 
 
 
+------------------------------------------------------------------------------	
+	SQL Database                                     
+-------------------------------
+
+"ORM": an "object-relational mapping" library.
+
+ORM has tools to convert ("map") between objects in code and database tables ("relations"), to make the connections or relations between tables or entities.
+
+
+Common ORMs example:
+-SQLAlchemy ORM (part of SQLAlchemy, independent of framework) 
+-Peewee (independent of framework)
+-Django-ORM (part of the Django framework)
+-etc.
+
+
+    
+    SQLAlchemy ORM        (No Async)                                                    https://fastapi.tiangolo.com/tutorial/sql-databases/
+-------------------------------
+
+    1.- pip install sqlalchemy
+    2.- create module for database (database.py)
+            project
+            └── app
+                ├── __init__.py
+                ├── crud.py
+                ├── schemas.py          <=  the Pydantic models/schemas
+                ├── main.py
+                ├── models.py           <=  the SQLAlchemy models
+                └── database.py
+
+    3.- Desarrollar Configuracion de la Database. (database.py)                          ??????????????????? DB URL
+
+        3.1.- Importaciones
+        3.2.- Instanciar URL, engine, session y la base                                
+            
+                        database.py
+            ------------------------------------------------
+            from sqlalchemy import create_engine
+            from sqlalchemy.ext.declarative import declarative_base
+            from sqlalchemy.orm import sessionmaker
+
+            SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"                                      <= URL para conectar con database. (ej. SQLite database)  (# postgresql => "postgresql://user:password@postgresserver/db")
+
+            engine = create_engine(                                                                 <= Crear engine. (SQLite requiere "check_same_thread": False, para usar multiples)
+                SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+            )
+            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)             <= Instance will be the actual database session.
+
+            Base = declarative_base()                                                               <= Instance will be will be a class used to create each of the database models or classes (the ORM models)
+            ------------------------------------------------    
+
+    4.- Crear database models. (models.py)                                               ????????????????????????????? Clases, types, Column() relationship
+
+                        models.py
+            ------------------------------------------------
+            from .database import Base                                                              <= Importar Base de database.py (ver arriba)
+
+            from sqlalchemy import Integer, String, Boolean, ForeignKey                             <= Importar SQLAlchemy class "type" (para definir tipos)
+            from sqlalchemy import Column                                                           <= Importar funcion Column (para crear columnas)
+            from sqlalchemy.orm import relationship                                                 <= importar relationship para crear relaciones entre tablas (attribute will contain the values from other tables related to this one)
+
+            class User(Base):                                                                       <= Crear tabla (Modelo). Heredar de Base.
+                __tablename__ = "users"                                                                 <= Indica el nombre de la tabla
+
+                id = Column(Integer, primary_key=True, index=True)                                      <= Crear columns. attribute = Column(type)
+                email = Column(String, unique=True, index=True)
+                hashed_password = Column(String)
+                is_active = Column(Boolean, default=True)
+
+                items = relationship("Item", back_populates="owner")                                    <= Crear relationship entre tablas. atributte = relationship("Tabla(modelo)")
+
+
+            class Item(Base):
+                __tablename__ = "items"
+
+                id = Column(Integer, primary_key=True, index=True)
+                title = Column(String, index=True)
+                description = Column(String, index=True)
+                owner_id = Column(Integer, ForeignKey("users.id"))
+
+                owner = relationship("User", back_populates="items")
+
+            ------------------------------------------------    
+
+    5.- Permitir Modelos pydantic a leer datos de ORMs (SQLAlchemy) 
+
+        Permitira no solo leer Diccionarios, sino tambien objetos de ORMs.         
+              id = data["id"]      =>       id = data.id        
+        Haciendolo pueden volverse response_model
+
+                        schema.py
+            ------------------------------------------------
+            class ItemBase(BaseModel):
+                title: str
+                description: Union[str, None] = None
+
+            class ItemCreate(ItemBase):
+                pass
+
+            class Item(ItemBase):
+                id: int
+                owner_id: int
+                class Config:                                                                       <= Crear subclasse Config. 
+                    orm_mode = True                                                                     <= Dar atributo orm_mode = True
+            ------------------------------------------------
+
+    6.- Crear funciones para CRUD. (crud.py)
+
+        Tendra nuestras funciones reutilizables para interactuar con la database
+        Create, Read, Update, and Delete
+
+                    crud.py
+            ------------------------------------------------
+            from sqlalchemy.orm import Session
+            from . import models, schemas                                                           <= models (SQLAlchemy models) and schemas (Pydantic models / schemas).
+
+
+            #Read
+            #---------------------------------------------------------------------
+            def get_user(db: Session, user_id: int):                                                <= Argumentos db: Session (db representara a la BBDD)
+                return db.query(models.User).filter(models.User.id == user_id).first()              <= regresa la primera (.first) concordancia de id con id de BBDD (.filter(models.User.id == user_id)) de la tabla de Usuarios de la BBDD (db.query(models.User)) 
+
+            def get_user_by_email(db: Session, email: str):
+                return db.query(models.User).filter(models.User.email == email).first()             <= regresa la primera (.first) concordancia de email con email de BBDD (.filter(models.User.id == user_id)) de la tabla de Usuarios de la BBDD (db.query(models.User)) 
+
+            def get_users(db: Session, skip: int = 0, limit: int = 100):                            <= Regresa todos los Users (limitando 100)
+                return db.query(models.User).offset(skip).limit(limit).all()
+
+            #Create
+            #---------------------------------------------------------------------
+            def create_user(db: Session, user: schemas.UserCreate):
+                db_user = models.User(                                                              1.- Instancia SQLAlchemy model with your data
+                    email = user.email, 
+                    hashed_password = HashealoMyFriendo(user.password
+                    )
+
+                db.add(db_user)                                                                     2.- Agregar Instancia a BBDD
+                db.commit()                                                                         3.- Guardar los cambios en BBDD
+                db.refresh(db_user) 
+                                                                                4.- Reload y se agregan los datos automaticos (like the generated ID) 
+                return db_user
+
+
+            def create_user_item(db:Session,    item:schemas.ItemCreate,    user_id:int):
+                db_item = models.Item(**item.dict(), owner_id=user_id)                              *Se convirtio en Dic, para mandar multiples datos como key-value. Ademas de poder agregar dato extra user_id que se tratara como key-value
+
+                db.add(db_item)
+                db.commit()
+                db.refresh(db_item)
+
+                return db_item
+
+    7.- Integrar lo realizado a la APP (main.py)
+
+        1.- Importar todo
+        2.- Crear dependencia (abrir y cerrar conexion/sesion con DDBB)
+        3.- Agregar la conexion a BBDD a la path operation function. 
+                db: Session = Depends(get_db)
+        4.- Llama a las funciones CRUD de crud.py
+        5.- Responder con response_model que tienen clase anidada orm_mode
+                Values return are SQLAlchemy models, or lists of SQLAlchemy models. But response_model (Pydantic models) with schemas using orm_mode
+                will extracte the value, and returned to the client, with all the normal filtering and validation.
+
+
+                    main.py
+            ------------------------------------------------
+            from sqlalchemy.orm import Session                          <=Permite a FastAPI conocer los metodos de la clase Session (.query(), .add(), .refresh(), .commit(), etc)          
+            from . import crud, models, schemas
+            from .database import SessionLocal, engine
+
+            from fastapi import Depends
+
+            models.Base.metadata.create_all(bind=engine)
+
+            # Dependency
+            def get_db():
+                db = SessionLocal()
+                try:
+                    yield db
+                finally:
+                    db.close()
+
+
+            @app.post("/users/", response_model=schemas.User)
+            def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+                db_user = crud.get_user_by_email(db, email=user.email)
+                if db_user:
+                    raise HTTPException(status_code=400, detail="Email already registered")
+                return crud.create_user(db=db, user=user)
+
+            @app.get("/users/{user_id}", response_model=schemas.User)
+            def read_user(user_id: int, db: Session = Depends(get_db)):
+                db_user = crud.get_user(db, user_id=user_id)
+                if db_user is None:
+                    raise HTTPException(status_code=404, detail="User not found")
+                return db_user
+
+            @app.post("/users/{user_id}/items/", response_model=schemas.Item)
+            def create_item_for_user(
+                user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)
+            ):
+                return crud.create_user_item(db=db, item=item, user_id=user_id)
 
 ------------------------------------------------------------------------------	
 	Updates / Partial updates.                                     
@@ -347,4 +550,5 @@ Actualizar data stored as JSON (e.g. NoSQL database). (file.JSON, texto plano, e
 -------------------------------
 
 -Autentificacion
+-updates
 -conexion a bases de datos
