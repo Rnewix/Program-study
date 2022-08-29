@@ -44,35 +44,35 @@ TYPE ANNOTATIONS          	(type hints)
 																var: float = 0.5
 																var: str = 'hola'
 																var: bool = True
+																var: list[type] = ...
+																var: set[type] = ...
+																var: dict[type, type] = ...
 																var: Clase 				<-Clase que creamos, o de python/librerias. (ej. clase Optional, List, Dict, etc. del modulo typing)
 																
 
+																python ver >3.6 y <3.9
+																---------------------------------------------					
+																	from typing import List									Declarar lista con tipado estatico
+																	list1 : List[type] = [values]									ej. num_none: List[int] = [1, 3, 5, 7]
 
-		---------------------------------------------					
+																	from typing import Dict									Declarar diccionarios con tipado estatico
+																	dicc1: Dict[type, type] = {value : values}						ej. country_key: Dict[str, int] = ['mexico': 23, 'canada': 12]
 
-
-	from typing import List									Declarar lista con tipado estatico
-	list1 : List[type] = [values]									ej. num_none: List[int] = [1, 3, 5, 7]
-
-	from typing import Dict									Declarar diccionarios con tipado estatico
-	dicc1: Dict[type, type] = {value : values}						ej. country_key: Dict[str, int] = ['mexico': 23, 'canada': 12]
-
-	from typing import Tuple								Declarar tupla con tipado estatico
-    tuple1: Tuple[type,type,...] = (values)							ej. code: Tuple[int, float, int] = [2, 0.56, 2]
+																	from typing import Tuple								Declarar tupla con tipado estatico
+																	tuple1: Tuple[type,type,...] = (values)							ej. code: Tuple[int, float, int] = [2, 0.56, 2]
 
 
-		---------------------------------------------
-	
+																	---------------------------------------------
 
-	from typing import Dict, List							Anidacion. Lista de diccionarios
-	ID: List[Dict[type, type]] = [{values: values}]	
+						
+ID: list[dict[type, type]] = [{values: values}]	 			Anidacion. Lista de diccionarios
 
-	from typing import Dict, List, Tuple					Anidacion. Lista de diccionarios con tuplas anidadas.
-	ID: List[Dict[type, Tuple[type, type]]] = [{'value':(value, value)}]		
+															Anidacion. Lista de diccionarios con tuplas anidadas.
+ID: list[dict[type, Tuple[type, type]]] = [{'value':(value, value)}]		
 
-	
-	var = List[Dict[type,type]]								Guardar tipeo en una variable para luego usar esta variable como atajo.
-	var2 : var = [{values: values}] 							=> var2 : List[Dict[type,type]] = [{values: values}]
+
+var = List[Dict[type,type]]									Guardar tipeo en una variable para luego usar esta variable como atajo.
+var2 : var = [{values: values}] 								(Resultado=> var2 : List[Dict[type,type]] = [{values: values}])
 
 
 		---------------------------------------------

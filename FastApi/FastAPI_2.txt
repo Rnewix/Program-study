@@ -15,6 +15,31 @@
             File            ->      El File
 
 
+
+------------------------------------------------------------------------------	
+	Predefined values en Path param/ Query param                    Valores predefinidos
+   	-------------------------------
+
+
+from enum import Enum                           1.- Importacion ENUM
+
+class Model1(str, Enum):                        2.- Crear modelo con opciones predefinidas
+    azul = "azul"                                       -especificar type  -heredar de Enum
+    rojo = "rojo"
+
+@app.get("/{option}")                           
+async def get_model(option: Model1):            3.- Path parametro poner como type al Modelo creado.
+    if option is Model1.azul:                   
+    if option.value == "rojo":
+    return
+
+
+
+
+
+
+
+
 ------------------------------------------------------------------------------	
 		Formularios.  
    	-------------------------------
@@ -171,13 +196,50 @@ deprecated=True                                     Deprecar una funcion.
 
 
 
+------------------------------------------------------------------------------	
+	JSON                                     
+-------------------------------
+Un objeto JSON 
+    Forma similar a diccionario de python. 
+    Keys son strings.
+    { "name":"John", "age":30, "city":"New York"}
 
 
 
 
+
+import json
+
+json.loads(JSON_type)                               Trasformar un JSON string a Python object 
+                                                            "{:}" => {:}
+json.load()
+
+json.dumps(py_obj)                                  Transformar un Python object a JSON string 
+                                                        indent=4        Transformar un Python object a JSON string preservando identacion de 4. Sino sera todo en linea.
+                                                        sort_keys=True  Al transformar, ordena claves por orden alfabetico (a,b,c,d...)
+
+                                                        Python object ------> Result= JSON string (javascript) equivalent
+                                                        ------------------------------------------------------------------
+                                                            dict	=>  Object          {:} => {:}      
+                                                            list	=>  Array           [,] => [,]      
+                                                            tuple	=>  Array           (,) => [,]  
+                                                            str	    =>  String          ""  => ""   
+                                                            int	    =>  Number          42  => 42   
+                                                            float	=>  Number          0.6 => 0.6      
+                                                            True	=>  true            True => true 
+                                                            False	=>  false           False => false
+                                                            None	=>  null            None => null 
+
+
+
+
+
+
+json.dump()
 
 ------------------------------------------------------------------------------	
 	Faltantes.
 -------------------------------
 
 -Autentificacion
+-conexion a bases de datos

@@ -559,58 +559,60 @@ yield
 next()
 
 -------------------------------------------------------
-Datetime
+Datetime 				manejo de fechas. manejo de horas
 -------------------------------------------------------
-import datetime
 
-datetime.datetime.now()			Regresa fecha yyyy-mm-dd 00:00:00.000000    hora:min:seg.miliseg
-			
-datetime.date.today()			Regresa fecha yyyy-mm-dd 
+	from datetime import datetime
+
+	datetime.now()				Manejo de fecha y hora. Regresa fecha yyyy-mm-dd 00:00:00.000000    hora:min:seg.miliseg
+				
+	date.today()				Manejo de fecha. Regresa fecha yyyy-mm-dd 
 
 		Obtener solo el ano, mes o el dia.
 	-----------------------------------------------	
-v = datetime.date.today()		Introduce info en variable. 
-	v.year				Regresa year  yyyy
-	v.month				Regresa mes   mm
-	v.day   			Regresa dia   dd
+	v = date.today()			Introduce info en variable. 
+		v.year						Regresa year  yyyy
+		v.month						Regresa mes   mm
+		v.day   					Regresa dia   dd
 	
 		Dar formato a la fecha
 	----------------------------------------------
-v = datetime.datetime.now()		Introduce info en variable	
-v.strftime('%d/%m/%Y')			Regresa dd/mm/yyyy
-v.strftime('Estamos en el ano %Y')
+	v = datetime.now()				Introduce info en variable	
+	v.strftime('%d/%m/%Y')			Regresa dd/mm/yyyy
+	v.strftime('Estamos en el ano %Y')
 
-	%Y	Ano
-	%m	Mes	(m minuscula)
-	%d	Dia
-	%H	Hora
-	%M 	Minutos (M MAYUSCULA)
-	%S	Segundos
+		%Y	Ano
+		%m	Mes	(m minuscula)
+		%d	Dia
+		%H	Hora
+		%M 	Minutos (M MAYUSCULA)
+		%S	Segundos
 	
 	
 	  Zona horaria. Colocar fehca y hora segun pais
 	------------------------------------------------
-import datetime
-import pytz
+
+	import datetime
+	import pytz
 	
 	cdmx_timezone = pytz.timezone('America/Mexico_City')
 	fecha_cdmx = datetime.now(cdmx_timezone)
 	print('Fecha en Mexico: ' + fecha_cdmx.strftime('%d/%m/%Y')
 
-	  Lista zonas horarias
-	------------------------
-		Etc/GMT+0
-		Etc/GMT+1
-		Etc/GMT-1
+			Lista zonas horarias
+			------------------------
+				Etc/GMT+0
+				Etc/GMT+1
+				Etc/GMT-1
 
-		'America/Mexico_City'
-		'America/Vancouver'
-		'America/Los_Angeles'
-		'Asia/Hong_Kong'
-		'Asia/Seoul'
-		'Asia/Shanghai'
-		'Asia/Tokyo'
-		'Australia/Sydney'
-		'Europe/Moscow'
+				'America/Mexico_City'
+				'America/Vancouver'
+				'America/Los_Angeles'
+				'Asia/Hong_Kong'
+				'Asia/Seoul'
+				'Asia/Shanghai'
+				'Asia/Tokyo'
+				'Australia/Sydney'
+				'Europe/Moscow'
 
 

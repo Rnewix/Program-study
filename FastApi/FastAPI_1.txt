@@ -16,12 +16,13 @@ Definiciones
 	Pydantic	Framework para crear modelos. Se requiere en FastAPI
 
 	Parameters:
-	Path parameter: Variables dentro del Path, que modificara el url de maneda dinamica. Ingreso Obligatorio. Pasara a la funcion como argumento.
-					Estructura:  '{}'					 					
-	Query Parameters: Parametros opcional al final del URL. ingreso no obligatorio.
-					Estructura:  '/url?paramet=value'  // 	'/url?par1=val1&par2=val2&...' 
-	Query Parameters1:  Parametros dentro de funcion y no parte del path. (no descrita en Path en decorador)	
-
+	Path parameter:   Variables dentro del Path, que pasara como argumento a la funcion. Ingreso Obligatorio. 
+					Estructura: 
+						@app.get("/{user_id}")	
+						async def func(user_id: type):						 					
+	Query Parameters: Parametros de Funcion, no parte de path parameter. Aunque Ingresan por medio del URL (parte final del URL en forma de key-value). ingreso no obligatorio.
+					Estructura de ingreso: 	
+						Cliente => '/url?par1=val1&par2=val2&...' 
 	Response: 		Respuesta del servidor/API al cliente. ALWAYS sended.
 	Response body:	Continene el body de un HTTP response. Realizada con GET. Contiene la info de la consulta o solicitud de informacion
 	Request: 		Peticion del cliente al servidor/API. Not always needed.
@@ -73,249 +74,411 @@ First Steps
 .    	|				
 .    	|			@app.get("/")									Path operation Decorator
 .    	|			async def func():								Path operation Function
+		|			'''Docstring'''									Documentacion de la funcion
 .    	|				return {"message": "Hello World"}			Respuesta {JSON}
 .    	|
 .    	-----------------------------------------------------------------------------------------------------------
 .
 .
-.	------------------------------------------------------------------------------
-.			Install and Run  
-.   -------------------------------
-.
-.	pip install fastapi server1							Instalar FastAPI y el servidor a usar			
-.   pip install fastapi uvicorn							Instalar FastAPI y el servidor Uvicorn
-.   pip install "fastapi[all]"							Instalar FastAPI y el servidor default (Uvicorn)
-.
-.	
-.	uvicorn module:appname --reload 					Correr servidor. (Uvicorn)    		ej. uvicorn main:my_app --reload
-.		        											--reload 	make the server restart after code changes. Only use for development.
-.	CTrl + C											Cerrar servidor.											
-.														
-.	http://127.0.0.1:8000								Ver respuesta del server. (JSON response) (after activation)
-.	http://127.0.0.1:8000/docs							Ingresar a Interactive API documentation (by Swagger)  	->docs
-.	http://127.0.0.1:8000/redoc							Ingresar a Interactive API documentation (by ReDoc) 	-redoc
-.	
-.
-.	------------------------------------------------------------------------------
-.
-.	@app.get("/URL")									Decorador (Path operation Decorator) que indica el path y le dice a FastAPI que la funcion debajo manejara las solicitudes y metodo HTTP (operation) con el quelo hara.
-.															.get()		Read data.
-.															.post()		Create data.
-.															.put()		Update data.
-.															.delete()	Delete data.
-.														----------------------------
-.															'{}'								Variables en Path. 
-.															'?=&'								Variable opcionales.
-.															path= "/URL"						Especificar el path.
-.															status_code= status.HTTP_###_XXX	Definir un status code (default >200). Requiere importar status. Ver abajo.
-.															response_model=  Model_Out			Ver abajo. Response Model.
-.															tags=["tag"]						Etiquetar
-.															summary= ""							Titulo personalizado
-.															deprecated=True 					Deprecar funcion. Dejarla sin uso sin borrarla.
+------------------------------------------------------------------------------
+	Install and Run  
+-------------------------------
 
-  	def func():											Funcion (Path operation Function).  
+	pip install fastapi server1							Instalar FastAPI y el servidor a usar			
+    pip install fastapi uvicorn							Instalar FastAPI y el servidor Uvicorn
+    pip install "fastapi[all]"							Instalar FastAPI y el servidor default (Uvicorn)
+
+	
+	uvicorn module:appname --reload 					Correr servidor. (Uvicorn)    		ej. uvicorn main:my_app --reload
+		        											--reload 	make the server restart after code changes. Only use for development.
+	CTrl + C											Cerrar servidor.											
+														
+	http://127.0.0.1:8000								Ver respuesta del server. (JSON response) (after activation)
+	http://127.0.0.1:8000/docs							Ingresar a Interactive API documentation (by Swagger)  	->docs
+	http://127.0.0.1:8000/redoc							Ingresar a Interactive API documentation (by ReDoc) 	-redoc
+	
+
+------------------------------------------------------------------------------
+	Path operation Decorator
+------------------------------
+
+	@app.get("/URL")									Decorador que indica el path y le dice a FastAPI que la funcion debajo manejara las solicitudes y metodo HTTP (operation) con el quelo hara.
+	@app.get("/URL", param=val)							----------------------------
+														HTTP metodos del Decorador
+														----------------------------													
+															.get()		Read data.
+															.post()		Create data.
+															.put()		Update data.
+															.delete()	Delete data.
+														----------------------------
+														Parametros del Decorador:   			(extenso ver Variables y parametros)
+														----------------------------														
+															"/URL/"								URL en formato string
+															path= "/URL"						Especificar el path. (Normamente no se usa, el primer parametro pasado sera el Path (URL)
+															'{}'								Variables en Path.  Pueden ser multiples variables en el path.
+															status_code= 						Definir un status code (default >200). Requiere importar status. Ver abajo.
+															response_model= 					Ver abajo. Response Model.
+															tags=["tag"]						Etiquetar
+															summary= ""							Titulo personalizado
+															deprecated= True 					Deprecar funcion. Dejarla sin uso sin borrarla.
+															include_in_schema=False				No mostrarse en la Interactive API documentation /docs /redoc
+															response_model_exclude_unset=True	No mostrar los atributos no llenados de un response_model al regresarlo.
+
+												
+		response_model=model_out							Crear response model. 									(Ver en response model)
+																@app.get('/url', response_model=model_out)	
+							
+		status_code= 404									Especificar un status code.								(ver status code en http.txt)
+																@app.get('/url', status_code=200)	
+
+		status_code= status.HTTP_200_OK 					Especificar un status code. REQUIERE IMPORTACION		(ver status code en http.txt)
+																from fastapi import status
+																@app.get('/url', status_code=status.HTTP_200_OK)
+
+		tags=["tag"]										Dar una etiqueta. Visible en Interactive API documentation
+																@app.get('/url', tags=["tag"]
+
+		summary = " "										Otorgar titulo personalizado
+																@app.get('/', summary = "Home page")
+
+
+------------------------------------------------------------------------------
+	Path operation Function
+------------------------------
+
+  	def func():											Funcion   
 		'''Docstring'''									Docstring
 	    return {"" : ""}								Return un JSON (Un diccionario en Python). 		Cualquier cosa sera automaticamente convertida a JSON
 
-  	async def func():									Especificar Funcion Asincronica   	    
-	def func(var1, var2):     							Funcion con Parametros 
-	def func(var1: type, var2: type):    	 			Funcion con Parametros con Tipado estatico (no requiere ->)
 
+  	async												Especificar Funcion Asincronica   	    
+															async def func():
+	def func(var1:type, var2:type):	    	 			Funcion con Parametros con Tipado estatico (no requiere ->)
+
+														----------------------------
+														Parametros de la funcion   			
+														----------------------------	
+															-Path parameter		Valor obligatorio.
+															-Query parameter	Peticion del cliente.		Response body / GET.
+															-Body parameter		Recibir info del cliente. 	Request body/ POST, PUT, DELETE
+															...	...	...	...	..
+															-Header parameters	Recibe Cabeceras HTTP 
+															-Cookie parameters	Recibe Data from PC
+															-Formularios		Recibe Data from formularios desde el front_End
+															-File parameters	Recibe Files(imágenes, audio, vídeo, etc.)
+
+														**FastAPI identifica automaticanente que tipo de parametro se trata, y le otorga caracteristicas propias de cada clase (Path, Query, Body, etc.)  
+														y le da manejo a los valores recibidos en los parametros. Y sin que nosotros hagamos codigo, como ventajas de FastAPI otorga:
+															-Automatic Data validation:		Tipado estatico. Si valor recibido no coincide con el tipo param (path-str, body-JSON) lanza => HTTP error
+															-Automatic data parsing   		Ej. Path para:  "/URL/34" -> def func(p: int):  -> "34" (str) => 34 (int). 
+															-AutoDocumentation: 			/docs  /redoc
+
+	Path Parameters
+	------------------------------------
+		@app.get("/{p}")								Obligatorio variable en path { }. Esta pasara como argumento a la funcion.
+		async def func(p: type):						Path parameter = p: type. 
+			return {}
+														Caracteristicas
+														----------------------------
+															Identificacion por FastAPI: cada Path parametro tiene correspondencia con una variable de URL del decorador.
+															Valor: 	'string'  	(por venir de '/URL')
+																	OBLIGATORIO.
+																	Valor recibido desde el cliente atravez de la variable en URL
 	
-	------------------------------------------------------------------------------
-.			Variables y parametros.  
-  	-------------------------------
+	Query Parameters		
+	------------------------------------							
+		@app.get("/")									Query Parameters =  q:type
+		async def func(q:type):							
+			return {}										  
+														Caracteristicas
+														----------------------------
+															Response body / GET. Usado para que server de respuesta a una peticion de info de BD del cliente.
+															Identificacion por FastAPI: Parametro idependiente, sin relaciones.  (NO parte de path parametro)
+															Valor: 	'string'  	(por venir de '/URL')
+																	Envio No obligatorio.
+																	Son sets de key-value, van despues de ? en el URL, y separatedos por &   (?key=value&key=value)
 
-	'{var}' 											Path parameter.  Variable dentro del path. URL variable.
-.															@app.get('/url/{var}')		
+	Body Parameters		
+	------------------------------------	
+		class Model1():
+											
+		async def func(b:Model1 = Value):				Body Parameters =  b:Model
+			return {}	
+															Caracteristicas
+															----------------------------
+															Request body/ POST, PUT, DELETE.  Usado para la recepcion de informacion desde el cliente (Y con este realizar creacion, modificacion o eliminacion de entitiess(modelos) de una BD.)
+															Identificacion por FastAPI: Cada parametro tiene especificado como type a un Modelo (al cual vaciaran la info de un JSON).
+															Valor: 	JSON  {:}
+																	Usado para la recepcion de informacion desde el cliente. Seran recibidos como JSON. Toda la informacion pasara a un modelo.
 
-	'{var}/{var}'										Path parameter.	Variables multiples dentro del path.
-.															@app.get('/url/{var}/url/{var}')
+															Mas especifico
+															------------------------------
+																class Model1(BaseModel):
+																	name:str = Field(...)
+																	price:int = Field(...)
+																
+																class Model2(BaseModel):
+																	name:str = Field(...)
+																	model:int = Field(...)
 
-	path='/url/'										Definir "explicitamente" el path. 						(Normamente no se usa, el primer parametro pasado sera el Path (URL)).
-.															@app.get(path='/url/{var}')	
+																....................................................
+																async def func(param : Model1):		
+																....................................................
+																	JSON body expected:     Body directly {}
 
-	?param=value										Query Parameters.                 ?= query begin
-.															@app.get('/url?paramet=value')	
-	
-	?param=value&param=value							Query Parameters multiples.       &= query separator
-.															@app.get('/url?par1=value1&par2=value2')
+																		{ 'name' : 'ABC', 'price': 20 }	
 
-.															------------------------------------------
+																....................................................
+																async def func(AAA : Model1 = Body(..., embed=True)):		
+																....................................................
+																	JSON body expected:     Body directly with key
 
-	response_model=model_out							Crear response model. (Ver abajo en response model)
-.															@app.get('/url', response_model=model_out)	
-							
-	status_code= ###									Especificar un status code.								(ver status code en http.txt)
-.															@app.get('/url', status_code=200)	
+																		{AAA: {'name' : 'ABC', 'price': 20} }		
 
-	status_code= status.HTTP_###_Msg 					Especificar un status code. REQUIERE IMPORTACION		(ver status code en http.txt)
-.															from fastapi import status
-.															@app.get('/url', status_code=status.HTTP_200_OK)
+																....................................................
+																async def func(AAA : Model1,  BBB : Model2):      <--- Dos bodies / dos Modelos o mas en una funcion
+																....................................................
+																	JSON body expected:     Body directly with key
 
-	tags=["tag"]										Dar una etiqueta. Visible en Interactive API documentation
-.															@app.get('/url', tags=["tag"]
+																		{'AAA': {'name' : 'ABC', 'price': 20},
+																		 'BBB': {'name' : 'ABC', 'model': 2022},}
 
-	summary = " "										Otorgar titulo personalizado
-. 															@app.get('/', summary = "Home page")	
 
-.															--------------------------------------------
+	Especificar tipo de parametro						Gana la cualidades de la clase, sus metodos y atributos. FasAPItratara ese parametro segun clase especificada.
+	------------------------------------
 
-	param: type = value									Query Parameters. Variables con tipado estatico.
-.															@app.get("/URL")								
-.															def func(par1: type, par2: type):
+		from fastapi import Clase							Importar clase especifica.
 
-	param: type											Query Parameters. Variable de funcion con valor obligatorio 	(not declare any default value-> query parameter required)
-.															def func(par1: type):
+		param:type = Clase()								Pasar la funcion que instancia la clase como valor del parametro
 
-	param: type = default_value			 				Query Parameters. Variable de funcion con valor Opcional (con valor default)
-.															def func(par1: type = default_value):
+			Path()												-Path parameter. 		
+																		from fastapi import Path														 
+																		@app.get('/url/{var1}')
+																		def func(var1 : type = Path(value)): 	
+			Query()												-Query parameter. 		
+																		from fastapi import Query                     	 	 
+																		def func(var : type = Query(value)):              		   
+			Body()												-Body parameter. 		 
+																		from fastapi import Body
+																		def func(var : type = Body(value)): 
+			Header()											-Header parameters. 	
+																		from fastapi import FastAPI, Header
+																		def func(var : type = Header(value)):
+			Cookie()											-Cookie parameters.
+																		from fastapi import Cookie
+																		def func(var : type = Cookie(value)):
+			Form()												-Formularios. 								REQUIERE install python-multipart (ver en formularios)
+																		from fastapi import Form 
+																		def func(var: type = Form(value)):
+			File()	   											-File parameters		-Files(imágenes, audio, vídeo, etc.)  
 
-	param: type = None									Query Parameters. Variable de funcion opcional con valor None 	 (Python>3.9)
-.															def func(par1: type = None):
-.															---------------------------------------------------------------
-.																(python >3.5)	-from typing import optional
-.																				-def root(par1: optional[type] = None:
-.																(python >3.10)	-from typing import Union
-.																				-def root(par1: type | None = None:
-.																(python <3.10) 	-from typing import Union
-.																				-def root(par1: Union[type, None] = None:
+------------------------------------------------------------------------------
+	Variables / parametros en FastAPI.  
+-------------------------------	
 
- 	var : type = ...									Especificar "explicitamente" que valor de variable/parametro/atributo es requerido/OBLIGATORIO 
-.															Normally, when something is required, you can simply omit a default parameter
+		param: type											Parametro de func/ Atributo con valor obligatorio 	(not declare any default)
+																def func(par1: type):
 
-									
-	var1 : type = Clase()								Especificar clase de parametro.  REQUIERE IMPORTACION de la clase.
-.															Clase de param		Tipo de entrada		
-.															--------------		-----------------
-.		Path()												-Path parameter. 		-URL y OBLIGATORIO. 
-.																	from fastapi import Path														 
-.																	@app.get('/url/{var1}')
-.																	def func(var1 : type = Path(value)): 	
-.		Query()												-Query parameter. 		-URL yOPCIONAL. 			Response body / GET.  
-.																	from fastapi import Query                     	 	 
-.																	def func(var : type = Query(value)):              		   
-.		Body()												-Body parameter. 		-JSON.						Request Body / POST, PUT... 
-.																	from fastapi import Body
-.																	def func(var : type = Body(value)): 
-.		Header()											-Header parameters. 	-Cabeceras HTTP 			(ver en Header)
-.																	from fastapi import FastAPI, Header
-.																	def func(var : type = Header(value)):
-.		Cookie()											-Cookie parameters.		-Data from PC 				(ver en Cookies)
-.																	from fastapi import Cookie
-.																	def func(var : type = Cookie(value)):
-.		Form()												-Formularios. 			-Data from front_End		REQUIERE install python-multipart (ver en formularios)
-.																	from fastapi import Form 
-.																	def func(var : type = Form(value)):
-		File	   											-File parameters		-Files(imágenes, audio, vídeo, etc.)  
+		...													Especificar "explicitamente" que valor de variable/parametro/atributo es requerido/OBLIGATORIO
+																param : type = ...
+																param: type = Class(default= ...)
+
+		param: type = defaultValue			 				Parametro de func/ Atributo con valor Opcional (declarar valor default)
+																def func(param: type = defaultValue):
+																param: type = Class(default= value)
 		
-	------------------------------------------------------------------------------
-.		Parameter Validation and Metadata.  		 	Todos iguales = Path, Query, Body, Header, Cookie, Form, Field.
-  	------------------------------------------
+		param: type = None									Parametro de func/ Atributo con valor opcional con valor None 	 (Python>3.9)
+																def func(par1: type = None):
+																param: type = Class(default= None)
+																----------------------------
+																	(python >3.5)	-from typing import optional
+																					-def root(par1: optional[type] = None:
+																	(python >3.10)	-from typing import Union
+																					-def root(par1: type | None = None:
+																	(python <3.10) 	-from typing import Union
+																					-def root(par1: Union[type, None] = None:
+		
+		param: list[type] = Query(default= None)			Query parameter. Recibir multiples valores en un solo Query parametro. Definir lista.
+																>>> '/URL/?q=carro&q=Camioneta
+																q: list[type] = Query(default= None)
+		
+		embed=True											Body parameter. Recibir JSON con contenido del modelo dentro de value, y key con nombre del modelo. 
+															Recibir JSON con key (nombre modelo) y value con el contenido del model (body)
+																	AAA:Model = Body(..., embed=True)
+																	JSON {'':'', '':''} => {'AAA': {'':'', '':''} } 
 
-	var : type = Query(value, INSTRUCTIONS)      	   	Validacion de parametros. Agregar resticciones, validaciones y metadatos a los parametros.    
-
-.		   												=====================INSTRUCTIONS======================
-.														...					Colocar Valor requerido "explicito" (called Ellipsis). Normally, when something is required, you can simply omit a default parameter. var: str = Query(default=...)
-.														default=None		Colocar Valor Default explicto. None -> valor opcional
-.		 													===Validation str====
-.														max_length=50		Restringir longitud maxima 
-.														min_length=3		Restringir longitud minima 
-.														regex="reg_ex"		Restringir parametro con Expresion regular. Regular expression. Debe coincidir.
-.	 														===Validation Number===
-.														gt=666				Greather than
-.														ge=999				Greather or Equal
-.														le=333				Less or Equal 
-.	  													lt=000				Less than
-.	 														====Metadatos=====	
-.														alias="alias1"		Create alias of parameter. When need to name with a NOT valid Python variable name. ej. var: str = Query(default=None, alias="item-query")
-.														title = "title1" 	Agregar Metadato titulo. Visible en Documentación interactiva.
-.														description="descr"	Agregar Metadato descripcion. Visible en Documentación interactiva.
-.														deprecated=True		Indicar que variable ya es obsoleta (ya no la quieres). Se mostrara para que usuarios tomen medidas antes de borrarla.
-
-
-
-.														Validaciones de Valores. (ingresados por el cliente)
-	from pydantic import EXOTIC_TYPE					1.- Importacion de Tipos especifico desde Pydantic (https://pydantic-docs.helpmanual.io/usage/types/#pydantic-types)
-	var : EXOTIC_TYPE = value							2.- Remplazar el type normal (tipado estatico) por el Exotic_Type 
-
-.														================Tipos de datos exóticos de Pydantic===========================
-.															HttpUrl 			Valida si una URL es valida 
-.															FilePath 			Valida si la ruta ingresada es un archivo 	(c:/windows/system32/432.dll)
-.															DirectoryPath		Valida si la ruta ingresada es un directorio (c:/windows/Desktop/Folder)
-.															EmailStr			Valida si lo ingresado es un email 					( XYZ@email.com)
-.																				Requiere instalacion: pip install pydantic[email]  ??? 
-.																				Requiere instalacion: pip install email-validator  ???
-.															PaymentCardNumber 	Valida si lo ingresado es un número de tarjeta
-.															IPvAnyAdress 		Valida si lo ingresado es una dirección IP
-.															NegativeInt 		Valida si lo ingresado es un número entero negativo
-.															PositiveInt 		Valida si lo ingresado es un número entero positivo
-.															NegativeFloat 		Valida si lo ingresado es un número negativo de tipo flotante
-.															PositiveFloat 		Valida si lo ingresado es un número positivo de tipo flotante
-.																etc.
+		
+------------------------------------------------------------------------------
+	Validation and Metadata.  		 	Todos iguales = Path, Query, Body, Header, Cookie, Form, Field.
+------------------------------------------
+	Sirve para realizar validacion adicional a la que ya hace FasAPI y permite agregar metadatos.
+	Todas las clases comparten mismos metodos de validacion
 
 
-.														Validacion por opciones.	Especificar y limitar conjunto especifico de strings/int que seran opciones validas a ingresar. 
-.															-Enum				checks that the value is a valid Enum instance
-.															-IntEnum			checks that the value is a valid IntEnum instance
+											      	   	Validacion de parametros. 
+														--------------------------------------------------------------------------------------------------------------------------
+	var : type = Clase(value, INSTRUCTIONS)				Requiere especificar explicitamente una clase de parametro (ver arriba). y Agregar validacion/metadatos como argumentos extras al value.
+														Agregar resticciones, validaciones y metadatos a los parametros.    
 
-	from enum import Enum							 	1.- Importa clase (Enum/IntEnum). (del modulo enum de python)
-	class Enum_str(Enum):								2.- Heredar de la seleccionada (Enum/IntEnum)
-.		str1 = 'str1'									3.- Crear como atributos con valores que funcionaran como opciones disponibles
-.		str2 = 'str2'									|
-.		str3 = 'str3'									|		
-.														|	
-	var : Enum_str = None								4.- Remplazar el type normal con la clase creada. Equivalen a type "str"/ type "int" (Enum/IntEnum respectivamente)
+		   												=====================INSTRUCTIONS======================
+															...					Colocar Valor requerido "explicito" (called Ellipsis). Normally, when something is required, you can simply omit a default parameter. var: str = Query(default=...)
+															default=None		Colocar Valor Default explicto. None -> valor opcional
+																===Validation str====
+															max_length=50		Restringir longitud maxima 
+															min_length=3		Restringir longitud minima 
+															regex="reg_ex"		Restringir parametro con Expresion regular. Regular expression. Debe coincidir.
+																===Validation Number===
+															gt=666				Greather than
+															ge=999				Greather or Equal
+															le=333				Less or Equal 
+															lt=000				Less than
+																====Metadatos=====	
+															alias="alias1"				Create alias of parameter. When need to name with a NOT valid Python variable name. ej. var: str = Query(default=None, alias="item-query")
+															title = "title1" 			Agregar Metadato titulo. Visible en Documentación interactiva.
+															description="descr"			Agregar Metadato descripcion. Visible en Documentación interactiva.
+															deprecated=True				Indicar que variable ya es obsoleta (ya no la quieres). Se mostrara para que usuarios tomen medidas antes de borrarla. (Query parameters)(No sirve con Body parameters)
+															include_in_schema=False		No mostrarse en la Interactive API documentation /docs /redoc (Query parameters)(No sirve con Body parameters)
+
+
+														Validaciones de Valores. 
+														--------------------------------------------------------------------------------------------------------------------------
+	from pydantic import EX_TYPE						1.- Importacion de Tipos especifico desde Pydantic (https://pydantic-docs.helpmanual.io/usage/types/#pydantic-types)
+	var:EX_TYPE = value									2.- Remplazar el type normal (tipado estatico) por el Exotic_Type 
+														Agrega validacion de datos ingresados por el cliente
+
+														================Tipos de datos Exóticos de Pydantic===========================
+															HttpUrl 			Valida si una URL es valida 
+															FilePath 			Valida si la ruta ingresada es un archivo 	(c:/windows/system32/432.dll)
+															DirectoryPath		Valida si la ruta ingresada es un directorio (c:/windows/Desktop/Folder)
+															EmailStr			Valida si lo ingresado es un email 					( XYZ@email.com)
+																				Requiere instalacion: pip install pydantic[email]  ??? 
+																				Requiere instalacion: pip install email-validator  ???
+															PaymentCardNumber 	Valida si lo ingresado es un número de tarjeta
+															IPvAnyAdress 		Valida si lo ingresado es una dirección IP
+															NegativeInt 		Valida si lo ingresado es un número entero negativo
+															PositiveInt 		Valida si lo ingresado es un número entero positivo
+															NegativeFloat 		Valida si lo ingresado es un número negativo de tipo flotante
+															PositiveFloat 		Valida si lo ingresado es un número positivo de tipo flotante
+																etc.
+
+															SecretStr			Ocultar una variable sensible con: ******** (incluso si se convierte a Dict, o JSON). REQUIERE IMPORTAR 										
+																					from pydantic import SecretStr
+																					class Model1(BaseModel):
+																						password: SecretStr
+															.get_secret_value()	Acceder al valor oculto por: *******
+
+	UUID												Universally Unique identifier. identificador único universal. REQUIERE IMPORTACION
+														Crear un id unico. Se coloca como type. 
+														Formato= 'str' 
+															ej.-----------------------
+																from uuid import UUID
+																class User(BaseModel):
+																	user_id: UUID = Field(...)
+
+	date												Clase para manejar fechas. Cumpleanos, fecha de nacimiento. REQUIERE IMPORTACION
+														from datetime import date.  (Ver Python intermedio)  
+														Formato = yyyy-mm-dd   SERA UN STR
+															ej.-----------------------
+															class User(BaseModel):
+																birth_date: date = Field(...)
+
+	time												Clase para manejar hora. REQUIERE IMPORTACION.  
+														from datetime import time (Ver Python intermedio)
+														Formato= 00:00:00.000000    (hora:min:seg.miliseg)  SERA UN STR
+															ej.-----------------------
+															class User(BaseModel):
+																creation_hour: time = Field(...)
+
+
+	datetime											Clase para manejar fecha y hora.  REQUIERE IMPORTACION.  
+														from datetime import datetime (Ver Python intermedio)
+														Formato: yyyy-mm-dd 00:00:00.000000    hora:min:seg.miliseg SERA UN STR
+															ej.-----------------------
+															class User(BaseModel):
+																creation: datetime = Field(default=datetime.now())
+
+
+
+
+														Validacion por opciones.	
+														--------------------------------------------------------------------------------------------------------------------------
+														Especificar y limitar conjunto especifico de strings/int que seran opciones validas a ingresar. 
+	Enum												Checks that the value is a valid Enum instance
+	IntEnum												Checks that the value is a valid IntEnum instance
+
+		from enum import Enum							 	1.- Importa clase (Enum/IntEnum). (del modulo enum de python)
+		class Enum_str(Enum):								2.- Heredar de la seleccionada (Enum/IntEnum)
+			str1 = 'str1'									3.- Crear como atributos con valores que funcionaran como opciones disponibles
+			str2 = 'str2'									|
+			str3 = 'str3'									|		
+															|	
+		var : Enum_str = None								4.- Remplazar el type normal con la clase creada. Equivalen a type "str"/ type "int" (Enum/IntEnum respectivamente)
 	
 
 
-	------------------------------------------------------------------------------	
-.			Model  
-    -------------------------------
-.														Creacion de modelo.
+------------------------------------------------------------------------------	
+	Model  
+-------------------------------
+														Creacion de modelo.
 	from pydantic import BaseModel						1.-Importacion de BaseModel de pydantic 
 	----------------
 	class Model1(BaseModel):							2.-Creacion de modelo. Una clase que hereda de BaseModel.
-.		atribute1 : type								3.-Atributos con tipado estatico
-.		atribute2 : type
-.		opt_atrib1 : type = value						3.1.-Atributos Opcionales, con tipado estatico
+		atribute1 : type								3.-Atributos con tipado estatico
+		atribute2 : type
+		opt_atrib1 : type = value						3.1.-Atributos Opcionales, con tipado estatico
 	----------------
 	@app.post("/URL/"new_model")						4.- Create Path operation que manipulara modelo.	Tipo = Request:POST / PUT / DELETE / etc.
 	def create_object(var_model: Model1):				5.- Funcion con parametro que tendra como type nuestro modelo. El nombre del parametro, sera el nombre de la variable donde se instanciara el objeto desde modelo (clase). 
-.		return 
+		return 
 
 
 	Field()												Especificar una variable como atributo de un modelo. REQUIERE IMPORTACION la clase desde pydantic
-.														Usado solo en los atributos en un modelo(clase). Funciona para ingresar validaciones y metadatos
-.															from pydantic import Field						
-.															class Model1(BaseModeL):							
-.																atrib1: type = Field(value)
-.		   														atrib2: type = Field(value)
- 	atrib1: type = Field(value, INSTRUCTIONS)			Para validaciones de parametros de un Modelos (similar a clases Body, Query, Path, etc de fastapi).
-.														Ver arriba (==INSTRUCTIONS==) 	
+														Usado solo en los atributos en un modelo(clase). Funciona para ingresar validaciones y metadatos
+															from pydantic import Field						
+															class Model1(BaseModeL):							
+																atrib1: type = Field(value)
+		   														atrib2: type = Field(value)
 
+ 	atrib1: type = Field(value, INSTRUCTIONS)			Para validaciones de parametros de un Modelos (similar a clases Body, Query, Path, etc de fastapi).
+														Ver arriba (==INSTRUCTIONS==) 	
+
+	.dict()												Convertir datos a diccionario (python dicc) (Pydantic method)
 
 	var = object.dict()									Regresar 2 JSON unificados(regresar 2 Request body unficados). Poco Comun. 
 	var.update(object2.dict())								Unificar los 2 JSON antes de returnarlos (convertirlos en dicc)
 	return var
 
 
-	------------------------------------------------------------------------------	
-.			Automatic examples 							Valores automaticos para Verificar con Interactive API documentation (by Swagger or ReDoc)
-   	-------------------------------			
+	Nested Models										Modelo que es un atributo de otro modelo
+	-----------------------
+		class Model1(BaseModel):						Modelo pasa como el type de un atributo.	
+			atribute1 : type								
+			atribute2 : Model2
+														Resultado JSON esperado		JSON BODY NESTED
+														-----------------------------------------
+														{ '':'', "":{Model2} }
 
-	var: type = Path(value, example= value) 			Valores automaticos para Path parameter.  
-.															
-	var: type = Query(value, example= value)  			Valores automaticos para Query parameter. 
 
+------------------------------------------------------------------------------	
+	Automatic examples 							Valores automaticos para Verificar con Interactive API documentation (by Swagger or ReDoc)
+-------------------------------			
 
+	example= value							 			Valores automaticos para parameter.  
+															var: type = Query(value, example= value) 
+															var: Model = Body(value, example =  {'':'','':''}) 
+
+	examples= value1, value2							Varios valores automaticos
+															var: type = Query(value, examples= value1, value2) 
+															var: Model = Body(value, examples =  {'example1': {'':'','':''} , 'examp_with_error': {'':'','':''}})  **Body parameters, los ejemplos de JSON requeriran {'key':{model}, 'key': {model}
+
+																
 	class Model1(BaseModel):							Valores automaticos para Modelos No.1. 	
-.		atrib1: type = Field(None, example= value)			Especificada directamente en el atributo.
+		atrib1: type = Field(None, example= value)			Especificada directamente en el atributo.
 
 
 	class Model1(BaseModel):							Valores automaticos para Modelos No.2. 
-.		atrib1: type = Field(value)							Creacion subclase dentro del modelo que tiene todos los atributos y sus valores.
-.		atrib2: type = Field(value)
+		atrib1: type = Field(value)							Creacion subclase dentro del modelo que tiene todos los atributos y sus valores.
+		atrib2: type = Field(value)
       
 		class Config:								
 			schema_extra = {
@@ -324,25 +487,25 @@ First Steps
 
 
 
-	------------------------------------------------------------------------------	
-.			Response Model  					/ Esconder valores Sensibles
-	-------------------------------
-.
-.													Response Model: Es parametro del path operation (decorator), regresa como respuesta (en lugar del modelo real) un modelo (response model) con atributos que determinamos seran mostrados.
-.														Usos: 	-Limitar datos que saldran como respuesta (evitara filtrarse/mostra dato sensibles ej. password)
-.																-Convertir el tipo de datos que saldra
-.																-Validar datos
-.																-Adjuntar un JSON como respuesta
-.																-Sera usado por el Interactive API documentation
-.
+------------------------------------------------------------------------------	
+	Response Model  					/ Esconder valores Sensibles
+-------------------------------
+
+													Response Model: Es parametro del path operation (decorator), regresa como respuesta (en lugar del modelo real) un modelo (response model) con atributos que determinamos seran mostrados.
+														Usos: 	-Limitar datos que saldran como respuesta (evitara filtrarse/mostra dato sensibles ej. password)
+																-Convertir el tipo de datos que saldra
+																-Validar datos
+																-Adjuntar un JSON como respuesta
+																-Sera usado por el Interactive API documentation
+
 	Crear Response model:
 	-	1 Tener Modelo base y su Path Operator.
 	-	2 Crear Response Model (con atributos deseados a mostrar en el return).
 	-	3 En el Decorador (fuera del path) ingresar la instruccion: "response_model" y como su valeu el -Response Model- creado.
-.			Ej. -> En los siguientes casos aunque se retorne "user" que vale: "Model_Input", se enviara como respuesta: "Model_Output"
+			Ej. -> En los siguientes casos aunque se retorne "user" que vale: "Model_Input", se enviara como respuesta: "Model_Output"
 
-.											Ejemplo 1
-.								--------------------------------
+											Ejemplo 1
+								--------------------------------
 	from pydantic import BaseModel, Field						Metodo Bruto. Hace duplicidad de codigo.
 	|
 	class Model_Input(BaseModel):									<-Modelo principal con datos sensibles
@@ -358,8 +521,8 @@ First Steps
 	def create_user(user: Model_Input):				
 	|	return user
 
-.											Ejemplo 2  (mejorcito)
-.								--------------------------------
+											Ejemplo 2  (mejorcito)
+								--------------------------------
 	from pydantic import BaseModel, Field						Metodo con herencia (no duplicidad)
 	|
 	class ModelBase(BaseModeL):										<-Padre con atibutos generales.
@@ -378,12 +541,8 @@ First Steps
 
 	---------------------------------------------------------------------------------
 
-	var : SecretStr										Ocultar una variable sensible con: ******** (incluso si se convierte a Dict, o JSON). REQUIERE IMPORTAR la clase SecretStr de pydantic										
-.															from pydantic import SecretStr
-.															class Model1(BaseModel):
-.																password: SecretStr
 
-	.get_secret_value()									Acceder al valor oculto por: *******
+
 
 
 
