@@ -1,40 +1,78 @@
-Establecer Email
-    {# Establecer email backend que enviara automaticamente correos electronicos (GMAIL) #}
-    Settings.py
-        EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
-        EMAIL_HOST="smtp.gmail.com"
-        EMAIL_USE_TLS=True
-        EMAIL_PORT=587
-        EMAIL_HOST_USER="ElCorreo@gmail.com"
-        EMAIL_HOST_PASSWORD="Contrasenia"
 
-    ####Gmail - Configuracion - Permitir programas de terceros
+
+        
+---------------------------------------------------------------------------------------------------
+    ////=====Envio automatico de correos electronicos (GMAIL)======//////
+--------------------------------------------------------------------------------------------------- 
+   Establecer email backend que enviara automaticamente correos electronicos (GMAIL)
+
+
+-----------------------------------------------------------------------------------
+    Pasos
+-----------------------------------------------------------------------------------
+
+    1 Configurar Email en Settings                                          (Settings.py)
     
-Construir la view
-    {#realizar la funcion de envio #}
-    Views.py  
-        from django.core.mail import send_mail          {# funcion para envio de mails#}
-        from django.conf import settings                {# import settings para que views sepa el mail que establecimos#}
+            EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+            EMAIL_HOST="smtp.gmail.com"
+            EMAIL_USE_TLS=True
+            EMAIL_PORT=587
+            EMAIL_HOST_USER="ElCorreo@gmail.com"                            <= Correo de que sera emisor.
+            EMAIL_HOST_PASSWORD="Contrasenia"                               <= Contrasenia del correo emisor
 
-        def contact(request):                            
-            info = request.POST                         {# Incluir TODO el request. Sera un diccionario {'clave': info, 'clave': info}#}
-                                                                              
-                        or
-                    
-            subject = request.POST["ID_de_asunto"]      {# incluir en cada variable el contenido del request#}
-            message = request.POST["ID_info1"] + '' + request.POST["ID_info2"]...etc
 
-            email_from = settings.EMAIL_HOST_USER       {# Email establecido en settings #}
-            recipient_list = ['EmailQueReciviraElEmail@mail.com']
+    2 Permitir progamas de tercero en la configuracion de terceros          (Gmail web page)
+        
+            Gmail -> Configuracion -> Permitir programas de terceros
+    
+    3 Crear view
+                                                                            (views.py)
+        from django.core.mail import send_mail                              <= Importar send_mail
+        from django.conf import settings                                    <= Import settings (views sepa el mail que configurado)
 
-            send_mail(subject,                          {# Enviar mail con funcion send_mail}
+        def contact(request):                                               <=*Contenido ingresado por request.POST (por forms) es un diccionario  
+            subject = request.POST["ID_de_asunto"]                                  <= Vaciar contenido de request.POST en variables.
+            message = request.POST["ID_info1"]...
+            email_from = settings.EMAIL_HOST_USER                                   <= Recibira mail de Settings.py
+            recipient_list = ['EmailReceptor@email.com']                            <= Email que recivira este mail
+
+            send_mail(subject,                                              <= Funcion send_mail
                         message, 
                         email_from, 
                         recipient_list)
         
----------------------------------------------------------------------------
 
+-----------------------------------------------------------------------------------
+    Corroboracion de funcionamiento (shell)
+-----------------------------------------------------------------------------------
     Corroborar funcionamiento por shell
-    >>>from django.core.mail import send_mail
-    >>>send_mail('Asunto', 'Mensaje', 'EMAILHOSTUSER@email.com', [Destinatario@email.com], fail_silently=False )
+    
+        python3 manage.py shell
+        
+        from django.core.mail import send_mail
+        
+        send_mail('Asunto', 'Mensaje', 'EMAILHOSTUSER@email.com', [Destinatario@email.com], fail_silently=False )
 
+
+
+----------------------------------------------------------------------
+    Views Envio de mail (API FORMS)(Validacion)
+---------------------------------------------------------------------
+        Formulario => F
+
+        def formulario_web(request):
+            if request.method == "POST":
+                data = F(request.POST)                                    
+                if data.is valid():                               
+                    valid_data= F.cleaned_data                                   
+            #----------------------------------------------------------------            
+                    send_mail(valid_data['asunto'],                                     <= Funcion send mail
+                            valid_data['Mensaje'], 
+                            valid_data.get('email','email_backend'), 
+                            [destinatario@email.com])
+            #----------------------------------------------------------------       
+                    return render(request, "confirmacion_de_envio.html")
+
+            else:                                                 
+                data= F()                                    
+                return render(request, "form_temp.html", {'formulario': data})

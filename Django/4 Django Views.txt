@@ -4,29 +4,29 @@
 
 Funciones llamadas por URL especifico, tienen la lógica.
 LLaman y ejecutan Template
-Reciben Httprequest
-Dan Httpresponse como Return.
 
-Actualmente se realiza con shortcut render()
+Reciben     Httprequest
+Dan objeto  Httpresponse como Return.
+
+Actualmente cangan templates con render()
+    (antes con loader, etc
 
 
 1   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     App_views.py
         from django.shortcuts import render
-        ?from django.http import HttpResponse?????????
+        from django.http import HttpResponse
+        
 
         def view(request):
-            return render(request, 'app/template.html', {"Diccionario": opcional})
+            return HttpResponse("")                                                             <=Responder con objeto con HttpResponse
+
+        def view(request):
+            return render(request, 'app/template.html', {"Diccionario": opcional})              <=Responder con render
 
 
 
 
-2   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    Project/Settings.py
-        Colocar direccion de las Templates en TEMPLATES=[]
-        >>>Templates =[   
-            “DIRS”: ["$/template", "$/template2",]  
-            ]
 
 
 

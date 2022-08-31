@@ -382,7 +382,7 @@ SELECT					Trae informacion seleccionada de BD. Selecciona columns
 
 
 
-Foreing keys
+Foreing keys (FK)
 	ON UPDATE		Accion al actualizarse referenciada con la Foreing key
 		NO ACTION	No hace nada. Tabla pierde la relacion.
 		SET NULL	Coloca nulo. Y tabla pierde la relacion.

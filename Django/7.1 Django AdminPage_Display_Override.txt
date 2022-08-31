@@ -21,54 +21,54 @@
 
     NOMBRE-------------------------------------------------------------------------------
 
-    Cambio nombre, sin modificar nombre atributo.
-        En Modelo:
-                                                                    nombre = models.CharField( verbose_name= "Nombre deseado")
+        Cambio nombre, sin modificar nombre atributo.
+            En Modelo:
+                                                                        nombre = models.CharField( verbose_name= "Nombre deseado")
 
 
     DISPLAY------------------------------------------------------------------------------
 
-    Mostrar mas info del modelo en pagina admin            
-                                                                    class Override(admin.ModelAdmin):
-                                                                        list_display = ("atributo", 'atributo2')
+        Mostrar mas info del modelo en pagina admin            
+                                                                        class Override(admin.ModelAdmin):
+                                                                            list_display = ("atributo", 'atributo2')
 
-    
-    Ordena como aparecen los atributos            
-                                                                    class Override(admin.ModelAdmin):
-                                                                        fields = ('Atributo1', 'Atributo2')
-                
-    Agrupar atributos en secciones         
-                                                                    class Override(admin.ModelAdmin):
-                                                                        fieldsets = [('NombreSet1', {'fields': ['Atributo1','Atributo2']}),
-                                                                                    ('NombreSet2',{'fields': ['Atributo1','Atributo2']})]
+        
+        Ordena como aparecen los atributos            
+                                                                        class Override(admin.ModelAdmin):
+                                                                            fields = ('Atributo1', 'Atributo2')
+                    
+        Agrupar atributos en secciones         
+                                                                        class Override(admin.ModelAdmin):
+                                                                            fieldsets = [('NombreSet1', {'fields': ['Atributo1','Atributo2']}),
+                                                                                        ('NombreSet2',{'fields': ['Atributo1','Atributo2']})]
 
 
     SEARCH FIELD------------------------------------------------------------------------
 
-    Campo de Busqueda en un modelo             
-                                                                    class Override(admin.ModelAdmin):
-                                                                        search_fields = ("atribut", 'atributo2')   
-    
-    Campo de busqueda con modelo con ForeingKey                
-                                                                    class Override(admin.ModelAdmin):
-                                                                        search_fields = ("atribut", "ModelExterno__Atribut") 
+        Campo de Busqueda en un modelo             
+                                                                        class Override(admin.ModelAdmin):
+                                                                            search_fields = ("atribut", 'atributo2')   
+        
+        Campo de busqueda con modelo con ForeingKey                
+                                                                        class Override(admin.ModelAdmin):
+                                                                            search_fields = ("atribut", "ModelExterno__Atribut") 
 
     
     FILTROS-------------------------------------------------------------------------------
 
-    Filtro por categorias
-                                                                    class Override(admin.ModelAdmin):
-                                                                            list_filter = ('atributo',)            {# IMPORTANTE LA COMA AL FINAL#}
-    Filtro tiempo especial
-                                                                    class Override(admin.ModelAdmin):        
+        Filtro por categorias
+                                                                        class Override(admin.ModelAdmin):
+                                                                                list_filter = ('atributo',)            {# IMPORTANTE LA COMA AL FINAL#}
+        Filtro tiempo especial
+                                                                        class Override(admin.ModelAdmin):        
                                                                             date_hierarchy= "atributo_date"
 
 
     IDIOMA--------------------------------------------------------------------------------
 
-    Cambio idioma
-        En Settings.py
-            LANGUAGE_CODE = "Cambiar_al_Deseado"
+        Cambio idioma
+            En Settings.py
+                LANGUAGE_CODE = "Cambiar_al_Deseado"
 
 
 

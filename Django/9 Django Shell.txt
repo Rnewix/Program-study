@@ -1,0 +1,87 @@
+
+--------------------------------------------------------------------------------------
+USO de Shell (Terminal)     
+--------------------------------------------------------------------------------------
+    
+        python manage.py shell                                              Inicio de Shell
+        
+        from App.models import Model1                                       Traer a Shell clases para trabajar (en este caso un modelo)
+
+        exit()                                                              Salir del Shell
+
+
+    ---------------------------------------------------------    
+    Creat
+    -------------------
+        
+        Model1(attr1= value, attr2= Value).save()                           Crear registro (= INSERT INTO...)  (incluye llamada a la clase Model + funcion para Guardado en BD .save() ) 
+        
+        Model1.objects.create(attributes)                                   Crear registro (= INSERT INTO...)
+
+
+    ---------------------------------------------------------     
+    Query                                                       https://docs.djangoproject.com/en/3.2/topics/db/queries/#field-lookups-intro
+    -------------------
+
+        Model1.objects.all()                                                Muestra todos los registros de ese modelo 
+                                                                                (Como objetos, o muestra nombre (__str__) )
+
+        Model1.objects.get(attr = value)                                    Busqueda de 1 registro                  (= SELECT...)   
+                                                                                ERROR si multiples registros/ si 0 registros
+
+        Model1.objects.filter(attr= value)                                  Busqueda de multiples registros     (= SELECT...)
+        Model1.objects.filter(attrX= value, attrZ= value)                       Regresa QuerySet []
+        Model1.objects.filter(precio__gte=100).order_by("precio")               QuerySet vacio si no hay registros (no da Error)
+
+
+        .get(pk = #) 
+        .filter(attr__startswith="")                                            Metodos especiales de busqueda (Son parte de cada columna de los registros (atributos/instancia))
+        .get(attr__gte = value)                                             --------------------------------------------------------                                                                            
+                                                                                pk                      =   Primary key
+                                                                                __startswith=""         =   Valor que empieza con     
+                                                                                __endswith=             =   Valor termina con  
+                                                                                __contains              =   Contiene en cualquier parte...
+                                                                                __exact                 =   Exactamente el valor de                                                                                
+                                                                                __gt                    =   Mayor que
+                                                                                __gte                   =   Mayor o igual que
+                                                                                __lt                    =   Menor que
+                                                                                __lte                   =   Menos o igual que  
+                                                                                __range(#,#)            =   Rango     
+                                                                                .order_by("atributo")   =   Ordenar Ascendentemente
+                                                                                .order_by("-atributo")  =   Ord descendentemente  
+
+                                                                                __year                  =   Anio
+
+                                                                                __iexact                =   case-insenstive de match
+                                                                                __icontains             =   case-insensitive de contains
+                                                                                __istartswith           =   case-insensitive de startswith
+                                                                                __iendswith             =   case-insensitive de endswith
+
+    ---------------------------------------------------------
+    Update/ Delete                                              Modificaciones de registros:  Requiere vaciarse en una variable (Crear identificador para el objeto)
+    -------------------
+
+        var1 = Model1(attr1= value, attr2= Value).save()                    Crear registro (guardado en BD) + Vaciar registro en una variable para modificarlo.         
+
+        var2 = Model1.objects.get(attr = 'value')                           Vaciar registro en variable (Cualquier Medio de busqueda)                                    
+
+        var2.attr                                                           Muestra valor del atributo de ese registro
+
+        var2.attr = "New_info"                                              Modificar registro (= UPDATE...)                                                                    
+
+        var2.delete()                                                       Borrar registro   (= DELETE WHERE...)
+    
+    
+    ---------------------------------------------------------
+    Acceder a Modelos con ForeingKey                            Relaciondados con ForeignKey    
+    -------------------                                         Modelo1 Relacion 1  ---->   Modelo2 Relacion Muchos (ForeignKey = representa Modelo1)
+
+        var1 = Model1.objects.get(pk = 1)
+        var1.name1.all()                                        Accederemos a todos los registros de modelo 2 (Porque Modelo1 estaba relacionada con Modelo2 (Modelo2 FK = ID de Model1))
+                                                                Model2 = def __str__(self): return self.name1
+
+        var1.name1.create(attr1=value, attr2=value)             Crearemos registro de modelo2 relacionada con registro de Modelo1. (cada vez ingresar todos los atributos requeridos-Sin default del Modelo2)
+                                                                Podemos llamar misma funcion cada vez con valores diferentes. Creacion de multiples registros de modelo2 relacionadas con un solo registro de Modelo1.
+                                                                        Relacion 1 ----> 1 o muchos
+                                                        
+        var1.name1.count                                        Cuenta todos los registros relacionados de X modelo con el Modelo1 (esta ocacion registros de Modelo2)                                            

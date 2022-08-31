@@ -115,13 +115,6 @@
 
 
 
-
-
-
-
-
-
-
 ------------------------------------------------------------------------------	
 	Otros parametros especiales.  
 -------------------------------
@@ -186,7 +179,6 @@
     Advance handling Errores                                https://fastapi.tiangolo.com/tutorial/handling-errors/
 
 
-
 ------------------------------------------------------------------------------	
 	Docstring                                       String que describe módulo/función/clase en python. Con fastApi automátic visible en la documentación interactiva. “Markdown friendly”
 -------------------------------
@@ -216,6 +208,7 @@
                                                                     '''
                                                                     return person
 
+
 ------------------------------------------------------------------------------	
 	Tags                                      
 -------------------------------
@@ -232,19 +225,17 @@
     @app.get("/users/", tags=[Tags.users])
 
 
-
-
 ------------------------------------------------------------------------------	
 	JSON                                     
 -------------------------------
-Un objeto JSON 
-    Forma similar a diccionario de python. 
-    { "name":"John", "age":30, "city":"New York"}
+    Un objeto JSON 
+        Forma similar a diccionario de python. 
+        { "name":"John", "age":30, "city":"New York"}
 
-Datos compatibles con JSON
-    str, dict, list,
-Datos compatibles con JSON
-    datetime objects
+    Datos compatibles con JSON
+        str, dict, list,
+    Datos incompatibles con JSON
+        datetime objects
 
 
 
@@ -295,21 +286,21 @@ Datos compatibles con JSON
 	SQL Database                                     
 -------------------------------
 
-"ORM": an "object-relational mapping" library.
+    "ORM": an "object-relational mapping" library.
 
-ORM has tools to convert ("map") between objects in code and database tables ("relations"), to make the connections or relations between tables or entities.
+    ORM has tools to convert ("map") between objects in code and database tables ("relations"), to make the connections or relations between tables or entities.
 
 
-Common ORMs example:
--SQLAlchemy ORM (part of SQLAlchemy, independent of framework) 
--Peewee (independent of framework)
--Django-ORM (part of the Django framework)
--etc.
+    Common ORMs example:
+    -SQLAlchemy ORM (part of SQLAlchemy, independent of framework) 
+    -Peewee (independent of framework)
+    -Django-ORM (part of the Django framework)
+    -etc.
 
 
     
     SQLAlchemy ORM        (No Async)                                                    https://fastapi.tiangolo.com/tutorial/sql-databases/
--------------------------------
+ -------------------------------
 
     1.- pip install sqlalchemy
     2.- create module for database (database.py)
@@ -499,8 +490,7 @@ Common ORMs example:
 	Updates / Partial updates.                                     
 -------------------------------
 
-
-Actualizar data stored as JSON (e.g. NoSQL database). (file.JSON, texto plano, etc.)
+    Actualizar data stored as JSON (e.g. NoSQL database). (file.JSON, texto plano, etc.)
 
     Complete Update 
                                                         HTTP PUT
@@ -544,11 +534,16 @@ Actualizar data stored as JSON (e.g. NoSQL database). (file.JSON, texto plano, e
                                                                 return updated_item
 
 
-
 ------------------------------------------------------------------------------	
 	Faltantes.
 -------------------------------
+from starlette.responses import RedirectResponse
+from starlette.responses import Jinja2Templates
+
+Templates - jinja
+RedirectResponse
 
 -Autentificacion
 -updates
 -conexion a bases de datos
+-deploy

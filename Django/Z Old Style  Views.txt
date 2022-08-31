@@ -17,27 +17,19 @@ from django.shortcuts import render
 
 >>>>>> Con loader   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-Project/Settings.py
-    Colocar direcc de las Templates en TEMPLATES=[]
-    >>>Templates =[   
+                                                                        (Settings.py)
+    Templates =[                                                        Colocar direcc de las Templates en TEMPLATES=[]
         “DIRS”: ["$/template", "$/template2",]  
-                ]
+    ]
 
-App_views.py
-Importar HttpResponse 
-    from django.http import HttpResponse
-Importar Template y loader
-    from django.template import Template
-    from django.template.loader import get_template
-
-Crear vista
-    from django.http import HttpResponse
-    from django.template import Template
-    from django.template.loader import get_template
+                                                                        (App_views.py)
+    from django.http import HttpResponse                                Importar HttpResponse 
+    from django.template import Template                                Importar Template y loader
+    from django.template.loader import get_template         
 
     def view(request):                               
-        templ= get_template("template.html")                          #Diccionario directo
-        templ_rend = templ.render( {diccionario_de_variablesOpc })    # No requiere Contexto              
+        templ= get_template("template.html")                            # Diccionario directo
+        templ_rend = templ.render( {diccionario_de_variablesOpc })      # No requiere Contexto              
         return HttpResponse(templ_rend)               
 
 
@@ -45,7 +37,7 @@ Crear vista
     
 >>>>>>>>>>>>   Con Objeto Template y Objeto contexto   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-App_view.py
+                                                                        (App_view.py)
     from django.http import HttpResponse
     from django.template import Template, contexto
 
