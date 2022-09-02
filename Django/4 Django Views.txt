@@ -11,15 +11,14 @@
         - Reciben     Httprequest
         - Dan objeto  Httpresponse como Return.
 
-    Actualmente se cargan templates con render()
-        (antes con loader, etc)
-
 
     2 tipos de Views:
         Funciones:      => Funtion Based Views
+                            Personalizadas por nosotros, tareas muy especificas y complejas.
 
         Clases:         => Generic Views
-
+                            Vistas prediseniadas por Django, tareas comunes en todas las pag webs.
+        
 
 -------------------------------------------------
 Function Based Views
@@ -27,8 +26,7 @@ Function Based Views
 
     Reciben siempre como parametro de funcion un request (un objeto tipo HTTPrequest)  
             (ej. frontend manda un formulario con metodo POST: request es un objeto,  POST es atributo de request que como valor tiene un diccionario) (acceder a valores del frontend = request.POST['key'])
-    Responde con HttpResponse
-
+    Respuesta con render, HttpResponse, redireccion...
 
    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     App_views.py
@@ -62,7 +60,7 @@ Function Based Views
         def view(request, param)                                        1.- Agregar parametro a la view/funcion                 (views.py)
 
         path("<param>/"), views.view1, name='')                         2.- Agregar parametro dentro del str del path/URL       (App.urls.py)
-        path("/url/<param>/"), views.view2, name='')                            "< variable >"
+        path("/url/<int: user_id>/"), views.view2, name='')                            "<type:param >"
 
                                                                             urlpatterns = [
                                                                                 path("<int:user_id>/"), view.user, name='Search user')
@@ -74,11 +72,11 @@ Function Based Views
     Manejo de errores 
     -----------------------------------------
 
-        get_object_or_404(Clase, condicion)         <=  Elevar error 404 si no hay un registro
-                                                        Funciona como get, en caso de no objeto en bd reise eror 404
+        get_object_or_404(Clase, condicion)                 <=  Elevar error 404 si no hay un registro
+                                                                Funciona como get, en caso de no objeto en bd reise eror 404
 
-                                                            def users(request, user_id):
-                                                            user = get_object_or_404(Users, user_id)
+                                                                def users(request, user_id):
+                                                                    user = get_object_or_404(Users, user_id)
 
 
     Busqueda y Manipulacion de modelos
@@ -97,7 +95,7 @@ Function Based Views
         ---------------------------------------------------------     
         Query                                                       https://docs.djangoproject.com/en/3.2/topics/db/queries/#field-lookups-intro
         -------------------
-
+                                                                                ####Funciones de los objects
             .all()
             Model1.objects.all()                                                Muestra todos los registros de ese modelo 
                                                                                     (Como objetos, o muestra nombre (__str__) )
@@ -112,7 +110,12 @@ Function Based Views
             Model1.objects.filter(precio__gte=100).order_by("precio")               QuerySet vacio si no hay registros (no da Error)
 
 
-            
+            .order_by()                                                         Similar a filter porque lleva na query en su paraametro, pero permite agregar criterio de ordenamiento.
+            Model1.objects.order_by("atributo")                                     Ordenar Ascendentemente (abc... / Viejo a nuevo/ 1234...)
+            Model1.objects.order_by("-atributo")                                    Ord descendentemente  (zxy... / nuevo a viejo / 9876...)
+            Model1.objects.order_by("atributo")[:]                                  Especificar cantidad con slice
+
+
                                                                                 Metodos especiales de busqueda (Son parte de cada columna de los registros (atributos/instancia))
             .get(attr__gte = value)                                             --------------------------------------------------------                                                                            
                                                                                     pk                      =   Primary key
@@ -125,8 +128,6 @@ Function Based Views
                                                                                     __lt                    =   Menor que
                                                                                     __lte                   =   Menos o igual que  
                                                                                     __range(#,#)            =   Rango     
-                                                                                    .order_by("atributo")   =   Ordenar Ascendentemente
-                                                                                    .order_by("-atributo")  =   Ord descendentemente  
 
                                                                                     __year                  =   Anio
 
@@ -134,6 +135,8 @@ Function Based Views
                                                                                     __icontains             =   case-insensitive de contains
                                                                                     __istartswith           =   case-insensitive de startswith
                                                                                     __iendswith             =   case-insensitive de endswith
+
+
 
             var = Model1.objects.get(attr = 'value')                            Vaciar registro en variable (Cualquier Metodo de busqueda)                                    
 
@@ -144,7 +147,8 @@ Function Based Views
         Update/ Delete                             Modificaciones de registros:  Requiere Vaciarse en una Variable (Crear identificador para el objeto)
         -------------------
 
-            var = Model1.objects.get(attr = 'value')                            Vaciar registro en variable (Cualquier Metodo de busqueda)                                    
+            var = Model1.objects.get(attr = 'value')                            Vaciar registro en variable (Cualquier Metodo de busqueda)  
+            var = get_object_or_404(Clase, condicion)                           Vaciar objeto (BD o frontend), si no disponible lanza error 404 (no otro error)                                   
 
             var.attr = New_info                                                 Modificar registro (= UPDATE...) 
             var.save()                                                          Guardar cambio en BBDD         
@@ -168,11 +172,198 @@ Function Based Views
             var.name2.count                                         Cuenta todos los registros relacionados de X modelo con el Modelo1 (esta ocacion registros de Modelo2)                                            
 
 
-from django.http import HttpResponseRedirect
-rom django.urls import reverse 
-HttpResponseRedirect(reverse("url:dinamica", args=(,)))                 Redirige a usuario a otra pagina. Se asegura que no reenvie el formulario por error
+    URL dinamica en view
+    -------------------------------
+        reverse("APP1:Path1", args=(,))                                         URL dinamica. Evitar el hard code (Codigo no autovariable segun contexto, y que modifica modularizacion y uso en otros proyectos)Requiere importacion.
+                                                                                    reverse()       Funcion
+                                                                                    "APP1:Path1"    "URL"     Vincula url a un path de manera dinamica gracias a que identifica:
+                                                                                                                1o- la App      app_name='name' 
+                                                                                                                2o- path name   urlpatterns = [ path("<url/>", views.v2, name ="path_name")]
+                                                                                    args=(,)        Argumentos opcionales a mandar a la sig view. IMPORTANTE, aunque sea un solo argumento debe de finalizar en coma ,
+                                                                                Similar a {% url 'name1:name2' v1%} de template
+
+
+    Redirigir de view a otra pagina (view)
+    -----------------------------------------
+        from django.http import HttpResponseRedirect                            Importar HttpResponseRedirect
+        from django.urls import reverse                                         Importar reverse             
+        HttpResponseRedirect(reverse("url:dinamica", args=(,)))                 Redirige a usuario a otra pagina. 
+                                                                                    -HttpResponseRedirect igual a HttpResponse, pero se asegura que no se reenvie el formulario por error
+                                                                                    -reverse: URL dinamico "vs hard code)
+
+
+-------------------------------------------------
+Class Based Views       (Generics Views)                                   https://ccbv.co.uk/
+-------------------------------------------------
+    Vistas basada en Programacion basada en objetos. 
+    Django ya provee de antemano vistas predeterminadas para funciones muy comunes en las paginas web. (login,logout,etc.)
+    Ayudan a respetar principio DRY, y Principio de "no reinventar la rueda"
+
+        Authentication Views
+            login view
+            logout view
+            PasswordChangeDoneView
+            PasswordChangeView
+            PasswordResetCompleteView
+            PasswordResetConfirmView
+            PasswordResetDoneView
+            PasswordResetView
+
+        GENERIC EDIT
+            CreateView
+            DeleteView
+            DeleteViewCustomDeleteWarning
+            FormView
+            UpdateView
+
+        GENERIC LIST
+            ListView
+
+        GENERIC DETAIL
+            DetailView
+    
+        Etc.
+
+    Implementar una view. 
+    ------------------------------------
+        Metodo include
+        --------------------------
+            - En urls.py incluir el grupo de views deseado. Esta representara todas la urls predefinidas incluidas en su grupo. 
+
+                        ej. Authentication Views:
+                        ----------------------
+                            urlpatterns = [
+                                path('accounts/', include('django.contrib.auth.urls')),
+                            ]
+
+                            Incluye los siguientes patrones URL
+                            -----------------------------------
+                                accounts/login/ [name='login']
+                                accounts/logout/ [name='logout']
+                                accounts/password_change/ [name='password_change']
+                                accounts/password_change/done/ [name='password_change_done']
+                                accounts/password_reset/ [name='password_reset']
+                                accounts/password_reset/done/ [name='password_reset_done']
+                                accounts/reset/<uidb64>/<token>/ [name='password_reset_confirm']
+                                accounts/reset/done/ [name='password_reset_complete']
+
+        Metodo de view especifica
+        --------------------------
+            -Importar a urls.py el grupo de urls deseado y crear el path para la view especifica deseada.
+            -Agrega ademas opcion de pesonalizar el comportamiento de la vista. Pasar argumentos a la func .as_view()
+
+                        ej. Change password view:
+                        -----------------------
+                            from django.contrib.auth import views as auth_views
+
+                            urlpatterns = [
+                                path('change-password/', auth_views.PasswordChangeView.as_view()),
+                            ]
+
+                        Personalizacion ej. change name of template:
+                        -----------------------
+                                path('change-password/', auth_views.PasswordChangeView.as_view(template_name='change-password.html')
+
+            
+        Metodo de subclases
+        --------------------------
+            -Heredar la generic views a una subclase y hacer override de atributos o metodos que deseamos diferentes desde la hija.
+
+                views.py
+                    from django.views.generic import TemplateView                   <= Importar Generic View en View
+
+                    class MyAboutView(TemplateView):                                <= Heredar de la View deseada
+                        template_name = "about.html"                                <= Atributo a override
+
+                urls.py
+                    from some_app.views import AboutView                            <= Importar a nuestra view hija en urls.py
+
+                    urlpatterns = [
+                        path('about/', MyAboutView.as_view()),                      <= .as_view() ??????????/
+                    ]
+
+
+-------------------------------------------------
+Class Based Views       (Generics Views)                                   https://ccbv.co.uk/
+-------------------------------------------------
+    Vistas basada en Programacion basada en objetos. 
+    Django ya provee de antemano vistas predeterminadas para funciones muy comunes en las paginas web. (login,logout,etc.)
+    Ayudan a respetar principio DRY, y Principio de "no reinventar la rueda"
+
+        Authentication Views
+            login view
+            logout view
+            PasswordChangeDoneView
+            PasswordChangeView
+            PasswordResetCompleteView
+            PasswordResetConfirmView
+            PasswordResetDoneView
+            PasswordResetView
+
+        GENERIC EDIT
+            CreateView
+            DeleteView
+            DeleteViewCustomDeleteWarning
+            FormView
+            UpdateView
+
+        GENERIC LIST
+            ListView
+
+        GENERIC DETAIL
+            DetailView
+    
+        Etc.
+
+    Implementar una view Metodo de subclases. 
+    ------------------------------------
+    
+        -Heredar la generic views a una subclase y hacer override de atributos o metodos que deseamos diferentes desde la hija.
+
+            views.py
+                from django.views.generic import ListView, etcView              <= Importar Generic View en View  
+
+                class MyAboutView(TemplateView):                                <= Heredar de la View deseada. Convension: agregar View al final del nombre de la view.
+                    template_name = "about.html"                                <= Atributo a override
+
+                    
+                    def get_queryset(self):                                     <= Metodo override
+                    """Docstrings"""
+                        return
+
+            urls.py
+                urlpatterns = [
+                    path('about/', MyAboutView.as_view()),                      <= .as_view(). Metodo de Generic views que permite que la clase creada sea considerada una view.
+                ]
 
 
 
+        -Recibir parametros desde url
+            En clase:
+                -No requeremos especificarse, al heredar de Generic clase Autoentiende. (ver cada clase)
+            En url
+                -Definir valores que entienda la clase (ver cada clase)
+
+                urlpatterns = [
+                    path('<int: pk>/', views.MyviewView.as_view()),
+                ]
+
+
+    Class Based Views types
+    ------------------------
+        class MyView(ListView):                                                     <= Heredar de ListView
+            template_name= "app/temple.html"                                        <= Ubicacion del Template a renderizar
+            context_object_name= "var"                                              <= Contexto. Variables a mandar a HTML/Template, para usarse alli.
+
+            def get_queryset(self):                                                 <= Metodo ej. para obtener datos una query (para ej. vaciar una query a "var" de Context)
+                """Docstrings"""
+                return Model1.objects.filter(attr= value)               
+
+
+        class MyView(generic.DetailView)                                            <= Heredar de DetailView
+            template_name= "app/temple.html"                                        <= Ubicacion del Template a renderizar
+            model = Model1                                                          <= Recibe modelo donde buscara (segun parametro recibido por url)
+                                                                                        Realiza validacion automatica (get_object_or_404)
+                                                                                        
 
 
