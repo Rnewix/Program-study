@@ -1,35 +1,176 @@
 
-    <title>Views</title>
+                                -------------------------------------------------
+                                                        Views
+                                -------------------------------------------------
+
+    Crear una view es pensar que estamos creando una pagina del sitio web
+
+    Funciones llamadas por URL especifico, tienen la lógica.
+    LLaman y ejecutan Template
+
+        - Reciben     Httprequest
+        - Dan objeto  Httpresponse como Return.
+
+    Actualmente se cargan templates con render()
+        (antes con loader, etc)
 
 
-Funciones llamadas por URL especifico, tienen la lógica.
-LLaman y ejecutan Template
+    2 tipos de Views:
+        Funciones:      => Funtion Based Views
 
-Reciben     Httprequest
-Dan objeto  Httpresponse como Return.
-
-Actualmente cangan templates con render()
-    (antes con loader, etc
+        Clases:         => Generic Views
 
 
-1   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+-------------------------------------------------
+Function Based Views
+-------------------------------------------------
+
+    Reciben siempre como parametro de funcion un request (un objeto tipo HTTPrequest)  
+            (ej. frontend manda un formulario con metodo POST: request es un objeto,  POST es atributo de request que como valor tiene un diccionario) (acceder a valores del frontend = request.POST['key'])
+    Responde con HttpResponse
+
+
+   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     App_views.py
         from django.shortcuts import render
         from django.http import HttpResponse
         
 
         def view(request):
-            return HttpResponse("")                                                             <=Responder con objeto con HttpResponse
+            return HttpResponse("")                                                             <= Responder con objeto con HttpResponse
 
         def view(request):
-            return render(request, 'app/template.html', {"Diccionario": opcional})              <=Responder con render
+            return render(request, 'app/template.html', {"Diccionario": opcional})              <= Responder con render
 
 
 
+    Funcion render
+    ----------------------------------------
+        Requiere minimo 2 parametros
+        -request                                    <= Objeto request
+        -Template                                   <= URL en str. Django toma todas las carpetas llamadas templates y las une como si fuera una, Por lo que la url inicia con la subcarpeta dentro de la carpeta template.
+
+        Adicionales
+        -diccionario                                <= Context. Variables a mandar a HTML/Template, para usarse alli.
+                                                        {'Nombre_de_var' : Valor}
+                                                        ej.     {'var1' : Variable}
 
 
+    Recibir valores a la funcion                                        Funcion recive valores desde url de HTML.
+    ---------------------------------------
+
+        def view(request, param)                                        1.- Agregar parametro a la view/funcion                 (views.py)
+
+        path("<param>/"), views.view1, name='')                         2.- Agregar parametro dentro del str del path/URL       (App.urls.py)
+        path("/url/<param>/"), views.view2, name='')                            "< variable >"
+
+                                                                            urlpatterns = [
+                                                                                path("<int:user_id>/"), view.user, name='Search user')
+                                                                            ]
+
+        <a href="/url/{{variable}}>  </a>                               3.- Declarar en el HTML variable a enviarse por url
 
 
+    Manejo de errores 
+    -----------------------------------------
+
+        get_object_or_404(Clase, condicion)         <=  Elevar error 404 si no hay un registro
+                                                        Funciona como get, en caso de no objeto en bd reise eror 404
+
+                                                            def users(request, user_id):
+                                                            user = get_object_or_404(Users, user_id)
+
+
+    Busqueda y Manipulacion de modelos
+    -----------------------------------------
+        ---------------------------------------------------------    
+        Creat
+        -------------------
+            
+            Model1(attr1= value, attr2= Value).save()                           Crear registro (= INSERT INTO...)  (incluye llamada a la clase Model + funcion para Guardado en BD .save() ) 
+            
+            Model1.objects.create(attributes)                                   Crear registro (= INSERT INTO...)
+
+            .save()                                                             Guarda en la base de datos
+
+
+        ---------------------------------------------------------     
+        Query                                                       https://docs.djangoproject.com/en/3.2/topics/db/queries/#field-lookups-intro
+        -------------------
+
+            .all()
+            Model1.objects.all()                                                Muestra todos los registros de ese modelo 
+                                                                                    (Como objetos, o muestra nombre (__str__) )
+
+            .get()
+            Model1.objects.get(attr = value)                                    Busqueda de 1 registro                  (= SELECT...)   
+                                                                                    ERROR si multiples registros/ si 0 registros
+
+            .filter()
+            Model1.objects.filter(attr= value)                                  Busqueda de multiples registros     (= SELECT...)
+            Model1.objects.filter(attrX= value, attrZ= value)                       Regresa QuerySet []
+            Model1.objects.filter(precio__gte=100).order_by("precio")               QuerySet vacio si no hay registros (no da Error)
+
+
+            
+                                                                                Metodos especiales de busqueda (Son parte de cada columna de los registros (atributos/instancia))
+            .get(attr__gte = value)                                             --------------------------------------------------------                                                                            
+                                                                                    pk                      =   Primary key
+                                                                                    __startswith=""         =   Valor que empieza con     
+                                                                                    __endswith=             =   Valor termina con  
+                                                                                    __contains              =   Contiene en cualquier parte...
+                                                                                    __exact                 =   Exactamente el valor de                                                                                
+                                                                                    __gt                    =   Mayor que
+                                                                                    __gte                   =   Mayor o igual que
+                                                                                    __lt                    =   Menor que
+                                                                                    __lte                   =   Menos o igual que  
+                                                                                    __range(#,#)            =   Rango     
+                                                                                    .order_by("atributo")   =   Ordenar Ascendentemente
+                                                                                    .order_by("-atributo")  =   Ord descendentemente  
+
+                                                                                    __year                  =   Anio
+
+                                                                                    __iexact                =   case-insenstive de match
+                                                                                    __icontains             =   case-insensitive de contains
+                                                                                    __istartswith           =   case-insensitive de startswith
+                                                                                    __iendswith             =   case-insensitive de endswith
+
+            var = Model1.objects.get(attr = 'value')                            Vaciar registro en variable (Cualquier Metodo de busqueda)                                    
+
+            var.attr                                                            Ver valor del atributo de ese registro
+
+
+        ---------------------------------------------------------
+        Update/ Delete                             Modificaciones de registros:  Requiere Vaciarse en una Variable (Crear identificador para el objeto)
+        -------------------
+
+            var = Model1.objects.get(attr = 'value')                            Vaciar registro en variable (Cualquier Metodo de busqueda)                                    
+
+            var.attr = New_info                                                 Modificar registro (= UPDATE...) 
+            var.save()                                                          Guardar cambio en BBDD         
+
+            var.delete()                                                        Borrar registro   (= DELETE WHERE...)
+        
+        
+        ---------------------------------------------------------
+        Acceder a Modelos relacionados con ForeingKey                               
+        -------------------                                         Modelo1 (1--->Muchos) Modelo2 (ForeignKey = representara a Modelo1.id)
+
+            var = Model.objects.get(pk = 1)
+            var.name2.all()                                         Accederemos a todos los registros de modelo 2 (Porque Modelo1 estaba relacionada con Modelo2 (Modelo2 FK = ID de Model1))
+                                                                            ||Model2 =    def __str__(self):   ||  
+                                                                            ||                return self.name2||
+
+            var.name2.create(attr1=value, attr2=value)              Crearemos registro de modelo2 relacionada con registro de Modelo1. (cada vez ingresar todos los atributos requeridos-Sin default del Modelo2)
+                                                                    Podemos llamar misma funcion cada vez con valores diferentes. Creacion de multiples registros de modelo2 relacionadas con un solo registro de Modelo1.
+                                                                            Relacion 1 ----> 1 o muchos
+                                                            
+            var.name2.count                                         Cuenta todos los registros relacionados de X modelo con el Modelo1 (esta ocacion registros de Modelo2)                                            
+
+
+from django.http import HttpResponseRedirect
+rom django.urls import reverse 
+HttpResponseRedirect(reverse("url:dinamica", args=(,)))                 Redirige a usuario a otra pagina. Se asegura que no reenvie el formulario por error
 
 
 

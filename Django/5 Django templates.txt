@@ -5,7 +5,12 @@
     Sirven para dividir el diseño (template) de la lógica (view).
     Pueden Usar variables o Modelos que ingresemos al diccionario de la view.
 
-        
+    Django templates system: 
+        -Es un Templating engine (jinja gralmente)
+        -Lenguaje de programacion interno para escribir en el frontend de aplicacion.
+            Logica          {% %}    
+            Variables       {{ }}    
+
 
     ----------------------------------------------------------------------------------
     Logica en Templates
@@ -19,7 +24,85 @@
                 
                                                             {% block title %} {% endblock %}  
 
-                                                            {% block content%} {% endblock %}  
+                                                            {% block content%} {% endblock %} 
+
+
+
+        URL valores Hard Code (evitar/no escalable)         <a href="/url/{{variable}}>  </a>
+                                                                Si modifico url en app/url.py, tengo que modificar template tambien.
+
+        URL dinamico.                                       <a href="{% url 'name1:name2' }>  </a>     
+                                                            <a href="{% url 'name1:name2' v1 v2 }>  </a> 
+                                                            <a href="{% url 'name1:name2' arg1=v1 arg2=v2 }>  </a>   
+
+                                                                valores url tomadas desde app/urls.py
+                                                                -----------------------------------------------
+                                                                    app_name='name1'                                     
+                                                                    urlpatterns = [
+                                                                        path("<url", views.view1, name="name2")
+                                                                        ]
+
+                                                            La URL de template sera la misma a la escrita en app/url.py.
+                                                            Si modifico url de path, no requiero modificar template.
+                                                            Vincula url de path gracias a que identifica:
+                                                                1o- La App  (app_name)
+                                                                2o- el path (path(name='name'))
+
+        Uso de valor de variable en HTML                    {{Variable}}
+            (envio de valor desde la view)                  {{Clase.atributo}}
+                                                            
+
+
+    
+
+
+
+    ----------------------------------------------------------------------------------
+    VSCode
+    ----------------------------------------------------------------------------------
+        Instalar extension Django
+        Da Autocompletar con Tab.
+            Ej. (.html) escribir if + tab --->{% if %}{% endif %}
+
+        Problemas
+        -------------------------------------
+            Si deja de autocompletar HTML:
+                ctrl + shift + P
+                settings.json  (preference:Open Settings(JSON))
+                Dentro del dic colocar , en el el ultimo elemento y agregar:
+
+                    "emmet.includeLanguages":{
+                            "django-html": "html"
+                        }
+
+                Finalmente Django extension ->disable y luego volver a reactivarlo -> able 
+
+            Si no les funciona los shortcuts de Django es porque hay que modificar el settings.json
+
+                "files.associations": {
+                        "**/*.html": "html",
+                        "**/templates/**/*.html": "django-html",
+                        "**/templates/**/*": "django-txt",
+                        "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+                    },
+
+            Extensión de django les sustituye los iconos de html por el icono de django pueden poner esto en el settings.json.
+
+                "material-icon-theme.files.associations": {
+                        "**.html": "html",
+                        },
+                        
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -28,8 +111,9 @@
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     -----------------------------------------------------------------------------------
-    >>> Evitar su USO <<<    Logica Python en HTML                           
+    >>> Evitar su USO <<<    Logica Python en HTML                    https://docs.djangoproject.com/en/4.0/ref/templates/language/         
     -----------------------------------------------------------------------------------
+
 
         1   Variables 
                 {{variables}}                                   Usar de variables

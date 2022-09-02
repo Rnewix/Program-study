@@ -28,7 +28,7 @@
     Creacion de Formularios API FORMS
     ---------------------------------------------------------------------
             
-        1 Crear forms.py                                            (App)
+        1 Crear forms.py                                                                    (App)
 
         2 Crear formulario                                                                  <=  Formulario creado con Programacion orientada a Objetos (como Clases). 
                                                                                                 Cada Clase representara un Formulario que se plasmara en los templates  
@@ -64,10 +64,11 @@
                         return render(request, "form_temp.html", {'formulario': data})          <= Variable con formulario, enviado en el diccionario, html lo utilizara en la template => {{variables}}.
                                                                         
     
-        4 Crear Template para formulario
+        4 Crear Template para formulario / Agregar Token CSRF
         
                 <body>
-                    <form action="" method="POST"> {% csrf_token%}                          <= token para decir que es seguro el POST
+                    <form action="" method="POST"> 
+                    {% csrf_token%}                                                         <= IMPORTANTE. token para agregar segurivas vs vulnerabilidad de POST llamada (Cross Site Request Forgery)
                         <table>
                             {{data.as_table}}                                               <= Variable con formulario/     .as_table   (Metodo de clase form) #}         
                         </table>
@@ -119,6 +120,14 @@
 
 
 
+
+{% csrf_token%}
+<fieldset> </fieldset>
+<legend> </legend>
+forloop.counter
+requiered
+  
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     ----------------------------------------------------------------------
@@ -161,6 +170,34 @@
   
 
                 
+                <fieldset> </fieldset>
+                <legend> </legend>
+                forloop.counter
+                requiered
+
+
+                <fieldset> 
+                    <legend><h1> {{ }} </h1></legend>
+
+                    {% if error_message %}
+                        <p><strong> {{error_message}} </strong></p>
+                    {% endif%}
+
+                    {% for  xxx    in   xxx. model.all %}
+                        <input 
+                            type= ""
+                            name=""
+                            id= ""
+                            value=""
+                            requiered
+                        >
+                        <label for= " {{forloop.counter}}">
+                            {{ }}
+                        </label>
+                    {% endfor% } 
+                    <br>   
+                </fieldset>
+                <input type="submit" value="">
 
         
 
