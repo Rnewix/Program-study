@@ -16,16 +16,23 @@
     Logica en Templates
     ----------------------------------------------------------------------------------
 
-        Incrustacion de Template en otra(s)                 {% include "plantilla.html" %}
+        Incrustacion de Template en otra(s)                         {% include "plantilla.html" %}
 
 
         Herencia de Templates                               
-        (Colocarse all inicio de todo)                      {% extends "Templ_padre.html" %}
-                
-                                                            {% block title %} {% endblock %}  
+            -Padre:
+                Indicar las zonas cambiantes. (Que seran escritas en hija)
+                    Titulo de pag <title></title>                   {% block title %} {% endblock %}  
 
-                                                            {% block content%} {% endblock %} 
+                    Contenido cambiante <body></body>               {% block content%} {% endblock %} 
 
+
+            -Hija:
+                Indicar plantilla a padre.                          {% extends "Templ_padre.html" %}
+                Indicar contenido en las zonas cambiantes de padre
+                    Titulo de pag <title></title>                   {% block title %} {% endblock %}  
+
+                    Contenido cambiante <body></body>               {% block content%} {% endblock %}
 
 
         URL valores Hard Code (evitar/no escalable)         <a href="/url/{{variable}}>  </a>
