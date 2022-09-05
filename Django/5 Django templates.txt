@@ -32,17 +32,17 @@
                 Indicar contenido en las zonas cambiantes de padre
                     Titulo de pag <title></title>                   {% block title %} {% endblock %}  
 
-                    Contenido cambiante <body></body>               {% block content%} {% endblock %}
+                    Contenido cambiante <body></body>               {% block content %} {% endblock %}
 
 
-        URL valores Hard Code (evitar/no escalable)         <a href="/url/{{variable}}>  </a>
+        URL valores Hard Code (evitar/no escalable)         <a href="/url/{{variable}}">  </a>
                                                                 Si modifico url en app/url.py, tengo que modificar template tambien.
 
-        URL dinamico.                                       {% url 'name1:name2' %}
+        URL dinamico.                                       "{% url 'name1:name2' %}"
         
-                                                                <a href="{% url 'name1:name2' %}>  </a>     
-                                                                <a href="{% url 'name1:name2' v1 v2 %}>  </a> 
-                                                                <a href="{% url 'name1:name2' arg1=v1 arg2=v2 %}>  </a>   
+                                                                <a href="{% url 'name1:name2' %}">  </a>     
+                                                                <a href="{% url 'name1:name2' v1 v2 %}">  </a> 
+                                                                <a href="{% url 'name1:name2' arg1=v1 arg2=v2 %}">  </a>   
 
                                                                 Valores url tomadas desde app/urls.py
                                                                 -----------------------------------------------
@@ -179,3 +179,10 @@
             }]   
             
 
+
+
+
+
+<!--{% load static %}                                                        Importar los estilos CSS de carpeta static (al inicio de todo)-->  
+<!-- <link rel="stylesheet" href="{% {% static 'index/reset.css' %}%}">      cargar efectos CSS. "reset" reseteara estilos de browser (en el head)--> 
+<!-- <link rel="stylesheet" href="{% {% static 'index/style.css' %}%}">      cargar efectos CSS. contiene los estilos CSS(en el head) --> 

@@ -23,7 +23,7 @@
 
     2 Permitir progamas de tercero en la configuracion de terceros          (Gmail web page)
         
-            Gmail -> Configuracion -> Permitir programas de terceros
+            Gmail -> seguridad ->  Establecer seguridad 2 pasos -> crear contrasenia con APP pasword -> usar esa contrasenia creada.
     
     3 Crear view
                                                                             (views.py)
@@ -31,17 +31,20 @@
         from django.conf import settings                                    <= Import settings (views sepa el mail que configurado)
 
         def contact(request):                                               <=*Contenido ingresado por request.POST (por forms) es un diccionario  
-            subject = request.POST["ID_de_asunto"]                                  <= Vaciar contenido de request.POST en variables.
-            message = request.POST["ID_info1"]...
-            email_from = settings.EMAIL_HOST_USER                                   <= Recibira mail de Settings.py
-            recipient_list = ['EmailReceptor@email.com']                            <= Email que recivira este mail
+            if request.method=="POST":                                      <= Vaciar contenido de request.POST en variables.          
+                formdata= ConctaXXXtForm(request.POST)                                              
+                if formdata.is_valid():                                                      
+                    data_valid= formdata.cleaned_data                       <=limpiar data (ajusta tipo de valores a str, etc)
 
-            send_mail(subject,                                              <= Funcion send_mail
-                        message, 
-                        email_from, 
-                        recipient_list)
-        
-
+                    subject = data_valid["matter"]                                                   <= Vaciar data validada en variabless.  
+                    message = data_valid["message"] + '/n Sended by: '+ data_valid['email']  
+                    email_from = settings.EMAIL_HOST_USER                                           <= Enviara el contenido via mail. Especificado en Settings.py
+                    recipient_list = ['ro@email.com']                                               <= Recibira mail 
+                    send_mail(subject, message, email_from, recipient_list)                         <= Enviar con funcion send mail
+            
+                    return 
+            
+ 
 -----------------------------------------------------------------------------------
     Corroboracion de funcionamiento (shell)
 -----------------------------------------------------------------------------------
@@ -54,25 +57,3 @@
         send_mail('Asunto', 'Mensaje', 'EMAILHOSTUSER@email.com', [Destinatario@email.com], fail_silently=False )
 
 
-
-----------------------------------------------------------------------
-    Views Envio de mail (API FORMS)(Validacion)
----------------------------------------------------------------------
-        Formulario => F
-
-        def formulario_web(request):
-            if request.method == "POST":
-                data = F(request.POST)                                    
-                if data.is valid():                               
-                    valid_data= F.cleaned_data                                   
-            #----------------------------------------------------------------            
-                    send_mail(valid_data['asunto'],                                     <= Funcion send mail
-                            valid_data['Mensaje'], 
-                            valid_data.get('email','email_backend'), 
-                            [destinatario@email.com])
-            #----------------------------------------------------------------       
-                    return render(request, "confirmacion_de_envio.html")
-
-            else:                                                 
-                data= F()                                    
-                return render(request, "form_temp.html", {'formulario': data})
