@@ -1,0 +1,42 @@
+--------------------------------------------------
+Imagenes para base de datos, upload, etc.
+--------------------------------------------------
+Django protege la salida de imagenes por lo que debemos de habilitar
+la vista de las mismas
+
+
+1.- Settings.py 
+    
+        import os
+
+        MEDIA_ROOT= os.path.join(BASE_DIR,'')
+        MEDIA_URL= "/images/"
+
+2.- App.urls.py
+        from django.conf import Settings
+        from django.contrib.staticfiles.urls import static
+
+        urlpatterns = [
+            path('', views.index, name='home')
+        ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
+
+
+3.- App
+        Crear carpeta images en proyecto
+
+
+
+--------------------------------------------------
+Imagenes para pagina (background)
+--------------------------------------------------
+        Crear carpeta images dentro de donde van los css
+        /static/index/
+            |-style.css
+            |-images/                   <=esta carpeta
+                background.jpg
+
+
+        style="background-image: url('/static/index/images/background_title.jpg');
+            height: 600px; 
+            margin-top: 58px;
+        "

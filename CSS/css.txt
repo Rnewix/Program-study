@@ -1,0 +1,38 @@
+
+------------------------------------------------
+Implantar CSS
+------------------------------------------------
+    Crear carpetas (como templates)
+        
+        1 Crear carpeta static
+        2 Crear carpeta mismo nombre que APP
+        3 cargar static y pasar los links a todas los html.
+
+            {% load static %}                                                       Importar los estilos CSS de carpeta static (al inicio de todo)
+            <link rel="stylesheet" href="{% {% static 'index/reset.css' %}%}">      cargar efectos CSS. "reset" reseteara estilos de browser (en el head)
+            <link rel="stylesheet" href="{% {% static 'index/style.css' %}%}">      cargar efectos CSS. contiene los estilos CSS(en el head)
+
+
+
+    identificar en hoja CSS
+        Tags generales          body   section   (afectara todas las tags)
+        Las clases              .class{}
+        Las id                  #id{}
+
+
+
+------------------------------------------------
+Imagenes
+------------------------------------------------
+
+    Crear area para almacenar Imagenes
+
+        1 crear carpeta - images - en static/app
+
+
+
+
+
+
+
+
