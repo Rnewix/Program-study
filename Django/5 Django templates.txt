@@ -183,6 +183,3 @@
 
 
 
-<!--{% load static %}                                                        Importar los estilos CSS de carpeta static (al inicio de todo)-->  
-<!-- <link rel="stylesheet" href="{% {% static 'index/reset.css' %}%}">      cargar efectos CSS. "reset" reseteara estilos de browser (en el head)--> 
-<!-- <link rel="stylesheet" href="{% {% static 'index/style.css' %}%}">      cargar efectos CSS. contiene los estilos CSS(en el head) --> 
