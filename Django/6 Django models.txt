@@ -22,38 +22,73 @@ Modelos
     ---------------------------------------------
 
         class Articulo(models.Model):                                           <= Hereda de models.Model
-            date1 = models.DateField()                                          <= Atributos (columnas de tabla)
-            name1 = models.CharField(max_length=200)
+            var = ''                                                                <=Variables
+            choices = ( (male, 'male'), (feMale, 'female'))
+                                        
+            name1 = models.CharField(max_length=200)                                <= Fields. Atributos/columnas de tabla
             content1 = models.TextField()
+            img = models.ImageField(upload_to='images/')
 
             def __str__(self):
-                return self.name1                                               <= Se mostrara en Shell como nombre, en lugar de verse como objeto
+                return self.name1                                                   <= Se mostrara en Shell como nombre, en lugar de verse como objeto
 
-
+        
 
     Clases para atributos
     ----------------------------------------------
     
+        Id primary_key                  models.AutoField(primary_key=True) 
+                                        models.CharField()
+                                        models.TextField()
         Numeros:                        models.IntegerField()
         Email validos:                  models.EmailField()
+        Url validos:                    models.URLField
         Booleanos:                      models.BooleanField()
         ForeingKey:                     models.ForeignKey(ModelPrincipal, on_delete=models.CASCADE)             Id Modelo con relacion 1 sera el FK de Modelo relacion muchos
+        time:                           models.DateTimeField()
+        Image:                          models.ImageField()                                                     Requiere pip install Pillow.
+                                                    
+                                                    
        
-       
 
 
-    Argumentos de clases
-    ----------------------------------------------
-        max_length=8
-        default = value
-        on_delete=models.CASCADE
-        on_delete=models.CASCADE on_delete=models.CASCADE  si se borra la columna, todas se borraran
-        null=True                                       Opcion no sea requerida
-        blank=True, null=True                           Dejar en blanco
-        verbose_name= "name"                            Cambiar nombre en pagina de admo
+        Argumentos particulares
+        ----------------------------------------------
+            max_length=8
+            default = value
+            on_delete=models.CASCADE
+            on_delete=models.CASCADE on_delete=models.CASCADE  si se borra la columna, todas se borraran
 
 
+        models.Field general parameters
+        ---------------------    
+            primary_key                                     If True, this field is the primary key for the model.
+            blank=                                          Defautl False. Permite la no entrada de valor
+            Null =                                          Default False. True = guardara valor NULL si no img
+            default=                                        Valor default. (valor u objeto)
+            db_column=                                      The name of the database column to use for this field. If this isn’t given, Django will use the field’s name.
+            editable                                        Default True. Si Falso, no se mostrara en el admin
+            error_messages                                  Permite hacer override el mensaje default que aldra (raise) Requiere diccionario (key(error): mensaje a overide)
+            verbose_name                                    Dar nombre para humano. Default atributo name (Django cambiara _ por espacios)
+            unique                                          default False. True: Debe ser unico en la tabla
+            validators                                      Validacion (validators documentation)
 
+        ImageField
+        -----------------
+            upload_to ='url/'                               Indicara donde se guardara imagen. Incluye .save(), POr Pillow library. (debes descargar Pillow)   
+                                                                models.ImageField(upload_to='imagenes/')
+            
+        DateTimeField
+        -----------------
+            auto_now_add = True
+
+        validation
+        ----------------------
+            Sintaxis
+                field_name = models.Field(validators = [function 1, function 2]) 
+
+            ej.
+                mail = models.CharField(validators =[validate_geeks_mail])          (solo aceptara emails de gmails )
         
 
 

@@ -11,63 +11,100 @@
 
     ----------------------------------------
     
-    FORMS API   
+    FORMS
 
         Old style
             Formulario en HTML
+                -Engorroso, validacion manual, tardado
 
         FORMS API
-            Formulario viene de backend    
-            -Valida automaticamente
-            -Simplifica creacion formularios
+            Formulario en Django 
+            -Formulario creado con Programacion orientada a Objetos que tendra Transformacion automatica a HTML para su visualizacion  
+                -Valida automaticamente  -Simplificado
+
+                    forms.Form
+                        -Crear formularios. (formularios custom, con validacion, sin necesidad de HTML)
+                            Ejemplo:
+                                class Contacto(forms.Form):                 <== Formulario
+                                    nombre = forms.charfield....
+                                    apellido = forms.charfield
+
+                    ModelForm
+                        -Crear formularios basandose en Modelo creado. (segun los fields del modelo, sera como se presentara en HTML)
+                            Ejemplo
+                                class Contacto(models.Model):               <== Modelo
+                                    nombre = models.charfield....
+                                    apellido = models.charfield
+                                    etc, etc
+
+                                from models import Contacto                 <== Formulario de modelo
+                                class Contacto(ModelForm):
+                                    model = Contacto
+
+                    Generic Views
+                        - Crea formularios que siempre existen en las web page.
+                        - Ya cuentan con toda la logica.
+                        (Create, Update, Delete,...)
+
+----------------------------------------------------------------------
+    Creacion de Formularios Forms                                               
+---------------------------------------------------------------------
+        La sintaxis de declaración para un formulario es muy similar a la de declarar un modelo, y comparte los mismos tipos de campo (y algunos parámetros similares).
+        Flexible.
 
 
+        1 Crear archivo forms.py                                                            <= Dentro de la App
 
-
-    ----------------------------------------------------------------------
-    Creacion de Formularios API FORMS                                               Se guarda en un Querydict que es un dicionario con key el atributo y value lo que introdice el cliente
-    ---------------------------------------------------------------------
-            
-        1 Crear forms.py                                                                    (App)
-
-        2 Crear formulario                                                                  <=  Formulario creado con Programacion orientada a Objetos (como Clases). 
-                                                                                                Cada Clase representara un Formulario que se plasmara en los templates  
-
-
+        2 Crear formulario  (forms.py)                                                      
                 from django import forms                                                    <= Importar forms
 
-                class Forms1(forms.Form):                                                   <= Hereda de forms 
-                    atribut1=forms.CharField()                                              <= clase para Atributos similares a modelos (pero funciones de forms)
-                    atribut2=forms.EmailField()                                             <= Cada atributo sera un campo. 
-                                                                                                (old style= campos escritos en HTML/template)
+                class Forms1(forms.Form):                                                   <= Hereda de forms.Form.    (Cada Clase creada representara un Formulario)
+                    atribut1=forms.CharField()                                              <= Cada Atributos sera un field en HTML. 
+                    atribut2=forms.EmailField()                                                 <= Atributos tendra una funcion (de forms) que hara: Validacion/parseo/Definira HTML a mostrar
+
+                    def validaciones(self)                                                  <= Metodos de clase (invocables desde View)
+                        var = self.cleaned_data['atribut1']                                     <= Aplica validadores predeterminados. Quita datos inseguros, y convierte a tipo estándar correcto 
+                        if not:
+                            raise ValidationError(_('mensaje1'))                                <= Elevar error de validacion.(Extra. _() = envolver texto en uno de las funciones de traduccion de Django ugettext_lazy() (importado como _()), lo cual es una buena práctica si desea traducir su sitio más tarde.)
 
 
         3 Crear View de formulario 
                                                                                             View doble funcion: 
                                                                                                     Si no recibe data   =>  Retorna template con formulario
                                                                                                     Si recibe data/POST =>  Realiza accion
-
-                def formulario_web(request):                                                <= Funcion
-
+                def formulario_web(request, #pk):                                           <= Funcion  #(opcion recibir id o pk)
+                    #obj = get_object_or_404(Objet_model, pk = pk)                              #<=Devuelve un objeto especificado de un modelo en función de su valor de clave principal y genera una excepción Http404 (not found) si el registro no existe.
+                                                                                                        #from django.shortcuts import get_object_or_404
                     if request.method=="POST":                                              <= Corre si ingresa data    
                         data= Forms1(request.POST)                                              <= Rescate de request en variable.   (Instanciar Clase Forms creada)              
+                        # data= Forms1(request.POST, request.FILES))                            #<= Rescate de request que incluye files.
                         
-                        if data.is valid():                                                     <= .is valid      Validador de la clase forms 
-                            data_valid= Forms1.cleaned_data                                     <= .cleaned_data  Data a Diccionario   key(atributo)-Value(data)
+                        if data.is valid():                                                     <= .is valid      Validador de la clase forms.  Check if the form is valid
+                            data_valid= data.cleaned_data                                     <= .cleaned_data  Data a Diccionario   key(atributo)-Value(data)
 
-                            # Manipulacion de data 
+                            #### Manipulacion de data ej. guardar imagen recbida#######
+                            #   name = data_valid.get("name")
+                            #   img = data_valid.get("img_field")
+                            #   obj = Model1.objects.create(
+                            #      title = name,
+                            #         img = img
+                            #         )
+                            #   obj.save()
 
-                            return render(request, "template.html")
+                            #return render(request, "template.html")
+                            #return redirect('view')                                        #<= from django.shortcuts import render, redirect. // def view(request): return HttpResponse('successfully uploaded') 
+                            #return HttpResponseRedirect(reverse('url_name')                #<= from django.http import HttpResponseRedirect. from django.core.urlresolvers import reverse//
 
                     else:                                                                   <= Corre si No ingresa data  (Muestra formulario)
                         data= Forms1()                                                          <= la clase formulario empacado en variable
                         return render(request, "form_temp.html", {'formulario': data})          <= Variable con formulario, enviado en el diccionario, html lo utilizara en la template => {{variables}}.
                                                                         
-    
+
         4 Crear Template para formulario / Agregar Token CSRF
         
                 <body>
-                    <form action="" method="POST"> 
+                    <form action="" method="POST">                                          <= Especificar metodo
+                    <form action="" method="POST" enctype="multipart/form-data">            <= Si POST que recibe varios tipos de datos (files) (y no solo JSON)
                     {% csrf_token%}                                                         <= IMPORTANTE. token para agregar segurivas vs vulnerabilidad de POST llamada (Cross Site Request Forgery)
                         <table>                                                                                                         <=tabla escrita en HTML
                             {{formulario.as_table}}                                         <= Variable con formulario/     .as_table   (devuelve como tabla html)         
@@ -79,47 +116,291 @@
         
 
         ----------------------------------------------------------------------
-            atributos Clase form                (usarse en view)
+            Fields          (atributos Clase form)
         ---------------------------------------------------------------------
-                                                                    Parametros
-            name = forms.CharField()
-            CharField()                                     max_length, min_length, empty_value, strip, /// widget=forms.Textarea
-            FloatField                                      max_value, min_value 
-            IntegerField                                    max_value, min_value 
-            URLField()                                      max_length, min_length, empty_value
-            BooleanField
-            ChoiceField(list_choice)                        requiere pasar una lista con tuplas:  list_choice= [('model_value', 'Human_read'), ('SO', 'Sophomore')]
-            DateField()
-            TimeField()
-            DateTimeField()                                 Acepta=  '2006-10-25 14:30:59'  '2006-10-25 14:30'  '2006-10-25'
-            EmailField()                                    max_length, min_length, empty_value
-            ImageField()
-            FileField()                                     allow_empty_file, max_length (ength of the filename)
-            FilePathField()                                 recursive, match, allow_files, allow_folders 
-            etc.
-                                                Parametros 
-                                                -----------------------------------------
-                                                    max_value                           These control the range of values permitted in the field.
-                                                    min_value                           These control the range of values permitted in the field.
-                                                    label='Your name'                   Label of field
-                                                    required=False                      No requerido (Default todo es requerido)
-                                                    max_length=100                      Cantidad maxima caracteres
-                                                    min_length                          Cantidad minima caracteres
-                                                    strip                               Eliminara espacios en blanco al inicio y final
-                                                    empty_value                         The value to use to represent “empty”. Defaults to an empty string.
-                                                    help_text='100 characters max.      Texto ayuda que aparecera a lado del campo
-                                                    recursive                           If False (the default) only the direct contents of path will be offered as choices. If True, the directory will be descended into recursively and all descendants will be listed as choices.
-                                                    match                               A regular expression pattern; only files with names matching this expression will be allowed as choices.
-                                                    allow_files                         Only files. Default is True. Specifies whether files in the specified location should be included. Either this or allow_folders must be True.
-                                                    allow_folders                       Only folders Default is False. Specifies whether folders in the specified location should be included. Either this or allow_files must be True.
+            name = forms.CharField()                                               Parametros
+            
+            forms.CharField()                                     max_length, min_length, empty_value, strip, /// widget=forms.Textarea
+            forms.FloatField                                      max_value, min_value 
+            forms.IntegerField                                    max_value, min_value 
+            forms.URLField()                                      max_length, min_length, empty_value
+            forms.BooleanField
+            forms.ChoiceField(list_choice)                        requiere pasar una lista con tuplas:  list_choice= [('model_value', 'Human_read'), ('SO', 'Sophomore')]
+            forms.DateField()
+            forms.TimeField()
+            forms.DateTimeField()                                 Acepta=  '2006-10-25 14:30:59'  '2006-10-25 14:30'  '2006-10-25'
+            forms.EmailField()                                    max_length, min_length, empty_value
+            forms.ImageField()                                    
+            forms.FileField()                                     allow_empty_file, max_length (ength of the filename)
+            forms.FilePathField()                                 recursive, match, allow_files, allow_folders 
+            otros:
+                MultipleChoiceField, DecimalField, DurationField, TypedChoiceField, GenericIPAddressField, TypedMultipleChoiceField, NullBooleanField, 
+                RegexField, SlugField, UUIDField, ComboField, MultiValueField, SplitDateTimeField, ModelMultipleChoiceField, ModelChoiceField​​​​.
+
+                -----------------------------------------
+                Parametros 
+                -----------------------------------------
+                    max_value                           These control the range of values permitted in the field.
+                    min_value                           These control the range of values permitted in the field.
+                    
+                    max_length=100                      Cantidad maxima caracteres
+                    min_length                          Cantidad minima caracteres
+                    strip                               Eliminara espacios en blanco al inicio y final
+                    empty_value                         The value to use to represent “empty”. Defaults to an empty string.
+                    
+                    recursive                           If False (the default) only the direct contents of path will be offered as choices. If True, the directory will be descended into recursively and all descendants will be listed as choices.
+                    match                               A regular expression pattern; only files with names matching this expression will be allowed as choices.
+                    allow_files                         Only files. Default is True. Specifies whether files in the specified location should be included. Either this or allow_folders must be True.
+                    allow_folders                       Only folders Default is False. Specifies whether folders in the specified location should be included. Either this or allow_files must be True.
+                    
+                    Forms fields parametros
+                    ------------------------            -------------------------------------
+                    error_messages                      Override mensaje de error Default (Pass in a dictionary with keys matching the error messages you want to override.)
+                    validators                          agregar funciones de validacion (ver validators)    
+                    localize                            The localize argument enables the localization of form data input, as well as the rendered output.
+                    disable                             Default=False. Si True: won’t be editable by users.
+                    label='Your name'                   Label of field. label que se mostrara el la pag web con este field
+                    help_text=''                        Texto ayuda que aparecera a lado del campo
+                    required                            Default= True. False: no required
+                    error_messages                      Override mensaje de error Default (Pass in a dictionary with keys matching the error messages you want to override.)
+                    label_suffix                        Por defecto, se muestran dos puntos después de la etiqueta (ejemplo. Renewal date:). Este argumento le permite especificar como sufijo diferente que contiene otros caracteres.
+                    initial                             El valor inicial para el campo cuando es mostrado en el formulario.
+                    widget                              Permite especificar un Widget. (ver widgets https://docs.djangoproject.com/en/2.2/ref/forms/widgets/)
+                
+                    -----------------------------------------
+                    widgets de atributos            ver widget de cada atributo Forms https://docs.djangoproject.com/en/2.2/ref/forms/widgets/
+                    -----------------------------------------
+                        Widgets es la forma HTML que tomara el atributo, especifica metodo, accion, input, como sera vera el area del input, etc. 
+                        Django especifica para cada Field de Forms (ChardField, etc) un widget, y este puede hacerse override.
+                        Para override, debemos epecificar el widget como parametro de Field
+
+                                ej description = forms.CharField(widget = forms.Textarea)
+
+                        widgets
+                        ----------------------------------
+                            widget = forms.TextInput                Area de texto rectangular de una linea
+                            widget = forms.Textarea                 Area de texto amplio multiples lineas                                         
+                            widget = forms.CheckboxInput            Boton para marcar
+                            widget = forms.NumberInput              Area solo numeros
+                            widget = forms.SelectDateWidget         Seleccion de fecha. cuadro de seleccion de mes, de dia y de ano.
+
+                            Override widgets             https://www.youtube.com/watch?v=quJzUzCs6Q0
+                            ------------------------------
+                            Dentro de la funcion widget pasar como parametro attrs y pasar valor dentro de diccionarion {}.  
+                                attrs={"":""}
+                                    widget = forms.TextInput(attrs={"placeholder":"Texto guia dentro del inputarea"})
+                                
+                                attrs
+                                ---------------------------
+                                "placeholder":"Texto"                   Dentro del recuadro para escribir se colocara texto guia que se borrara al inciar escritura
+                                "row": #                                Especificara tamano de text area. Que tan alto especificando filas
+
+
         ----------------------------------------------------------------------
-            Metodos de la clase forms                   (usarse en view)
+            Metodos de la clase forms                       https://docs.djangoproject.com/en/1.10/ref/forms/api/#django.forms.Form.clean
         ---------------------------------------------------------------------
-        
+                            
+            .as_ul()                            fields de formulario en html  disposicion lista desordenada             (en HTML)
+            .as_p()                             fields de formulario en html  disposicion parrafos                      (en HTML)
+            .as_table                           fields de formulario en html  disposicion tabla                         (en HTML)
+            .field_order                        Default = None. Recibe lista de fields names. Segun esa lista presentara los fields. (Si field no se encuetra escrito => no aparecera en HTML)
+
+            .clean()
             .cleaned_data                       Informacion formulario como Diccionario
-            .as_ul()                            Informacion en lista para html            (default en tablas)
-            .as_p()                             Informacion en parrafos para html
-            .as_table
+            .is_valid()
+            .errors                             Access the errors attribute to get a dictionary of error messages:
+            .errors.as_data()
+
+
+        ---------------------------------------
+        Validaciones        https://docs.djangoproject.com/en/1.10/ref/forms/validation/
+        ---------------------------------------
+
+                self.cleaned_data['atribut1'] 
+                raise ValidationError(_('mensaje1'))
+
+                class Forms1(forms.Form):                                                   
+                    atribut1=forms.CharField()                                              
+            
+
+                    def validaciones(self)                                                  <= Metodos de clase (invocables desde View)
+                        var = self.cleaned_data['atribut1']                                     <= Aplica validadores predeterminados. Quita datos inseguros, y convierte a tipo estándar correcto 
+                        if not:
+                            raise ValidationError(_('mensaje1'))                                <= Elevar error de validacion.(Extra. _() = envolver texto en uno de las funciones de traduccion de Django ugettext_lazy() (importado como _()), lo cual es una buena práctica si desea traducir su sitio más tarde.)
+
+
+        ------------------------------------------------
+        Styling required or erroneous form rows
+        -----------------------------------------------
+            Forms puede hacer HTML para resaltar errores en rojo o bold. 
+            Simply set the Form.error_css_class and/or Form.required_css_class attributes:
+
+                from django import forms
+
+                class ContactForm(forms.Form):
+                    error_css_class = 'error'
+                    required_css_class = 'required'
+
+
+----------------------------------------------------------------------
+    Creacion de Formularios  ModelForm                                              
+---------------------------------------------------------------------
+        ModelForm crea formulario a partir de un modelo.  
+        Ej. formulario solo para asignar los campos de un solo modelo.
+        El modelo ya definirá la mayor parte de la información que necesita en su formulario.
+
+
+        1 Tener creado tu modelo (models.Model)                                            
+
+                from django.db import models
+                class Model1(models.Model):
+                    title = models.CharField(max_length = 200)
+                    img = models.ImageField(upload_to = "images/")
+
+                    def __str__(self):
+                        return self.title
+
+        2 Crear archivo forms.py                                                            <= Dentro de la App
+                                                
+
+        3 Crear formulario  (forms.py)                                                      
+
+                from django.forms import ModelForm                                          <= Importar ModelForm
+                from .models import Model1                                                  <= Importar modelo
+
+                clase Model1Form(ModelForm)                                                 <= importar de ModelForm
+                    class Meta:
+                        model = Model1                                                          <= Pasar el modelo
+                        fields = '__all__'                                                      <= Especificar los fields (column del modelo) que se usaran (todos)
+
+
+                    Manipular Fields
+                    -----------------------------
+                        class Meta:                                                             <= Agregar correcciones en clase meta
+                            fields = ['field1', 'field2']                                           <=Especifica cuales fields usar
+                            exclude                                                                 <=Especifica cuales fields no se usan y el resto se usara
+                            
+                            propiedad = {"field" : _(" "), }                                       <=Manipula caracteristicas de Field especifico
+                            ---------------------------------------------
+                                ej. labels = { 'name': _('Your name'), }                                <=Cambio de Label de Field name
+                                ej. help_texts = { 'field1': _('Enter a email from gmail'), }
+
+
+        4 Crear View de formulario 
+                                                                                            
+                def formulario_web(request):                                                
+                    if request.method=="POST":                                                  
+                        data= Model1Form(request.POST)                                                            
+                        if data.is valid():                                                     
+                            data_valid= Forms1.cleaned_data  
+                            #                                   
+                            #Manipulacion #
+                            #
+                            return redirect('view')                                        
+                    else:                                                                   
+                        data= Forms1()                                                          
+                        return render(request, "form_temp.html", {'formulario': data})          
+                                                                        
+
+        5 Crear Template para formulario / Agregar Token CSRF
+        
+        
+----------------------------------------------------------------------
+    Creacion de Formularios  Views                                           
+---------------------------------------------------------------------
+
+    1.- Tener tu modelo listo
+
+
+    2.- Crear View
+
+            from django.views.generic.edit import CreateView, UpdateView, DeleteView
+            from django.urls import reverse_lazy
+            from .models import Model1
+
+            class Model1Create(CreateView):                                                     
+                model = Model1
+                fields = '__all__'                                                                      <= Especificar Fields
+                initial={'date_of_death':'05/01/2018',}                                                 <= valores iniciales (opcional)
+
+            class Model1Update(UpdateView):
+                model = Model1
+                fields = ['first_name','last_name','date_of_birth','date_of_death']                     <= Especificar Fields a modificar
+
+            class Model1Delete(DeleteView):
+                model = Model1
+                success_url = reverse_lazy('Model1')                                                   <= Especificar a donde redirecciona
+                                                                                                reverse_lazy() is a lazily executed version of reverse(), se usa aquí porque estamos proporcionando una URL a un atributo de vista basado en clases.
+
+
+    3.- Crear Template
+
+            Template Create/Update.
+            ---------------------------------------------------------
+            Create y Update usan la misma Template. View requiere nombre de forma predeterminada.
+
+                Forma de nombrar:       Modelo + _form.html                                     Model1_form.html 
+                Otro nombre:            template_name_suffix = '_other_suffix') (en la view)    Model1_formularies.html 
+
+
+            Template Delete.
+            ---------------------------------------------------------
+            Delete requiere plantilla de confirmacion de nombre y forma predeterminada. 
+            (No requiere plantilla formulario porque no se mete nada, solo es un boton de borrar y una redireccion)
+
+                Forma de nombrar:       Modelo +  _confirm_delete.html                          Model1_confirm_delete.html  
+                Otro nombre:            template_name_suffix = '_other_suffix') (en la view)    Model1_erase_confirm.html 
+            
+                        {% extends "base_generic.html" %}
+
+                        {% block content %}
+
+                        <h1>Delete Model1_name</h1>
+
+                        <p>Are you sure you want to delete: {{ Model1_name }}?</p>
+
+                        <form action="" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" action="" value="Yes, delete." />
+                        </form>
+
+                        {% endblock %}
+
+
+
+    4.- Creacion de URL
+
+                urlpatterns += [
+                    url(r'^Model1/create/$', views.Model1Create.as_view(), name='Model1_create'),
+                    url(r'^Model1/(?P<pk>\d+)/update/$', views.Model1Update.as_view(), name='Model1_update'),
+                    url(r'^Model1/(?P<pk>\d+)/delete/$', views.Model1Delete.as_view(), name='Model1_delete'),
+                ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     ----------------------------------------------------------------------
@@ -154,17 +435,37 @@
 
 
 
-{% csrf_token%}
-<fieldset> </fieldset>
-<legend> </legend>
-forloop.counter
-requiered
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     ----------------------------------------------------------------------
-    FORMULARIO Old Style  (Logica en Html) (Query)
+    FORMULARIO HTML
     ---------------------------------------------------------------------
             
 
@@ -172,19 +473,19 @@ requiered
             
                 def view(request):
                     if request.GET["ID_de_query"]:
-                        var_query = request.GET["ID_de_query"]                                                              Recuperar Query 
+                        query = request.GET["ID_de_query"]                                                              Recuperar Query 
 
                         # manipular la Query
 
-                        var_result= Modelo.objects.filter(atributo__incontains = var_query)                                 Definir como hacer la Query solicitada  (__incontains = SELECT FROM >>LIKE)                                                                             
-                        return render (request,"template.html", {"resultado":var_result, "query":var_query})                Resultado al usuario
+                        var_result= Modelo.objects.filter(atributo__incontains = query)                                 Definir como hacer la Query solicitada  (__incontains = SELECT FROM >>LIKE)                                                                             
+                        return render (request,"template.html", {"resultado":var_result, "query":query})                Resultado al usuario
                     else:
                         mensaje: 'No has introducudo nada'
                         return Httpresponse(Mensaje)
             
         ----Template-------------------------------------
         
-                <p>Estas buscando: <strong>{{query}}</strong></p>
+                <p>Estas buscando: <strong>{{query}}</strong></p>                                                       
 
                 {% if resultado %}
                     <p>Resultados: {{resultado|length}}</p>

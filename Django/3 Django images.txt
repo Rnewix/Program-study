@@ -1,28 +1,49 @@
 --------------------------------------------------
-Imagenes para base de datos, upload, etc.
+Imagenes para base de datos, upload, etc.                               https://www.geeksforgeeks.org/python-uploading-images-in-django/
 --------------------------------------------------
 Django protege la salida de imagenes por lo que debemos de habilitar
-la vista de las mismas
+la vista de las mismas.
 
+pip install pillow
 
 1.- Settings.py 
     
         import os
 
-        MEDIA_ROOT= os.path.join(BASE_DIR,'')
-        MEDIA_URL= "/images/"
+        MEDIA_ROOT= os.path.join(BASE_DIR,'media')                            <= MEDIA_ROOT is for server path to store files in the computer. Automaticamente media se creara en el root del projecto.
+        MEDIA_URL= "/media/"                                                  <= is the reference URL for browser to access the files over
+                                                                                    (aqui crear carpetas como image, etc.)
 
 2.- App.urls.py
-        from django.conf import Settings
-        from django.contrib.staticfiles.urls import static
+        Opcion 1
+        ----------------------
+                from django.conf import Settings
+                from django.contrib.staticfiles.urls import static
 
-        urlpatterns = [
-            path('', views.index, name='home')
-        ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
+                urlpatterns = [
+                    path('', views.index, name='home')
+                ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
+
+
+        Opcion2
+        -----------------------
+                from django.contrib import admin
+
+                from django.conf import settings
+                from django.conf.urls.static import static
+                
+                urlpatterns = [
+                    path('image_upload', hotel_image_view, name = 'image_upload'),
+                    path('success', success, name = 'success'),
+                ]
+
+                if settings.DEBUG:
+                    urlpatterns += static(settings.MEDIA_URL,
+                                          document_root=settings.MEDIA_ROOT)
 
 
 3.- App
-        Crear carpeta images en proyecto
+                Crear carpeta images dentro de carpeta media del proyecto 
 
 
 
