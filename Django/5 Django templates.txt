@@ -60,9 +60,69 @@
         Uso de valor de variable en HTML                    {{Variable}}
             (envio de valor desde la view)                  {{Clase.atributo}}
                                                             
+    -------------------------------------------------------------------------------------
 
 
-    
+                                             https://docs.djangoproject.com/en/4.0/ref/templates/language/ 
+        1   Variables 
+                {{variables}}                                       Usar de variables
+                {% with var='value' %} {% endwith %}                Declarar variable en template
+
+        2   Logica ==  {% %}
+
+            -   {% for i in iterable %}                             Ciclo for
+                {{variables}}
+                {% endfor %}
+
+            -   {% if %}                                            If
+                {% else %}
+                {% endif %}
+
+
+            -   {# or / and / not / in #}   
+            -   {# ==, !=, <, >, <=, >= #}
+                        ----------------------------------
+                        {% if a > b and b > c %}
+                        % if a == b or c == d and e %}
+                        {% if somevar is not None %}
+                        {% if "hello" in greetings %}
+                        ----------------------------------
+
+            -   {% ifchanged %}                                             Usado dentro de loop
+                {% else %}                                                  Detecta si hay cambio, o si hubo cambio en condicion especificada. Si fue asi hace lo que tiene dentro de su bloque
+                {% endifchanged %}
+
+                    {% for i in iterable %}             
+                        {% ifchanged variable %}                             <= Variable disparador/Condicion
+                            Accion/{{variable}} 
+                        {% else%}
+                            Accion2/{{variable2}} 
+                        {% endifchanged %}  
+                    {% endfor %}
+
+                        --------------------------------
+                        {% for date in days %}                                  Solo si detecta cambio de date.date mostrara {{date.date}}.
+                            {% ifchanged date.date %} 
+                                {{ date.date }} 
+                            {% endifchanged %}
+                        {% endfor %}
+
+
+            https://docs.djangoproject.com/en/4.0/ref/templates/builtins/
+
+
+        3   Comentarios             {# el comentario #}
+
+                                    {% comment %}
+                                    Tu comentario multilinea
+                                    {% endcomment %}
+
+        4   Filtros     Django Buscar template filter
+                {{variable|uper}}
+                {{variable|lower}}
+                {{variable|first|uper}}
+
+
 
 
 
@@ -107,61 +167,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    -----------------------------------------------------------------------------------
-    >>> Evitar su USO <<<    Logica Python en HTML                    https://docs.djangoproject.com/en/4.0/ref/templates/language/         
-    -----------------------------------------------------------------------------------
-
-
-        1   Variables 
-                {{variables}}                                   Usar de variables
-                {% with var='value' %} {% endwith %}            Declarar variable en template
-
-        2   Logica ==  {% %}
-
-                {% for i in iterable %}
-                {{variables}}
-                {% endfor %}
-
-                {% if %}
-                {% else %}
-                {% endif %}
-
-
-                {# or / and / not / in #}
-                {# ==, !=, <, >, <=, >= #}
-                        ----------------------------------
-                        {% if a > b and b > c %}
-                        % if a == b or c == d and e %}
-                        {% if somevar is not None %}
-                        {% if "hello" in greetings %}
-                        ----------------------------------
-
-            https://docs.djangoproject.com/en/4.0/ref/templates/builtins/
-
-
-        3   Comentarios ==  {# el comentario #}
-
-                        ==  {% comment %}
-                            Tu comentario multilinea
-                            {% endcomment %}
-
-        4   Filtros     Django Buscar template filter
-                {{variable|uper}}
-                {{variable|lower}}
-                {{variable|first|uper}}
-
+   ///////////////////////////////////////////////////////////////////////////////////////////////
 
     ----------------------------------------------------------------------------------       
     Registro de Templates en ProjectApp/settings.py

@@ -197,7 +197,8 @@ Class Based Views       (Generics Views)                                   https
 -------------------------------------------------
     Vistas basada en Programacion basada en objetos. 
     Django ya provee de antemano vistas predeterminadas para funciones muy comunes en las paginas web. (login,logout,etc.)
-    Ayudan a respetar principio DRY, y Principio de "no reinventar la rueda"
+    Ayudan a respetar principio DRY, y Principio de "no reinventar la rueda".
+    Reducen significativamente la cantidad de código requerido, sigue la práctica adecuada de Django,  vista más robusta con menos código, menos repetición, y menos mantenimiento.
 
     Views disponbibles
     --------------------
@@ -267,77 +268,195 @@ Class Based Views       (Generics Views)                                   https
                                 path('change-password/', auth_views.PasswordChangeView.as_view(template_name='change-password.html')
 
             
-        3.- Metodo de subclases
+        3.- Metodo Views that inherit from Generic Views    
         --------------------------
-            - Heredar la generic views a una subclase y hacer override de atributos o metodos que deseamos diferentes desde la hija.
+            -Heredar la generic views a una subclase y hacer override de atributos o metodos que deseamos diferentes desde la hija.
 
                 views.py
-                    from django.views.generic import TemplateView                   <= Importar Generic View en View
+                ----------------
+                    from django.views.generic import ListView, etcView              <= Importar Generic View en View  
 
-                    class MyAboutView(TemplateView):                                <= Heredar de la View deseada
+                    class MyAboutView(TemplateView):                                <= Heredar de la View deseada. Convension: agregar View al final del nombre de la view.
                         template_name = "about.html"                                <= Atributo a override
 
+                        
+                        def get_queryset(self):                                     <= Metodo override
+                        """Docstrings"""
+                            return
+
                 urls.py
+                ----------------
+                Definir valores que entienda la clase (ver cada clase)
+
                     from some_app.views import AboutView                            <= Importar a nuestra view hija en urls.py
 
                     urlpatterns = [
-                        path('about/', MyAboutView.as_view()),                      <= .as_view() ??????????/
+                        path('about/', MyAboutView.as_view()),                      <= .as_view(). Metodo de Generic views que crea una instancia de la clase. IMPORTANTE
+                    ]
+
+                    urlpatterns = [
+                        path('<int: pk>/', views.MyviewView.as_view()),
                     ]
 
 
--------------------------------------------------
-Class Based Views       (Generics Views)                                   https://ccbv.co.uk/
--------------------------------------------------
 
-    Implementar una view Metodo de subclases. 
+    --------------------------------------------------------------------------------------------------------------------------------------
+                                                Views that inherit from Generic Views  
+    --------------------------------------------------------------------------------------------------------------------------------------
+
     ------------------------------------
-    
-        -Heredar la generic views a una subclase y hacer override de atributos o metodos que deseamos diferentes desde la hija.
+    ListView
+    ------------------------------------
 
-            views.py
-                from django.views.generic import ListView, etcView              <= Importar Generic View en View  
-
-                class MyAboutView(TemplateView):                                <= Heredar de la View deseada. Convension: agregar View al final del nombre de la view.
-                    template_name = "about.html"                                <= Atributo a override
-
-                    
-                    def get_queryset(self):                                     <= Metodo override
-                    """Docstrings"""
-                        return
-
-            urls.py
-                urlpatterns = [
-                    path('about/', MyAboutView.as_view()),                      <= .as_view(). Metodo de Generic views que permite que la clase creada sea considerada una view.
-                ]
+        1.- View
+        --------------------------
+            from django.views.generic import ListView:                              <=Importacion List View
+        
+            class Model1ListView(ListView):                                         <= Heredar de ListView
+                model= Model1                                                           <=Especificar Modelo a listar
 
 
 
-        -Recibir parametros desde url
-            En clase:
-                -No requeremos especificarse, al heredar de Generic clase Autoentiende. (ver cada clase)
-            En url
-                -Definir valores que entienda la clase (ver cada clase)
+            =========EXTRAS==========  
+              Cambiar el comportamiento por defecto
 
-                urlpatterns = [
-                    path('<int: pk>/', views.MyviewView.as_view()),
-                ]
+                class Model1ListView(ListView):
+                    template_name= "app/temple.html"                                        <= Tamplate. Especificar propia ubicacion del Template.
+                    context_object_name= "var"                                              <= Contexto. Cambia nombre de Variable que representara nuestra lista en el HTML/Template.
+                    queryset = Model1.objects.filter()                                      <= Modificar comportamiento de la query.
+                    queryset = Model1.objects.orderby('-date')
+                                                                                                    Ej. Solo da una lista de 5 registros, de titulos que contengan war:
+                                                                                                            queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
+                    paginate_by = 10                                                        <= Mostrara automaticamente los registros de 10 en 10 en dif paginas.
+                                                                                                    Requiere agregar un bloque extra al html base. Solo si paginated esta habilitada, este bloque correra.
+                                                                                                    HTML para paginacion
+                                                                                                    ---------------------------------------------------------------------------------------------------------
+                                                                                                        {% block content %}{% endblock %}
+
+                                                                                                        {% block pagination %}
+                                                                                                            {% if is_paginated %}
+                                                                                                                <div class="pagination">
+                                                                                                                    <span class="page-links">
+                                                                                                                        {% if page_obj.has_previous %}
+                                                                                                                            <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                                                                                                                        {% endif %}
+                                                                                                                        <span class="page-current">
+                                                                                                                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                                                                                                                        </span>
+                                                                                                                        {% if page_obj.has_next %}
+                                                                                                                            <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                                                                                                                        {% endif %}
+                                                                                                                    </span>
+                                                                                                                </div>
+                                                                                                            {% endif %}
+                                                                                                        {% endblock %} 
+
+                    def get_queryset(self):                                                 <= Metodo Override. Modificar comportamiento de la query
+                        """Docstrings"""
+                        return Model1.objects.filter()           
+
+                    def get_context_data(self, **kwargs):                                   <= Pasar variables de contexto adicionales a la plantilla
+                        context = super(Model1ListView, self).get_context_data(**kwargs)        <= Crear el contexto normal
+                        context['extra'] = 'extra_data'                                         <= Agregar mas contexto (key:value)
+                        return context                                                          <=Devolver contexto actualizado. Con lo que agregamos nuevo.
 
 
-    Class Based Views types
-    ------------------------
-        class MyView(ListView):                                                     <= Heredar de ListView
-            template_name= "app/temple.html"                                        <= Ubicacion del Template a renderizar
-            context_object_name= "var"                                              <= Contexto. Variables a mandar a HTML/Template, para usarse alli.
+        2.- URL
+        ------------------------
+            Model1ListView.as_view()                                                        <= Concenso para nombrar vista  Modelo1 + ListView  (.as_view es metodo que instanciara la ListView)
 
-            def get_queryset(self):                                                 <= Metodo ej. para obtener datos una query (para ej. vaciar una query a "var" de Context)
-                """Docstrings"""
-                return Model1.objects.filter(attr= value)               
+            urlpatterns = [
+                url(r'^books/$', views.Model1ListView.as_view(), name='books'),
+            ]
 
 
-        class MyView(generic.DetailView)                                            <= Heredar de DetailView
-            template_name= "app/temple.html"                                        <= Ubicacion del Template a renderizar
-            model = Model1                                                          <= Recibe modelo donde buscara (segun parametro recibido por url)
-                                                                                        Realiza validacion automatica (get_object_or_404)
+        3.- Template
+        -----------------------
+            model1_list.html                                                                <= Nombre de Template.  Model1 + _list.html (puede cambiarse con template_name= "app/temple.html" en view )
+            object_list (model1_list)                                                       <= Nombre de Variable de plantilla para acceder a la lista (modificable con context_object_name= "var" )
+
+                                {% if model1_list %}
+                                    <!-- code here to list the books -->
+                                {% else %}
+                                    <p>There are no books in the library.</p>
+                                {% endif %}
+                                
+                ej.Lista de libros
+                --------------------------------------
+                    {% extends "base_generic.html" %}
+
+                    {% block content %}
+                        <h1>Book List</h1>
+
+                        {% if book_list %}
+                        <ul>
+
+                        {% for book in book_list %}
+                        <li>
+                            <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{book.author}})             Funcion: .get_absolute_url()  (EVItar usarlas en templates)
+                        </li>
+                        {% endfor %}
+
+                        </ul>
+                        {% else %}
+                        <p>There are no books in the library.</p>
+                        {% endif %} 
+                    {% endblock %}
+
+
+
+    ------------------------------------
+    DetailView
+    ------------------------------------
+        Desplegará información sobre un objeto/registro específico.
+        Si registro no encontrado aplica automaticamente get_object_or_404(). la pag 404 lanzada es personalizable
+
+        1.- View
+        --------------------------
+            from django.views.generic import DetailView
+            from books.models import Model1
+            #from django.utils import timezone
+
+            class Model1DetailView(DetailView)                                            
+                model = Model1                                                          
                                                                                         
+
+                =========EXTRAS==========    
+
+                Ver ListView (arriba)  
+
+                def get_object(self):
+                    object = super(Model1DetailView, self).get_object()
+                    object.last_accessed = timezone.now()
+                    object.save()
+                    return object                                                                                
+
+
+        2.- URL
+        ------------------------
+            urlpatterns = [
+                url(r'^book/(?P<pk>\d+)$', views.BookDetailView.as_view(), name='book-detail'),
+            ]
+
+
+        3.- Template
+        -----------------------    
+            model1_detail.html                                                                <= Nombre de Template.  Model1 + _detail.html (puede cambiarse con template_name= "app/temple.html" en view )
+
+
+            {% extends "base_generic.html" %}
+
+                {% block content %}
+                <h1>Title: {{ book.title }}</h1>
+                <p><strong>Author:</strong>     <a href="">{{ book.author }}</a>  </p> <!-- author detail link not yet defined -->
+                <p><strong>Summary:</strong> {{ book.summary }}</p>
+                <p><strong>Language:</strong> {{ book.language }}</p>
+                <p><strong>Genre:</strong> {% for genre in book.genre.all %} {{ genre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                    ...
+                    ...
+                {% endblock %}
+
+
+        
 
 

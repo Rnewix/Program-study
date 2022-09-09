@@ -41,7 +41,7 @@
                                 class Contacto(ModelForm):
                                     model = Contacto
 
-                    Generic Views
+                    Generic Views       
                         - Crea formularios que siempre existen en las web page.
                         - Ya cuentan con toda la logica.
                         (Create, Update, Delete,...)
@@ -436,23 +436,6 @@
 
 
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
