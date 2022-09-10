@@ -1,0 +1,335 @@
+
+----------------------------------------------------------
+Sesiones
+----------------------------------------------------------
+
+    Utilidad:   Dar a cada usuario individual una experiencia personalizada, basada en su uso previo del sitio, preferencias, etc.
+    Se usa el atributo session del parametro request (HttpRequest).
+    session es un  objeto tipo diccionario.
+    Representa la conección específica el navegador actual (realizada por un usuario)
+    Por defecto, Django solo guarda información en la base de datos de sesión y envía la cookie de sesión al cliente cuando la sesión ha sido modificada (asignada) o eliminada.
+
+
+
+
+    Actualizar dato de session
+        var = request.session.get('key', value)                     Obtiene de request.session el valor de key. O crearla. 
+                                                                        var = request.session.get('num_visits', 0)      Este caso pretendemos numero de visita. Si no existia, se crea con el valor predefinido de 0.
+        request.session['something'] = "something"                  Modificar una clave de la sesion 
+                                                                        request.session['num_visits'] = num_visits + 1  En este caso aumentamos las visitas de la sesion.
+        request.session.modified = True                             Guardar los cambios.
+
+
+    Hacer que el sitio actualice la base de datos y envíe la cookie en cada solicitud
+        SESSION_SAVE_EVERY_REQUEST = True                           (settings.py)
+
+
+
+----------------------------------------------------------
+Autenticación de Usuario (login/Logout/pasword)
+----------------------------------------------------------
+    https://developer.mozilla.org/es/docs/Learn/Server-side/Django/Authentication
+
+    Login y log out. Usaremos el metodo include. 
+
+
+        1.- URL proyecto
+        ----------------------
+            urlpatterns = [
+                path('accounts/', include('django.contrib.auth.urls')),
+            ]
+
+                            Patrones URL
+                            -----------------------------------
+                                accounts/login/ [name='login']
+                                accounts/logout/ [name='logout']
+                                accounts/password_change/ [name='password_change']
+                                accounts/password_change/done/ [name='password_change_done']
+                                accounts/password_reset/ [name='password_reset']
+                                accounts/password_reset/done/ [name='password_reset_done']
+                                accounts/reset/<uidb64>/<token>/ [name='password_reset_confirm']
+                                accounts/reset/done/ [name='password_reset_complete']
+
+                            Patrones URL con regex
+                            -----------------------------------
+                                ^accounts/login/$ [name='login']
+                                ^accounts/logout/$ [name='logout']
+                                ^accounts/password_change/$ [name='password_change']
+                                ^accounts/password_change/done/$ [name='password_change_done']
+                                ^accounts/password_reset/$ [name='password_reset']
+                                ^accounts/password_reset/done/$ [name='password_reset_done']
+                                ^accounts/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$ [name='password_reset_confirm']
+                                ^accounts/reset/done/$ [name='password_reset_complete']
+        
+        2.- Crear carpeta registration (para los html)
+        -----------------------------   
+                templates
+                    registration
+                        Aqui van los HTML
+
+
+            2.1.- habilitar en Settings
+            -----------------------------
+
+                        TEMPLATES = [
+                        {
+                            'DIRS': ['./templates',],
+                            'APP_DIRS': True,
+                            ...
+        
+        3.- Crear template para cada url.
+        ---------------------------------
+                Ver cada caso
+
+    -----------------------------------------------------------------
+    LogIn
+    -----------------------------------------------------------------
+        Template nombre:  login.html
+
+                    {% extends "base_generic.html" %}
+
+                    {% block content %}
+
+                    {% if form.errors %}
+                    <p>Your username and password didn't match. Please try again.</p>
+                    {% endif %}
+
+                    {% if next %}
+                        {% if user.is_authenticated %}
+                        <p>Your account doesn't have access to this page. To proceed,
+                        please login with an account that has access.</p>
+                        {% else %}
+                        <p>Please login to see this page.</p>
+                        {% endif %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+
+                    <div>
+                    <td>{{ form.username.label_tag }}</td>
+                    <td>{{ form.username }}</td>
+                    </div>
+                    <div>
+                    <td>{{ form.password.label_tag }}</td>
+                    <td>{{ form.password }}</td>
+                    </div>
+
+                    <div>
+                    <input type="submit" value="login" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    </div>
+                    </form>
+
+                    {# Assumes you setup the password_reset view in your URLconf #}
+                    <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+
+                    {% endblock %}
+
+        Redireccion default a:
+            http://127.0.0.1:8000/accounts/profile/
+        
+        Cambiar redireccion:
+            LOGIN_REDIRECT_URL = '/'                        (Aqui redirigimos a Home)
+
+    -----------------------------------------------------------------
+    LogOut
+    -----------------------------------------------------------------
+        Template nombre: logged_out.html
+            
+                    {% extends "base_generic.html" %}
+
+                    {% block content %}
+                    <p>Logged out!</p>
+
+                    <a href="{% url 'login'%}">Click here to login again.</a>
+                    {% endblock %}
+
+
+    -----------------------------------------------------------------
+    Reinicio de contraseña                                  Obtener la dirección del correo electrónico del usuario
+    -----------------------------------------------------------------
+        Template nombre: password_reset_form.html
+
+                    {% extends "base_generic.html" %}
+                    {% block content %}
+
+                    <form action="" method="post">{% csrf_token %}
+                        {% if form.email.errors %} {{ form.email.errors }} {% endif %}
+                            <p>{{ form.email }}</p>
+                        <input type="submit" class="btn btn-default btn-lg" value="Reset password" />
+                    </form>
+
+                    {% endblock %}
+
+
+    -----------------------------------------------------------------
+    Reinicio de contraseña hecho                            Obtenido correo para enviar mail reinicio de contraseña. Django solamente enviará correos de reinicio a las direcciones (usuarios) que ya están almacenadas en la base de datos
+    -----------------------------------------------------------------
+        Template nombre: password_reset_done.html
+
+
+                    {% extends "base_generic.html" %}
+                    {% block content %}
+                    <p>We've emailed you instructions for setting your password. If they haven't arrived in a few minutes, check your spam folder.</p>
+                    {% endblock %}
+
+
+    -----------------------------------------------------------------
+    Correo electrónico de reinicio de contraseña            Suministra el texto HTML del correo electrónico, y contiene el enlace de reseteo que enviaremos a los usuarios
+    -----------------------------------------------------------------
+        Template nombre: password_reset_email.html      (no tiene url)
+
+                    Someone asked for password reset for email {{ email }}. Follow the link below:
+                    {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+        
+    -----------------------------------------------------------------
+    Confirmación de reinicio de contraseña                  Página es donde introduces una nueva contraseña después de pinchar el enlace en el correo electrónico de reinicio de contraseña
+    -----------------------------------------------------------------
+        Template nombre: password_reset_confirm.html
+
+                    {% extends "base_generic.html" %}
+
+                    {% block content %}
+
+                        {% if validlink %}
+                            <p>Please enter (and confirm) your new password.</p>
+                            <form action="" method="post">
+                                <div style="display:none">
+                                    <input type="hidden" value="{{ csrf_token }}" name="csrfmiddlewaretoken">
+                                </div>
+                                <table>
+                                    <tr>
+                                        <td>{{ form.new_password1.errors }}
+                                            <label for="id_new_password1">New password:</label></td>
+                                        <td>{{ form.new_password1 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ form.new_password2.errors }}
+                                            <label for="id_new_password2">Confirm password:</label></td>
+                                        <td>{{ form.new_password2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><input type="submit" value="Change my password" /></td>
+                                    </tr>
+                                </table>
+                            </form>
+                        {% else %}
+                            <h1>Password reset failed</h1>
+                            <p>The password reset link was invalid, possibly because it has already been used. Please request a new password reset.</p>
+                        {% endif %}
+
+                    {% endblock %}
+
+
+    -----------------------------------------------------------------
+    Reinicio de contraseña completado                  mostrada para notificarte cuando el reinicio de contraseña ha tenido éxito
+    -----------------------------------------------------------------
+        Template nombre: password_reset_complete.html
+        
+
+                    {% extends "base_generic.html" %}
+                    {% block content %}
+
+                    <h1>The password has been changed!</h1>
+                    <p><a href="{% url 'login' %}">log in again?</a></p>
+
+                    {% endblock %}
+
+
+
+    -----------------------------------------------------------------
+        Usuarios identificados              https://docs.djangoproject.com/en/1.10/topics/auth/default/#limiting-access-to-logged-in-users
+    -----------------------------------------------------------------
+
+        {{ user }}                              Variable automaticamente anadida por default al contexto.
+
+        {% if user.is_authenticated %}          Para determinar si el usuario estas en estatus identificado. Dentro de un if puede mostrar el contenido específico al registrado
+
+
+                                                Barra de navegacion                 Mostrar opciones segun estado de login/logout
+                                                
+                                                                                    {% if user.is_authenticated %}
+
+                                                                                        <li>User: {{ user.get_username }}</li>
+                                                                                        <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+
+                                                                                    {% else %}
+
+                                                                                        <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+
+                                                                                    {% endif %} 
+        
+
+        
+        Vistas basadas en funciones
+        Restringir el acceso a tus funciones A personas no registradas. 
+        Decorador.@login_required
+
+            @login_required  
+                                                    from django.contrib.auth.decorators import login_required
+                                                    @login_required
+                                                    def my_view(request):
+
+                
+        Vistas basadas en clasese
+        Restringir el acceso a tus funciones A personas no registradas. Mas redireccion a otra url.
+        Pasar a la vista un parametro AccessMixin (LoginRequiredMixin, etc.)
+
+            LoginRequiredMixin
+                                                    from django.contrib.auth.mixins import LoginRequiredMixin
+                                                    class MyView(LoginRequiredMixin, View):
+                                                        login_url = '/login/'
+                                                        redirect_field_name = 'redirect_to'     
+
+
+
+----------------------------------------------------------
+Permisos de Usuario
+----------------------------------------------------------
+    Django por default da permisos add, change, and delete a todos los modelos
+    Permisos están asociados con los modelos, definen las operaciones que pueden llevarse a cabo en un modelo instanciado por 
+      un usuario que tiene el permiso
+
+    Modelos
+        1 Crear subclase Meta
+        2 Definir campo permissions
+        3 Definir permisos ('nombre_permiso", "valor_mostrado")
+
+        class BookInstance(models.Model):
+            ...
+            class Meta:
+                permissions = (("permiso", "valor"), ("permiso", "valor"))  
+
+    Templates
+        {{ perms }}             Comprobar permisos perm + nombre app especifico + el nombre permiso 
+                                    {{ perms.App1.permiso1 }}
+
+                                {% if perms.catalog.can_mark_returned %}
+                                {% endif %}
+    
+    Views
+
+        Vista de funcion
+            @permission_required('App1.permiso')            Se usa decorador. Una view puede tener mutliples decoradores de permiso uno sobre otro.
+                                                            Requiere importacion.
+
+                                                                from django.contrib.auth.decorators import permission_required
+
+                                                                @permission_required('app1.permiso1')
+                                                                @permission_required('app1.permiso2')
+                                                                def my_view(request)
+
+        vista basada en clases
+            PermissionRequiredMixin
+            permission_required=()                          Se pasa como parametro de la clase. Se crea attibuto permission_required con el/los permisos requeridos.  
+                                                            Requiere importacion 
+
+                                                                from django.contrib.auth.mixins import PermissionRequiredMixin
+
+                                                                class MyView(PermissionRequiredMixin, View):
+                                                                    permission_required = 'app1.permiso1'
+                                                                
+                                                                    permission_required = ('app1.permiso1', ''app1.permiso2')

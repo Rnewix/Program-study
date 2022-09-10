@@ -1,0 +1,7 @@
+bs5-$           HTML completo
+bs5-nav         Barra de Nav
+bs5-card        Tarjeta de HTML
+bs5-table       Tabla 
+bs5-jumbotron   Pagina de bienvenida (como netflix)
+bs5-button      Boton html
+bs5-form-input  Formulario
