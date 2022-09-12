@@ -310,7 +310,7 @@ Class Based Views       (Generics Views)                                   https
 
         1.- View
         --------------------------
-            from django.views.generic import ListView:                              <=Importacion List View
+            from django.views.generic import ListView                              <=Importacion List View
         
             class Model1ListView(ListView):                                         <= Heredar de ListView
                 model= Model1                                                           <=Especificar Modelo a listar

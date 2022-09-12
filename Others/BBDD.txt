@@ -118,13 +118,13 @@ Tipos de datos:
 	Lógicos: 		BOOLEAN
 
 
-    	CHAR(n)			String. No. de caracteres especifico (EFICIENTE memoria) 
-    	VARCHAR(n)		Texto. Hasta 255 letras.
-    	TEXT			Texto. No limite.
+	CHAR(n)			String. No. de caracteres especifico (EFICIENTE memoria) 
+	VARCHAR(n)		Texto. Hasta 255 letras.
+	TEXT			Texto. No limite.
     	
 	INTEGER			Numero (sin decimal).
-		BIGINT			Para numero grandes
-		SMALLINT		Para numeros pequenos (<99)(EFICIENTE)
+	BIGINT			Para numero grandes
+	SMALLINT		Para numeros pequenos (<99)(EFICIENTE)
 	DECIMAL(n,s)		Numero con decimal (n =cantidad numeros, s =Cantidad de decimales)
 	NUMERIC(n,s)		;;;;;;;;;;;;;
 	
@@ -137,13 +137,13 @@ Tipos de datos:
 	
 	
 Constraints 				(Restricciones a los datos)
-	NOT NULL		No permite valores nulos.
-	UNIQUE			Valor unico en la columna.
-	PRIMARY KEY		Identifica entity. NOT NULL y UNIQUE.
-	FOREIGN KEY		Identifica de manera única una tupla en otra tabla. (Relacion entre tablas, algo de una viene de otra)
-	CHECK			Especificar condiciones de valor a aceptar.
-	DEFAULT			Coloca un valor por defecto cuando no hay un valor especificado.
-	INDEX			Permitir búsquedas más rápidas. DESVENTAJA: cada vez mas lento el ingreso de nuevo elemento (tiene que repasar todos los index previos para definir uno nuevo 0n) 
+	NOT NULL (NN)				No permite valores nulos.
+	UNIQUE					Valor unico en la columna.
+	PRIMARY KEY (PK)		Identifica entity. NOT NULL y UNIQUE.
+	FOREIGN KEY (FK)		Identifica de manera única una tupla en otra tabla. (Relacion entre tablas, algo de una viene de otra)
+	CHECK					Especificar condiciones de valor a aceptar.  CHEK(IN("opcion1","opcion2"))
+	DEFAULT					Coloca un valor por defecto cuando no hay un valor especificado.
+	INDEX					Permitir búsquedas más rápidas. DESVENTAJA: cada vez mas lento el ingreso de nuevo elemento (tiene que repasar todos los index previos para definir uno nuevo 0n) 
 
 
 PASO 2: Inclusion de Foreing Keys
@@ -198,7 +198,7 @@ Formas:
 		
 3a forma normal (3FN): Ademas los campos que NO son clave, NO deben tener dependencias.
 	No dependencia funcional entre dos campos.  Si modifico una columna de una tabla, no requiero modificar otra columna.
-	    Ejemplp: 1 factura 100, 
+	    Ejemplo: 1 factura 100, 
 					
 4a forma normal (4FN): Ademas campos multivaluados se identifican por una clave única.
 	Va a ver casos que un elemeto en una tabla, tiene 2 o mas valores de otra tabla. Tabla alumno, Tabla materia.
@@ -206,6 +206,21 @@ Formas:
 		Ejemplo Persona: 1 y Materias: 1/2/3 ==> id_1: Persona1, materia2.  id2: Persona 1, materia 3.
 		
 		
+Romper relacion muchos a muchos
+----------------------------------
+Crear una tabla Pivote
+Contendran los id de de las 2 entidades relacionadas como FK (o el num de entidades que existan)
+	PrimaryKey(PK): Sera una PK compuesta. Las id seran tanto FK como PK, asi que las dos PK deben de conicidir
+
+		ej
+		----------------------------------
+		POST N >|--------|< Etiquetas
+		
+		Tabla Pivote POST_Etiquetas
+			post_id 		INTERGER(FK, PK)
+			Etiquetas_id	INTERGER(FK, PK)
+		
+
 
 
 
@@ -216,9 +231,9 @@ Formas:
 	1 Instalacion-------------------
 		sudo apt update
 		sudo apt install mysql-server
-		mysql --version					Know mysql version
+		mysql --version								Know mysql version
 		sudo mysql                            		Open mysql in terminal
-		exit;						Close mysql
+		exit;										Close mysql
 
 	2 workbench---------------------
 			https://www.mysql.com/products/workbench/
