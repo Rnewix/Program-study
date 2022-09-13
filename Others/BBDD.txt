@@ -127,6 +127,7 @@ Tipos de datos:
 	SMALLINT		Para numeros pequenos (<99)(EFICIENTE)
 	DECIMAL(n,s)		Numero con decimal (n =cantidad numeros, s =Cantidad de decimales)
 	NUMERIC(n,s)		;;;;;;;;;;;;;
+	AUTOINCREMENT
 	
 	DATE			Ano-mes-dia
 	TIME			La hora

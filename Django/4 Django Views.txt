@@ -115,7 +115,9 @@ Function Based Views
             Model1.objects.order_by("-atributo")                                    Ord descendentemente  (zxy... / nuevo a viejo / 9876...)
             Model1.objects.order_by("atributo")[:]                                  Especificar cantidad con slice
 
-
+            .las()
+            .first()
+            .count()
                                                                                 Metodos especiales de busqueda (Son parte de cada columna de los registros (atributos/instancia))
             .get(attr__gte = value)                                             --------------------------------------------------------                                                                            
                                                                                     pk                      =   Primary key
@@ -170,6 +172,11 @@ Function Based Views
                                                                             Relacion 1 ----> 1 o muchos
                                                             
             var.name2.count                                         Cuenta todos los registros relacionados de X modelo con el Modelo1 (esta ocacion registros de Modelo2)                                            
+
+  
+            .add()                                                  Agrega objeto a la relacion 
+            .remove(var)                                            Elimina objeto de la relacion
+            .clear()                                                Eliminar todos los objetos de la relacion
 
 
     URL dinamica en view

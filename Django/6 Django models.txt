@@ -28,9 +28,16 @@ Modelos
             name1 = models.CharField(max_length=200)                                <= Fields. Atributos/columnas de tabla
             content1 = models.TextField()
             img = models.ImageField(upload_to='images/')
+            sex = models.CharField(choices)
 
             def __str__(self):
                 return self.name1                                                   <= Se mostrara en Shell como nombre, en lugar de verse como objeto
+            
+            class Meta:                                                             <= subclase para metadatos. Como se mostrara en BD, etc.
+                verbose_name = 'Articulo'
+                Verbose_name_plural = 'Articulos'
+                db_table = "Articulo"
+                ordering = ['last_name', 'first_name']
 
         
 
@@ -44,20 +51,15 @@ Modelos
         Email validos:                  models.EmailField()
         Url validos:                    models.URLField
         Booleanos:                      models.BooleanField()
-        ForeingKey:                     models.ForeignKey(ModelPrincipal, on_delete=models.CASCADE)             Id Modelo con relacion 1 sera el FK de Modelo relacion muchos
-        time:                           models.DateTimeField()
+        Time:                           models.DateTimeField()
         Image:                          models.ImageField()                                                     Requiere pip install Pillow.
-                                                    
-                                                    
-       
-
+        ForeingKey:                     models.ForeignKey(ModelPrincipal, on_delete=models.CASCADE)             Id Modelo con relacion 1 sera el FK de Modelo relacion muchos
+        Relacion n a n                  models.ManyToManyField(ModelRelacion)
 
         Argumentos particulares
         ----------------------------------------------
             max_length=8
-            default = value
-            on_delete=models.CASCADE
-            on_delete=models.CASCADE on_delete=models.CASCADE  si se borra la columna, todas se borraran
+            on_delete=models.CASCADE  si se borra la columna, todas se borraran
 
 
         models.Field general parameters
@@ -65,19 +67,18 @@ Modelos
             primary_key                                     If True, this field is the primary key for the model.
             blank=                                          Defautl False. Permite la no entrada de valor
             Null =                                          Default False. True = guardara valor NULL si no img
-            default=                                        Valor default. (valor u objeto)
-            db_column=                                      The name of the database column to use for this field. If this isn’t given, Django will use the field’s name.
-            editable                                        Default True. Si Falso, no se mostrara en el admin
+            default =                                       Valor default. (valor u objeto)
+            db_column =                                     The name of the database column to use for this field. If this isn’t given, Django will use the field’s name.
+            editable =                                      Default True. Si Falso, no se mostrara en el admin
             error_messages                                  Permite hacer override el mensaje default que aldra (raise) Requiere diccionario (key(error): mensaje a overide)
-            verbose_name                                    Dar nombre para humano. Default atributo name (Django cambiara _ por espacios)
-            unique                                          default False. True: Debe ser unico en la tabla
+            verbose_name =                                  Dar nombre para humano. Default atributo name (Django cambiara _ por espacios)
+            unique =                                        default False. True: Debe ser unico en la tabla
             validators                                      Validacion (validators documentation)
 
         ImageField
         -----------------
             upload_to ='url/'                               Indicara donde se guardara imagen. Incluye .save(), POr Pillow library. (debes descargar Pillow)   
                                                                 models.ImageField(upload_to='imagenes/')
-            
         DateTimeField
         -----------------
             auto_now_add = True
@@ -90,9 +91,52 @@ Modelos
             ej.
                 mail = models.CharField(validators =[validate_geeks_mail])          (solo aceptara emails de gmails )
         
+        choices
+        ------------------------
+        Manera de dar opciones especificas en un Field.
+
+            1 Metodo. (profesional)
+                Crear choices.py en app
+                    
+                    choices.py
+
+                Crear opciones en tuplas ('key', 'value')                           (lo que debe ingresar el cliente es el key)
+                    
+                    sexos =(
+                        ('f', 'femenino'),
+                        ('m', 'masculino')
+                    )
+                
+                Importar choices a models
+                Agregar Field con choices
+                
+                    from .choices import sexos            
+                
+                    sex = models.CharField(max_length= 1, choices= sexos, default = 'f')
+
+        Relaciones entre tablas  (ForeingKey)
+        ----------------------------------
+        var = models.ForeignKey(Modelo1, attrs)
+            Modelo1                         indica la relacion hacia
+            null= True, blank=True          Porque al inicio no contamos con valores o puede haber relacion 0   
+            on_delete=models.CASCADE        En caso de que se borre el modelo principal se borrara todos los modelos dependiente (osea los que lo tienen relacionado como FK)
+            on_delete=models.RESTRICT       NO permite eliminacion de una llave a la cual se esta haciendo referencia
+            related_name = 'newname'        Renombrar la tabla relacionada
 
 
+        Relaciones muchos a muchos
+        ----------------------------------
+        Se realiza usando ManyToManyField de models. Creara una tercera tabla con 2 columnas que seran llaves foraneas.
 
+            from django.db import models
+
+            var= models.ManyToManyField(ModelRelacion)
+
+        Para ingresar a los valores de la tabla relacionada:
+            -tabla_relacionada_minusculas + _set        
+
+
+                ej gender= models.ManyToManyField(ModelRelacion)
 
 
 --------------------------------------------------------------------------------------
