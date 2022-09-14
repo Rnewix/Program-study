@@ -17,8 +17,8 @@ pip install pillow
 2.- App.urls.py
         Opcion 1
         ----------------------
-                from django.conf import Settings
-                from django.contrib.staticfiles.urls import static
+                from django.conf import settings
+                from django.conf.urls.static import static
 
                 urlpatterns = [
                     path('', views.index, name='home')

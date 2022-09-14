@@ -23,12 +23,12 @@ Modelos
 
         class Articulo(models.Model):                                           <= Hereda de models.Model
             var = ''                                                                <=Variables
-            choices = ( (male, 'male'), (feMale, 'female'))
+            choices = ( ('male', 'male'), ('feMale', 'female'))
                                         
             name1 = models.CharField(max_length=200)                                <= Fields. Atributos/columnas de tabla
             content1 = models.TextField()
             img = models.ImageField(upload_to='images/')
-            sex = models.CharField(choices)
+            sex = models.CharField(choices = choices)
 
             def __str__(self):
                 return self.name1                                                   <= Se mostrara en Shell como nombre, en lugar de verse como objeto
@@ -41,13 +41,17 @@ Modelos
 
         
 
-    Clases para atributos
+    Clases para atributos                   https://docs.djangoproject.com/en/4.1/ref/models/fields/
     ----------------------------------------------
     
         Id primary_key                  models.AutoField(primary_key=True) 
-                                        models.CharField()
+        Texto                           models.CharField()
                                         models.TextField()
-        Numeros:                        models.IntegerField()
+        Numeros:                        models.IntegerField()                       -2147483648 to 2147483647
+                                        models.SmallIntegerField                         -32768 to 32767
+                                        models.PositiveBigIntegerField                        0 to 9223372036854775807             
+                                        models.PositiveIntegerField                           0 to 2147483647
+                                        models.PositiveSmallIntegerField                      0 to 32767
         Email validos:                  models.EmailField()
         Url validos:                    models.URLField
         Booleanos:                      models.BooleanField()
@@ -59,14 +63,14 @@ Modelos
         Argumentos particulares
         ----------------------------------------------
             max_length=8
-            on_delete=models.CASCADE  si se borra la columna, todas se borraran
+            on_delete=models.CASCADE    si se borra la columna, todas se borraran
 
 
         models.Field general parameters
         ---------------------    
             primary_key                                     If True, this field is the primary key for the model.
-            blank=                                          Defautl False. Permite la no entrada de valor
-            Null =                                          Default False. True = guardara valor NULL si no img
+            blank=                                          Defautl False. Permite la no entrada de valor en field
+            Null =                                          Default False. True = permite guardara valor NULL. (no usar en Fields que usan str porque str vacio y null es redundante y convencion Django dice q se deja strings vacios)
             default =                                       Valor default. (valor u objeto)
             db_column =                                     The name of the database column to use for this field. If this isn’t given, Django will use the field’s name.
             editable =                                      Default True. Si Falso, no se mostrara en el admin
@@ -83,6 +87,13 @@ Modelos
         -----------------
             auto_now_add = True
 
+        class Meta 
+        ----------------------                                                           
+                verbose_name =                              Nombre como aparecera en singular
+                Verbose_name_plural =                       Nombre en caso de ser plural
+                db_table =                                  Como se nombrara en la BBDD
+                ordering = ['']                             Como se ordenaran por default
+
         validation
         ----------------------
             Sintaxis
@@ -90,54 +101,134 @@ Modelos
 
             ej.
                 mail = models.CharField(validators =[validate_geeks_mail])          (solo aceptara emails de gmails )
-        
+
+                from django.core.validators import MaxValueValidator, MinValueValidator
+                integer_field = IntegerField(
+                    default=1,
+                    validators=[
+                        MaxValueValidator(100),
+                        MinValueValidator(1)
+                    ]
+                )
+                
         choices
         ------------------------
         Manera de dar opciones especificas en un Field.
 
             1 Metodo. (profesional)
                 Crear choices.py en app
-                    
-                    choices.py
-
-                Crear opciones en tuplas ('key', 'value')                           (lo que debe ingresar el cliente es el key)
-                    
-                    sexos =(
-                        ('f', 'femenino'),
-                        ('m', 'masculino')
-                    )
-                
                 Importar choices a models
                 Agregar Field con choices
+
+            1 Metodo recomendado                (HARD CODE)
+                Dentro del modelo crear las choices. Dentro de variable que contiene tupla con dentro otras tuplas con las opciones.
+                    var= ( ('value', 'display_text'))
+                    var= ( ('value', _('display_text')))                            <= escalable para traduccion en un futuro.
+
+                -----------------------------------------------------------------
+                Opcion general
                 
-                    from .choices import sexos            
+                    class Model1(models.Model):
+                        SEXO =(
+                            ('f', _('femenino')),
+                            ('m', _('masculino'))
+                        )            
+                    
+                        sex = models.CharField(max_length= 1, choices= SEXO, default = 'f')
+                -------------------------------------------------------------------
+                Opcion con  integer field:
+
+                    class Book(models.Model):
+                        STATUS = (
+                            (1,  _('Available to borrow')),
+                            (2, _('Borrowed by someone')),
+                            (3, _('Archived - not available anymore')),
+                        )
+                        # [...]
+                        status = models.PositiveSmallIntegerField(
+                            choices=STATUS,
+                            default=1,
+                        )
+
+            2 Metodo con variables   (NO HARDCODE but LONG)
+
+                def Model1(models.Model):
+                    FEMENINO = 'f'
+                    MASCULINO = 'm'
+
+                    sexos =(
+                        (FEMENINO, _('femenino')),
+                        (MASCULINO, _('masculino'))
+                    )            
                 
-                    sex = models.CharField(max_length= 1, choices= sexos, default = 'f')
+                    sex = models.CharField(max_length= 1, choices= sexos, default = FEMENINO)
 
         Relaciones entre tablas  (ForeingKey)
         ----------------------------------
         var = models.ForeignKey(Modelo1, attrs)
             Modelo1                         indica la relacion hacia
             null= True, blank=True          Porque al inicio no contamos con valores o puede haber relacion 0   
-            on_delete=models.CASCADE        En caso de que se borre el modelo principal se borrara todos los modelos dependiente (osea los que lo tienen relacionado como FK)
-            on_delete=models.RESTRICT       NO permite eliminacion de una llave a la cual se esta haciendo referencia
+            on_delete=models.CASCADE        Also deletes the object containing the ForeignKey. Cuando se elimina un objeto al que se hace referencia, también se eliminarán todos los objetos que hacen referencia a ese objeto
+            on_delete=models.PROTECT        Prevent deletion of the referenced object by raising ProtectedError. El argumento PROTEGER evita la eliminación del objeto referenciado si hay objetos que hacen referencia a este objeto. 
+            on_delete=models.RESTRICT       Prevent deletion of the referenced object by raising RestrictedError. Unlike PROTECT, deletion of the referenced object is allowed if it also references a different object that is being deleted in the same operation via a CASCADE relationship.
+                                            Se permite la eliminación del objeto referenciado si los objetos que hacen referencia y el objeto referenciado hacen referencia a algún otro objeto común en una relación “CASCADA”.
+            SET_NULL                        Cuando se elimina el objeto referenciado, en objeto que hace referencia el valor donde estaba el objeto referenciado cambia a null (user eliminado, pero sus blogs se quedan a nombre de Anonimo (null))
+                                            *requiere tener tambien argumento null=True 
+            SET_DEFAULT                     *requiere valor  colocar un => default = value   || XYZ = models.ForeignKey(WASD, on_delete = models.SET_DEFAULT, null = True, default = QWERTY) ||
+            SET()                           = que SET_DEFAULT pero podemos pasar un invocable.
+            DO_NOTHING                      No se hará nada para manejar los efectos de la eliminación
+            
             related_name = 'newname'        Renombrar la tabla relacionada
 
 
-        Relaciones muchos a muchos
+        Relaciones muchos a muchos                  https://www.youtube.com/watch?v=QBzsoQPgJQ8
         ----------------------------------
-        Se realiza usando ManyToManyField de models. Creara una tercera tabla con 2 columnas que seran llaves foraneas.
+            Se realiza usando ManyToManyField de models. Creara una tercera tabla con 2 columnas que seran llaves foraneas.
 
-            from django.db import models
+                from django.db import models
 
-            var= models.ManyToManyField(ModelRelacion)
+                var= models.ManyToManyField('ModelRelacion')
 
-        Para ingresar a los valores de la tabla relacionada:
-            -tabla_relacionada_minusculas + _set        
+            Ingreso a los datos:
+                Desde tabla que referencia:
+                    tab2.tab1.all()
+                    tab2.tab1.filter()
+                    tab2.tab1.count()
 
+                    Remover un objeto relacionado
+                        tab2.tab1.remove(Objetoaquitar)
+                    
+                Desde tabla que es referenciada por otras (tabla que referencia en minusculas + _set)
+                    tab1.tab2_set.all()      
 
-                ej gender= models.ManyToManyField(ModelRelacion)
+                                 
+                
+         Relaciones muchos a muchos  .through                   Elegir manualmente la join table            https://www.youtube.com/watch?v=oDeHM_SQNnM
+        ---------------------------------
+            ManyToManyField.through                     Django will automatically generate a table to manage many-to-many relationships. However, if you want to manually specify the 
+                                                        intermediary table, you can use the through option to specify the Django model that represents the intermediate table that you want to use.
+                                                        The most common use for this option is when you want to associate extra data with a many-to-many relationship.
 
+                        ej-------------------------------------
+
+                            class Person(models.Model):
+                                name = models.CharField(max_length=128)
+
+                                def __str__(self):
+                                    return self.name
+
+                            class Group(models.Model):
+                                name = models.CharField(max_length=128)
+                                members = models.ManyToManyField(Person, through='Membership')
+
+                                def __str__(self):
+                                    return self.name
+
+                            class Membership(models.Model):
+                                person = models.ForeignKey(Person, on_delete=models.CASCADE)
+                                group = models.ForeignKey(Group, on_delete=models.CASCADE)
+                                date_joined = models.DateField()
+                                invite_reason = models.CharField(max_length=64)
 
 --------------------------------------------------------------------------------------
 Migraciones
