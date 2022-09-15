@@ -1,0 +1,580 @@
+Django ya crea por default el modelo de usuario. No requiere que lo creemos nosotros.
+(django.contrib.auth.User)
+
+auth_user
+
+auth_group
+
+auth_permission
+
+
+-----------------------------------
+User  (class models.User)
+-----------------------------------
+    Fields
+    ---------------------
+
+        username                                Required. 150 characters or fewer. Usernames may contain alphanumeric, _, @, +, . and - characters.
+
+        first_name                              Optional (blank=True). 150 characters or fewer.
+
+        last_name                               Optional (blank=True). 150 characters or fewer.
+
+        email                                   Optional (blank=True). Email address.
+
+        password                                Required. A hash of, and metadata about, the password. (Django doesn’t store the raw password.) Raw passwords can be arbitrarily long and can contain any character. See the password documentation.
+
+        groups                                  # Many-to-many relationship to Group
+
+        user_permissions                        # Many-to-many relationship to Permission
+
+        is_staff                                Boolean. Designates whether this user can access the admin site.
+
+        is_active                               Boolean. Designates whether this user account should be considered active. We recommend that you set this flag to False instead of deleting accounts; that way, if your applications have any foreign keys to users, the foreign keys won’t break.
+                                                    This doesn’t necessarily control whether or not the user can log in. Authentication backends aren’t required to check for the is_active flag but the default backend (ModelBackend) and the RemoteUserBackend do. You can use AllowAllUsersModelBackend or AllowAllUsersRemoteUserBackend if you want to allow inactive users to login. In this case, you’ll also want to customize the AuthenticationForm used by the LoginView as it rejects inactive users. Be aware that the permission-checking methods such as has_perm() and the authentication in the Django admin all return False for inactive users.
+
+        is_superuser                            Boolean. Designates that this user has all permissions without explicitly assigning them.
+
+        last_login                              A datetime of the user’s last login.
+
+        date_joined                             A datetime designating when the account was created. Is set to the current date/time by default when the account is created.
+
+    Attributes
+    ----------------------
+    
+        is_authenticated                        Read-only attribute always True (AnonymousUser.is_authenticated always False). Show if user is authenticated. This does not imply any permissions or active.
+
+        is_anonymous                            Read-only attribute always False. If True => AnonymousUser objects.
+
+    Methods
+    -----------------------
+        get_username()                          Returns the username for the user. Since the User model can be swapped out, you should use this method instead of referencing the username attribute directly.
+
+        get_full_name()                         Returns the first_name plus the last_name, with a space in between.
+
+        get_short_name()                        Returns the first_name.
+
+        set_password(raw_password)              Sets the user’s password to the given raw string. Doesn’t save the User object.
+                                                    if value None => is like activate method set_unusable_password().
+
+        check_password(raw_password)            Returns True if the given raw string is the correct password for the user.
+        
+        set_unusable_password()                 Marks the user as having no password set. 
+                                                    check_password() return False (Different to blank string as a password.)
+
+        has_usable_password()                   Returns False if set_unusable_password() has been called for this user.
+
+        get_user_permissions(obj=None)          Returns a set of permission strings that the user has directly.
+
+        get_group_permissions(obj=None)         Returns a set of permission strings that the user has, through their groups.
+
+        get_all_permissions(obj=None)           Returns a set of permission strings that the user has, both through group and user permissions.
+
+        has_perm(perm, obj=None)                Returns True if the user has the specified permission, where perm is in the format "<app label>.<permission codename>". 
+                                                    inactive = always return False. 
+                                                    active superuser = always return True.
+
+    
+        has_perms(perm_list, obj=None)          Returns True if the user has each of the specified permissions, where each perm is in the format "<app label>.<permission codename>".
+
+        has_module_perms(package_name)          Returns True if the user has any permissions in the given package (the Django app label). 
+
+        email_user(subject, message, from_email=None, **kwargs)   Sends an email to the user. If from_email is None, Django uses the DEFAULT_FROM_EMAIL. Any **kwargs are passed to the underlying send_mail() call.
+
+----------------------------------------------
+Referenciar a usuario.
+----------------------------------------------
+    2 maneras:
+        -directly refer to auth.User            Directa y no segura
+
+        -AUTH_USER_MODEL.                       Indirectamente, para uso en models (Usa CustomUser)
+        -get_user_model().                      Indirectamente, para uso fuera de models (views.py, etc)
+
+
+    auth.User
+    -------------
+        Sin embargo,  lo recomendado es usar un custon user model en lugar del usuario directamente.
+
+                    from django.contrib.auth.models import User
+
+                    class Post(models.Model):
+                        author = models.ForeignKey(User, on_delete=models.CASCADE) 
+
+
+    AUTH_USER_MODEL
+    -----------------
+        Created a custom user model in an app called accounts
+
+        # settings.py
+            AUTH_USER_MODEL = `accounts.CustomUser`
+
+        # blog/models.py
+            from django.conf import settings 
+
+            class Post(models.Model):
+                author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE )
+    
+    get_user_model
+    ---------------
+        # settings.py
+            AUTH_USER_MODEL = `accounts.CustomUser`
+
+        # accounts/views.py
+            from django.contrib.auth import get_user_model
+            from django.contrib.auth.mixins import LoginRequiredMixin
+            from django.views.generic import ListView
+
+            User = get_user_model()
+
+            class UserListView(LoginRequiredMixin, ListView):
+                model = User
+                template_name = "user_detail.html"
+
+
+----------------------------------------------
+Extender User model
+----------------------------------------------
+
+    proxy model 
+        Dont substituting default User. Is based in User
+        Purely behavioral (don’t change anything stored in the database)
+        Allows default ordering, custom managers, or custom model methods
+
+
+    profile model
+        Dont substituting default User
+        Store information related to User (use a OneToOneField to a model containing the fields for additional information)
+        Allows store non-auth related information about a site user. (no auth - caracateristicas diferenctes a autorizaciones y permisos)
+        -hey aren’t auto created when a user is created, but a django.db.models.signals.post_save could be used to create or update related models as appropriate
+
+        Create profile Model
+        --------------------------------------------
+            from django.contrib.auth.models import User
+
+            class Employee(models.Model):
+                user = models.OneToOneField(User, on_delete=models.CASCADE)
+                department = models.CharField(max_length=100)
+
+
+        Acceder a valores de profit Model a traves de User:
+        --------------------------------------------------
+            u = User.objects.get(username='pepe')
+            pepe_depto = u.employee.department                     <=Modelo que referencia en minusculas + . + atributo de modelo que referencia
+
+
+        Ver profile model in Admin
+        ------------------------------------------- 
+            define an InlineModelAdmin en App.admin.py
+
+            from django.contrib import admin
+            from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+            from django.contrib.auth.models import User
+
+            from .models import Employee
+
+            # Define an inline admin descriptor for Employee model (which acts a bit like a singleton)
+            class EmployeeInline(admin.StackedInline):
+                model = Employee
+                can_delete = False
+                verbose_name_plural = 'employee'
+
+            # Define a new User admin
+            class UserAdmin(BaseUserAdmin):
+                inlines = (EmployeeInline,)
+
+            # Re-register UserAdmin
+            admin.site.unregister(User)
+            admin.site.register(User, UserAdmin)
+
+
+----------------------------------------------
+Custom User model
+----------------------------------------------
+This model behaves identically to the default user model, but you’ll be able to customize it in the future if the need arises.
+If you’re starting a new project, it’s highly recommended to set up a custom user model, even if the default User model is sufficient for you.
+Do this BEFORE creating any migrations or running manage.py migrate for the first time. (if created database tables is significantly MORE difficult since it affects foreign keys and many-to-many relationship, has to be manually)
+
+
+    1- Created a custom user model in an app called accounts 
+    ------------------------------------------------------
+        from django.contrib.auth.models import AbstractUser         (ver abajo)
+        from django.contrib.auth.models import PermissionsMixin
+
+        class MyUser(AbstractUser, PermissionsMixin):
+            pass
+
+    1.5- Crear CustomManager
+    ----------------------------------------------------
+        create_user() 
+        create_superuser()
+
+    2- Cambiar el modelo default en settings.py
+    ----------------------------------------------------
+        AUTH_USER_MODEL = 'myapp.MyUser'                            (ej. AUTH_USER_MODEL = `accounts.CustomUser`)
+
+            
+    --------------------------------------------------------------------------------------------------
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    --------------------------------------------------------------------------------------------------
+
+    3- Uso por parte del admin
+    ---------------------------------------------------
+
+        3.1- Registrar modelo en app admin.py
+        -------------------------------------------------------
+
+            admin.site.register(MyUser, UserAdmin)
+
+
+        3.2- Crear formulario.
+        ------------------------------------------------------
+            Reescribir los forms atados a User para que ahora creen/modifique Custom User (app admin.py)
+            Formularios dentro del nucleo de Django especial para usuarios. (Django usa muchos tipos deForm, segun sea caso requerido)
+            
+            class UserCreationForm(forms.ModelForm)
+            class UserChangeForm(forms.ModelForm)
+            
+            
+        3.3- Definir attributos y metodos extras de custom User para uso en admin. (app admin.py)
+        ---------------------------------------------------------------------------------------
+
+            class UserAdmin(BaseUserAdmin)
+
+
+
+    
+        Cuidado
+    -----------------------------------------------
+        Reusable app no deben referenciar a User o a CustomUser, creara problemas en otros projectos. Especialmente si son ForeignKey.
+        Solucion:   
+
+            from django.conf import settings 
+            settings.AUTH_USER_MODEL                    Referenciar al usuario registrado como default (especialmente en FK y ManyToMany )
+
+                                                            from django.conf import settings            
+                                                            class Article(models.Model):
+                                                                author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
+
+            get_user_model()                            django.contrib.auth.get_user_model() trae a cualquier usuario usado en la app.
+
+
+
+----------------------------------------------
+Crear Custom User model
+----------------------------------------------
+
+    1 Creation  Custom User model   (indicar lo siguiientes:)                                      https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#substituting-a-custom-user-model
+    ----------------------------------------------                                                  https://www.youtube.com/watch?v=lNxQkW1kjto&list=PLMbRqrU_kvbTGg_oUKXyWi63Mo9Yoot9K&index=55
+
+        Fields                                                  Colocar los fields que deseas tenga el usuario. Los campos de auth user no escritos, no se usaran.
+
+        USERNAME_FIELD = 'field'                                String, senala cual campo sera el identificador. El campo debe de ser unico (unique=True). 
+                                                                        (Normalmente username) (otras opciones, password, etc.)
+
+                                                                        class MyUser(AbstractBaseUser):
+                                                                            myusername = models.CharField(max_length=40, unique=True)
+                                                                            
+                                                                            USERNAME_FIELD = 'myusername'
+
+        EMAIL_FIELD = 'field'                                   String describing the name of the email field on the User model. 
+                                                                This value is returned by get_email_field_name()
+
+        REQUIRED_FIELDS = ['field']                             String list. Lista los Campos que se pediran durante la creacion en la consola (via the createsuperuser command).
+                                                                        No afecta otras partes de Django (como crear usuario con admin)
+                            
+        is_active                                               Bool. atrribute. Default True. Si True, indica que puede iniciar sesion
+
+                                                                        models.BooleanField(default=True)
+
+        is_admin                                                Bool. atrribute. Indica si ingresa a panel de administracion
+
+                                                                        is_admin = models.BooleanField(default=False)
+
+        def__str__(self)                                        Metodo que mostrara un str como nombre.
+
+
+                             ------Metodos raros requeridos por Admin y necesitado en AbstractBaseUser-----
+
+        def has_perm(self, perm, obj=None)                      Metodo que invocara siempre admin. (see permissions). If User.is_active and is_superuser are both True, this method always returns True.
+                                                                    Si recibe objeto, return los permisos especificos de ese objeto
+
+        def has_module_perms(self, app_label)                   Metodo que invocara siempre admin. Returns True if the user has any permissions in the given package
+                                                                    Si recibe objeto, return los permisos especificos de ese objeto
+
+        @property
+        def is_staff(self):                                     Metodo con decorador. retorna el attibuto is_admin
+
+
+                            ej
+                        -------------------------------------------
+                        from django.contrib.auth.models import AbstractBaseUser
+                        from django.contrib.auth.models import PermissionsMixin
+
+                            class MyUser(AbstractBaseUser, PermissionsMixin):
+                                email = models.EmailField(
+                                    verbose_name='email address',
+                                    max_length=255,
+                                    unique=True,
+                                )
+                                date_of_birth = models.DateField()
+                                is_active = models.BooleanField(default=True)
+                                is_admin = models.BooleanField(default=False)
+
+                                USERNAME_FIELD = 'email'
+                                REQUIRED_FIELDS = ['date_of_birth']
+
+                                def __str__(self):
+                                    return self.email
+
+                                def has_perm(self, perm, obj=None):
+                                    return True
+
+                                def has_module_perms(self, app_label):
+                                    return True
+
+                                @property
+                                def is_staff(self):
+                                    return self.is_admin
+
+
+    2 Creation Custom Manager                           https://www.youtube.com/watch?v=HTIr44gLvxY&list=PLMbRqrU_kvbTGg_oUKXyWi63Mo9Yoot9K&index=56
+    ----------------------------------------------
+     Se refiere al manager que creara a los usuarios segun nuestra clase. 
+     Solo si tenemos fields/atributos iguales al auth.User podriamos usar el Django’s UserManager (username, email, is_staff, is_active, is_superuser, last_login, and date_joined fields )     
+     Pero si tenemos fields diferentes debemos creas un custom manager. (Basado en BaseUserManager el cual se debe de importar)   
+    ------------------------------
+        1 Importar BaseUserManager
+        2 Crear nuevo manager con sus 2 metodos: (crear usuario y crear superusuario)
+
+                def create_user(self, username_field, password=None, **los_otros_REQUIRED_FIELDS)
+                def create_superuser(self, username_field, password=None, **los_otros_REQUIRED_FIELDS)
+
+        3 Cambiar el manager de django (objects) por el nuestro dentro del Custom user de manera de atributo.
+            objects = MyUserManager()
+
+                        
+                        -------------------------------------------
+                        from django.db import models
+                        from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)                      <= importaciones para custom user y custom manager
+                        from django.contrib.auth.models import PermissionsMixin                                         <= importar para los permisos en customuser
+
+                        class MyUserManager(BaseUserManager):                                                           <= Creacion de custom manager (hereda de BaseUserManager), los parametros igual orden a user
+                            def create_user(self, email, date_of_birth, password=None):                                         <=como username_field usaremos email (este caso)
+                                if not email:                                                                                   <=validacion para email.
+                                    raise ValueError('Users must have an email address')
+
+                                user = self.model(                                                                              <=Definir el user, escribir todos attrs, attr = attr
+                                    email=self.normalize_email(email),                                                          <= Se normalizan los emails con metodo .normalize_email(email) que recibe email como parametro
+                                    date_of_birth=date_of_birth,
+                                )
+
+                                user.set_password(password)                                                                     <= metodo que encriptara un password
+                                user.save(using=self._db)
+                                return user
+
+                            def create_superuser(self, email, date_of_birth, password=None):                            <=Creacion superuser, los parametros igual orden a user
+                    
+                                user = self.create_user(                                                                        <=Crear usuario usando la funcion que ya hicimos arriba (ya encripta password y normaliza email)
+                                    email,                                                                                       <=atributos en orden.
+                                    password = password,
+                                    date_of_birth = date_of_birth,
+                                )
+                                user.is_admin = True                                                                            <=agregar atributo de ser admin (superuser)
+                                user.save(using=self._db)
+                                return user
+
+
+                        class MyUser(AbstractBaseUser, PermissionsMixin):                                               <=Custom user. Importar AbstractBaseUser y los PermissionsMixin
+                            email = models.EmailField(verbose_name='email address', max_length=255, unique=True,)       <=Los Fields deseados (los demas du auth User se borraran)
+                            date_of_birth = models.DateField()
+                            is_active = models.BooleanField(default=True)
+                            is_admin = models.BooleanField(default=False)
+
+                            objects = MyUserManager()                                                                           <=aclara que el manager en objecs no es el default sino el que creamos arriba 
+
+                            USERNAME_FIELD = 'email'                                                                    <= Indica cual field es el username. Esta ves username no es user name sino email.
+                            REQUIRED_FIELDS = ['date_of_birth']                                                         <= Fields que se mostraran en la consola al crear usuario como superusuario
+
+                            def __str__(self):
+                                return self.email                                                                          
+
+                            def has_perm(self, perm, obj=None):                                                         <=Pasalo asi, son metodos que invoca admin por si solo
+                                return True
+
+                            def has_module_perms(self, app_label):                                                      <=Pasalo asi, son metodos que invoca admin por si solo
+                                return True
+
+                            @property                                                                                   <=Pasalo asi, son metodos que invoca admin por si solo
+                            def is_staff(self):
+                                return self.is_admin
+
+
+    --------------------------------------------------------------------------------------------------
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    --------------------------------------------------------------------------------------------------
+
+
+    3 Creacion de formularios de Custom Manager para admin          https://www.youtube.com/watch?v=UTJ_Dr5I5sQ&list=PLMbRqrU_kvbTGg_oUKXyWi63Mo9Yoot9K&index=57
+    ------------------------------------------------------          https://www.youtube.com/watch?v=Owg7ZzSRvUw&list=PLMbRqrU_kvbTGg_oUKXyWi63Mo9Yoot9K&index=58
+
+        Ejemplo de abajo. Django documentacion, con creacion de logica de creacion y update de usuario en admin.py
+
+        Pero puede crearse form en carpeta forms con estilo function form. Y crear view en views con CreateView, UpdateView, DeleteView y ListView y hacerlo por http
+
+
+
+
+
+
+    ----------------------------------------------------------------------------
+        Ejemplo final
+    ----------------------------------------------------------------------------
+
+                ==========Creacion de CUSTOM USER======================
+        APP.MODELS.PY
+
+            from django.db import models
+            from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)                      <= importaciones para custom user y custom manager
+            from django.contrib.auth.models import PermissionsMixin                                         <= importar para los permisos en customuser
+
+            class MyUserManager(BaseUserManager):                                                           <= Creacion de custom manager (hereda de BaseUserManager), los parametros igual orden a user
+                def create_user(self, email, date_of_birth, password=None):                                         <=como username_field usaremos email (este caso)
+                    if not email:                                                                                   <=validacion para email.
+                        raise ValueError('Users must have an email address')
+
+                    user = self.model(                                                                              <=Definir el user, escribir todos attrs, attr = attr
+                        email=self.normalize_email(email),                                                          <= Se normalizan los emails con metodo .normalize_email(email) que recibe email como parametro
+                        date_of_birth=date_of_birth,
+                    )
+
+                    user.set_password(password)                                                                     <= metodo que encriptara un password
+                    user.save(using=self._db)
+                    return user
+
+                def create_superuser(self, email, date_of_birth, password=None):                            <=Creacion superuser, los parametros igual orden a user
+           
+                    user = self.create_user(                                                                        <=Crear usuario usando la funcion que ya hicimos arriba (ya encripta password y normaliza email)
+                        email,                                                                                       <=atributos en orden.
+                        password = password,
+                        date_of_birth = date_of_birth,
+                    )
+                    user.is_admin = True                                                                            <=agregar atributo de ser admin (superuser)
+                    user.save(using=self._db)
+                    return user
+
+
+            class MyUser(AbstractBaseUser, PermissionsMixin):                                               <=Custom user. Importar AbstractBaseUser y los PermissionsMixin
+                email = models.EmailField(verbose_name='email address', max_length=255, unique=True,)       <=Los Fields deseados (los demas du auth User se borraran)
+                date_of_birth = models.DateField()
+                is_active = models.BooleanField(default=True)
+                is_admin = models.BooleanField(default=False)
+
+                objects = MyUserManager()                                                                           <=aclara que el manager en objecs no es el default sino el que creamos arriba 
+
+                USERNAME_FIELD = 'email'                                                                    <= Indica cual field es el username. Esta ves username no es user name sino email.
+                REQUIRED_FIELDS = ['date_of_birth']                                                         <= Fields que se mostraran en la consola al crear usuario como superusuario
+
+                def __str__(self):
+                    return self.email                                                                          
+
+                def has_perm(self, perm, obj=None):                                                         <=Pasalo asi, son metodos que invoca admin por si solo
+                    return True
+
+                def has_module_perms(self, app_label):                                                      <=Pasalo asi, son metodos que invoca admin por si solo
+                    return True
+
+                @property                                                                                   <=Pasalo asi, son metodos que invoca admin por si solo
+                def is_staff(self):
+                    return self.is_admin
+
+
+            ==========Creacion de Formulario de CUSTOM USER para usarse en Admin ======================
+
+        APP.ADMIN.PY
+
+                from django.contrib import admin                                                            <=Importar todo 
+
+                from django import forms
+                from django.contrib.auth.models import Group                                                    <=Ver si se requiere o no (quitar grupos)
+                from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
+                from django.contrib.auth.forms import ReadOnlyPasswordHashField
+                from django.core.exceptions import ValidationError
+
+                from APP.MODELS import MyUser                                                               <= Importar Custom User
+
+
+
+                class UserCreationForm(forms.ModelForm):                                                    <= Formulario para creacion de Usuario. 
+                    
+                    """A form for creating new users. Includes all the required                                     <=Documentacion
+                        fields, plus a repeated password."""
+                    
+                    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)                       || <= Un extra. Para pedir el pasword 2 veces y confirmar
+                    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)          ||
+
+                    class Meta:                                                                                     <= Meta como formsViews
+                        model = MyUser                                                                                      <=Custom User
+                        fields = ('email', 'date_of_birth')                                                                 <=Campos que se pediran en la creacion. si todos = '__all__'
+
+                    def clean_password2(self):                                                                      || <= Un extra. Metodo que confirma el match entre los pasSwords
+                        # Check that the two password entries match                                                 \\
+                        password1 = self.cleaned_data.get("password1")                                               ||
+                        password2 = self.cleaned_data.get("password2")                                               ||
+                        if password1 and password2 and password1 != password2:                                       ||
+                            raise ValidationError("Passwords don't match")                                           ||
+                        return password2                                                                             ||
+
+                    def save(self, commit=True):                                                                    || <= Un extra. Metodo que hashea password
+                        # Save the provided password in hashed format                                               \\
+                        user = super().save(commit=False)                                                            ||   
+                        user.set_password(self.cleaned_data["password1"])                                            ||
+                        if commit:                                                                                   ||
+                            user.save()                                                                              ||
+                        return user                                                                                  ||
+
+
+                class UserChangeForm(forms.ModelForm):                                                      <= Reescribir UserChangeForm ligado al auth User
+                    """A form for updating users. Includes all the fields on
+                        the user, but replaces the password field with admin's
+                        disabled password hash display field.
+                    """
+                    password = ReadOnlyPasswordHashField()                                          
+
+                    class Meta:                                                                                      <= Indicar el Custom User
+                        model = MyUser
+                        fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')                     <=Pasar todos los fields para ser modificados 
+
+
+                class UserAdmin(BaseUserAdmin):                                                             <=Clase Override? como se vera en admin. 
+                        # The forms to add and change user instances
+                    form = UserChangeForm
+                    add_form = UserCreationForm
+
+                        # The fields to be used in displaying the User model.
+                        # These override the definitions on the base UserAdmin
+                        # that reference specific fields on auth.User.
+                    list_display = ('email', 'date_of_birth', 'is_admin')
+                    list_filter = ('is_admin',)
+                    fieldsets = (
+                        (None, {'fields': ('email', 'password')}),
+                        ('Personal info', {'fields': ('date_of_birth',)}),
+                        ('Permissions', {'fields': ('is_admin',)}),
+                    )
+                    # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
+                    # overrides get_fieldsets to use this attribute when creating a user.
+                    add_fieldsets = (
+                        (None, {
+                            'classes': ('wide',),
+                            'fields': ('email', 'date_of_birth', 'password1', 'password2'),
+                        }),
+                    )
+                    search_fields = ('email',)
+                    ordering = ('email',)
+                    filter_horizontal = ()
+
+
+
+                admin.site.register(MyUser, UserAdmin)                                                          <= Registrar Custom User y el nuevo UserAdmin
+                
+                #admin.site.unregister(Group)                                                                    <= since we're not using Django's built-in permissions, unregister the Group model from admin.

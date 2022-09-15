@@ -25,6 +25,11 @@ python manage.py migrate
         1   Crear proyecto                                  django-admin startproject projectnameApp    (dir Proyect)
 
 
+        (Opcional)
+            1.5 Crear Custom User                          
+                (antes de cualquier migracion) 
+
+
         2   Inicializar BBDD                                python manage.py migrate                    (ProjectApp)    
 
 
@@ -62,6 +67,8 @@ python manage.py migrate
                                                             App/Templates/ -> App
                                                             App/Templates/App/ -> Xcarpeta                                      <=Finalmente aqui ingresaremos nuestras template (xml/html/etc.)
                                                             App/Templates/App/ -> template.html                                 <=O tener template directamente     
+
+                3- Fronted                                  App/static/App -> css img  (dentro c.css imagen frontend)                                            
 
 
         3   Registrar app al proyecto                       "AppName.apps.AppNameConfig"                (settings.py)           <= str que llama a AppNameConfig que esta dentro de apps.py dentro de la nueva App

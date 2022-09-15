@@ -28,19 +28,12 @@ pip install pillow
         Opcion2
         -----------------------
                 from django.contrib import admin
-
                 from django.conf import settings
-                from django.conf.urls.static import static
-                
-                urlpatterns = [
-                    path('image_upload', hotel_image_view, name = 'image_upload'),
-                    path('success', success, name = 'success'),
-                ]
-
+               
                 if settings.DEBUG:
-                    urlpatterns += static(settings.MEDIA_URL,
-                                          document_root=settings.MEDIA_ROOT)
-
+                from django.conf.urls.static import static
+                urlpatterns += static(settings.MEDIA_URL, 
+                    document_root=settings.MEDIA_ROOT)
 
 3.- App
                 Crear carpeta images dentro de carpeta media del proyecto 

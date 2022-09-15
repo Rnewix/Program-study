@@ -294,20 +294,28 @@ Permisos de Usuario
       un usuario que tiene el permiso
 
     Modelos
-        1 Crear subclase Meta
+        1 Crear clase Meta
         2 Definir campo permissions
-        3 Definir permisos ('nombre_permiso", "valor_mostrado")
+        3 Definir permisos ('nombre_permiso/code_name", "nombre/explicacion del permiso")
 
-        class BookInstance(models.Model):
-            ...
-            class Meta:
-                permissions = (("permiso", "valor"), ("permiso", "valor"))  
+                class Task(models.Model):
+                    ...
+                    class Meta:
+                        permissions = [
+                            ("change_task_status", "Can change the status of tasks"),
+                            ("close_task", "Can remove a task by setting its status as closed"),
+                        ]               
+    Accion 
+        4 Comprobar si hay permiso antes de la realizacion de algo:
+            user.has_perm('app.close_task')
+
+
 
     Templates
         {{ perms }}             Comprobar permisos perm + nombre app especifico + el nombre permiso 
                                     {{ perms.App1.permiso1 }}
 
-                                {% if perms.catalog.can_mark_returned %}
+                                {% if perms.catalog.change_task_status %}
                                 {% endif %}
     
     Views

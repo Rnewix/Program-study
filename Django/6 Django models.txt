@@ -11,6 +11,7 @@ Por lo que para nosotros manipulemos una tabla, lo hara representandola para nos
                 Una tabla/Entinty   se representara con    Un objeto (instanciado de una clase)
                 Cada columna        se representara con    Cada atributo del objeto
 
+QuerySet es la representación del resultado de una consulta a la base de datos, pero devuelta como una lista de instancias. Por ser lista puede iterarse, etc.
                         
 
 
@@ -55,7 +56,7 @@ Modelos
         Email validos:                  models.EmailField()
         Url validos:                    models.URLField
         Booleanos:                      models.BooleanField()
-        Time:                           models.DateTimeField()
+        Time:                           models.DateTimeField()				campos de fecha y hora automatizados no aparecen en el adminstrador, No visible en Admin, para mostrar datetime en admin: ver abajo.
         Image:                          models.ImageField()                                                     Requiere pip install Pillow.
         ForeingKey:                     models.ForeignKey(ModelPrincipal, on_delete=models.CASCADE)             Id Modelo con relacion 1 sera el FK de Modelo relacion muchos
         Relacion n a n                  models.ManyToManyField(ModelRelacion)
@@ -75,7 +76,7 @@ Modelos
             db_column =                                     The name of the database column to use for this field. If this isn’t given, Django will use the field’s name.
             editable =                                      Default True. Si Falso, no se mostrara en el admin
             error_messages                                  Permite hacer override el mensaje default que aldra (raise) Requiere diccionario (key(error): mensaje a overide)
-            verbose_name =                                  Dar nombre para humano. Default atributo name (Django cambiara _ por espacios)
+            verbose_name =                                  Como se nombrara y sera visible ( ej en admin, etc). Default atributo name (Django cambiara _ por espacios) todo puede estar en ingles pero para nuestros usuarios podremos nombrarlos en el idioma que usan.
             unique =                                        default False. True: Debe ser unico en la tabla
             validators                                      Validacion (validators documentation)
 
@@ -85,14 +86,16 @@ Modelos
                                                                 models.ImageField(upload_to='imagenes/')
         DateTimeField
         -----------------
-            auto_now_add = True
+            auto_now_add = True				    created = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+            auto_now=True				    updated = models.DateTimeField(auto_now=True, verbose_name="Fecha de edición")
 
         class Meta 
         ----------------------                                                           
-                verbose_name =                              Nombre como aparecera en singular
-                Verbose_name_plural =                       Nombre en caso de ser plural
+                verbose_name =                              Nombre como aparecera en singular la tabla(tmb en admin)
+                Verbose_name_plural =                       Nombre en caso de ser plural la tabla(tmb en admin)
                 db_table =                                  Como se nombrara en la BBDD
-                ordering = ['']                             Como se ordenaran por default
+                ordering = ['']                             Es una lista. Ordena los registros (tmb en admin) por default. si se le coloca '-' ordenara de manera invertida (ej ordering = ['-name'])
+                
 
         validation
         ----------------------
@@ -230,6 +233,24 @@ Modelos
                                 date_joined = models.DateField()
                                 invite_reason = models.CharField(max_length=64)
 
+
+
+    Mostrar campos de fecha y hora en admin 
+    --------------------------------------
+    En Admin de app agregar mas codigo: Clase con los campos a ver solo en read_only
+    
+    Ej. App Project/ modelo Project
+    
+    from django.contrib import admin
+    from .models import Project
+
+    class ProjectAdmin(admin.ModelAdmin):
+    	readonly_fields = ('created', 'updated')
+
+    admin.site.register(Project, ProjectAdmin)
+    
+    
+     
 --------------------------------------------------------------------------------------
 Migraciones
 --------------------------------------------------------------------------------------
