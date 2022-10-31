@@ -1,0 +1,20 @@
+
+
+Automatizacion de Test
+
+-------------------------------------
+Instalacion
+-------------------------------------
+Instalar:
+  Selenium
+  PyUnit Report             (dara reporte de si falla o fue bien)
+  Driver de tu navegador.   (Une Selenium con el navegador especifico) (Chrome = ChromeDriver) 
+1- Venv
+2- pip install selenium
+3- pip install pyunitreport
+
+
+
+--------------------------------------
+
+--------------------------------------
