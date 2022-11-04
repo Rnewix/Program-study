@@ -1,3 +1,4 @@
+driver = 1
 
 """
 Automatizacion de Test
@@ -16,7 +17,8 @@ Requerimientos a instalar:
     Opcionales
     -----------------
         3.- PyUnit Report               (Escribira reporte de lo realizado por selenium en PDF)
-        4.- Unittest                    (Framework para pruebas unitarias)(creacion de clases de pruebas)
+        4.- Unittest                    (Framework para realizar pruebas)(Selenium por si solo no tiene tools de pruebas, solo es un bot/automatizacion)
+                                        (alternativas a Unittes= pytest, nose)
   
 
     ( Venv )
@@ -30,21 +32,42 @@ driver => Objeto que realizara todas las acciones en el browser.
 """
 
 
+"""----------------------------------
+UNITTEST                             
+----------------------------------"""
+"""                   
+Framework para realizar pruebas. Selenium por si solo no tiene tools de pruebas, solo es un bot/automatizacion
+
+class MyClase(unittest.TestCase):                       <---Hereda de unittest.TestCase. TesCase indica a unittest que esta clase es un test
+    def setUp(self):                                    <---The setUp method is part of initialization. This method will get called before every test function which you are going to write in this test case class
+        self.driver = webdriver.Firefox()
+        
+    def test_search_(self):                             <--- El Test. The test case method should always start with characters test
+        driver = self.driver
+        
+    def tearDown(self):                                 <---The tearDown method will get called after every test method. This is a place to do all cleanup actions
+        self.driver.close()                                 <-- cierra Tab
+        self.driver.quit()                                  <-- Cierra todo el Browser
 """
---------------------
+
+
+
+"""--------------------
 Indice
---------------------
+--------------------"""
+"""
 - Script basico
-- Drivers Browser
+- Drivers para Browsers
+- Navegacion
 - Locators
 - Interaction
 - Assertions (validadores)
 
 """
 
-#--------------------------------------
-#Script Basico de test en OOP
-#--------------------------------------
+"""--------------------------------------
+Script Basico de test (unittest-Selenium) en OOP
+--------------------------------------"""
 
 # Importaciones 
 ### Librerias que gustes usar ##############
@@ -83,10 +106,11 @@ if __name__ == "__main__":                                              #<---- N
             )
                    
 
+
+"""-------------------------------------------------------------
+    Drivers: https://github.com/SergeyPirogov/webdriver_manager
+-------------------------------------------------------------"""
 """
--------------------------------------------------------------
-Drivers: https://github.com/SergeyPirogov/webdriver_manager
--------------------------------------------------------------
     Edge
         from selenium import webdriver
         from selenium.webdriver.edge.service import Service as EdgeService
@@ -100,73 +124,132 @@ Drivers: https://github.com/SergeyPirogov/webdriver_manager
         from webdriver_manager.firefox import GeckoDriverManager
 
         cls.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+"""        
         
-        
---------------------------------------------------------------
-Driver
---------------------------------------------------------------
 
-    driver.get()
-    driver.quit()
+"""-------------------------------------------------------------
+Navegacion     
+-------------------------------------------------------------"""
 
-    driver.maximize_window()
+driver.get("http://www.example.com")
 
-    driver.find_element()   <<<<<<<<<<<< Seletores
-    
-    driver.implicitly_wait(10)
+driver.forward()
+
+driver.back()
+
+#cambio de ventana
+driver.switch_to_window("windowName")
+
+#Cambio de frame
+driver.switch_to_frame("frameName")
+
+#Cambio de frema a subframe child
+driver.switch_to_frame("frameName.0.child")
+
+#Regresar al parent frame
+driver.switch_to.default_content()
+
+#Cambio a un pop up
+alert = driver.switch_to.alert
+
+
+
+"""----------------------------------------------------------
+    Locators
+-------------------------------------------------------------"""
 """
+    Seleccionar elementos de la pag web para interactuar con ellos.
+    Seleccionar un elemento especifico, seleccionar varios, seleccionar varios y luego hacerles un ciclo for, etc...
+    Requiere la importacion de By
 
+        Tradicional locators:
+            Identifican precisamente un elemento
+            Id / Name / class / XPATH / CSS selector / Link Text / PartialLinkText
+            
+        Relative Locators:
+            Cuando un elemento no es facilmente identificable, se puede apoyar en otros que si lo son:
+            Above / Below / Left of / Right of / Near / Chain of multiples relative locators
+            
+    Normalmente se vacia el elemento localizado en una variable para posteriormente manipularlo con Interactions, etc.
+------------------------------------------------------------"""
 
-"""
--------------------------------------------------------------
-Locators
--------------------------------------------------------------
-Seleccionar elementos de la pag web para interactuar con ellos.
-Seleccionar un elemento especifico, seleccionar varios, seleccionar varios y luego hacerles un ciclo for, etc...
-Requiere la importacion de By
-
-Tradicional locators:
-    Identifican precisamente un elemento
-    Id / Name / class / XPATH / CSS selector / Link Text / PartialLinkText
-
-    Codigo:
-        driver.find_element(By.ABC, "xyz")
-        
-                           (By.ID, "search")      
-                           (By.NAME, "q")
-                           (By.CLASS_NAME, "input-text")  |%|  (By.CLASS_NAME, "search-button")
-                           (By.TAG_NAME, "img")
-                           (By.XPATH, "//*[@id='top']/body/div/div[2]/div[2]/ul/li[4]/a/img")
-                           (By.CSS_SELECTOR, "div.header-minicart span.icon")  |%|  (By.CSS_SELECTOR,"#fruits .tomatoes")
-Relative Locators:
-    Cuando un elemento no es facilmente identificable, se puede apoyar en otros que si lo son:
-    Above / Below / Left of / Right of / Near / Chain of multiples relative locators
-    
-    Codigo:
-        locate_with(By.TAG_NAME, "input").above({By.ID: "password"})
-    
-                   (By.TRADICIONAL_LOC)  .below({By.ID: "email"})
-                                         .to_left_of({By.ID: "submit"})
-                                         .to_right_of({By.ID: "cancel"})
-                                         .near({By.ID: "lbl-email"})
-        
-        locate_with(By.TAG_NAME, "button").below({By.ID: "email"}).to_right_of({By.ID: "cancel"})
-"""
-
+#import by
 from selenium.webdriver.common.by import By
 
-#Tradicional locator
+
+#Tradicional locators---------- .find_element()
+        
+driver.find_element(By.ID, "search")     
+    
+driver.find_element(By.NAME, "q")
+
+"""<html>
+<body>
+<p class="content">Site content goes here.</p>
+</body>
+</html>"""
+driver.find_element(By.CLASS_NAME, "content")  
+driver.find_element(By.CLASS_NAME, "search-button")
+
+driver.find_element(By.TAG_NAME, "img")
+driver.find_element(By.TAG_NAME, "h1")
+
+driver.find_element(By.XPATH, "//*[@id='top']/body/div/div[2]/div[2]/ul/li[4]/a/img")
+
+"""<html>
+<body>
+<p class="content">Site content goes here.</p>
+</body>
+</html>  
+https://saucelabs.com/resources/articles/selenium-tips-css-selectors"""
+driver.find_element(By.CSS_SELECTOR,"p.content")
+driver.find_element(By.CSS_SELECTOR, "div.header-minicart span.icon")  
+
+
+"""<html>
+<body>
+<p>Are you sure you want to do this?</p>
+<a href="continue.html">Continue</a>
+<a href="cancel.html">Cancel</a>
+</body>
+</html> """
+driver.find_element(By.LINK_TEXT, 'Continue')
+driver.find_element(By.PARTIAL_LINK_TEXT, 'Conti')
+
+
+    
+#Relative Locators------------- locate_with()
+
+locate_with(By.ID, "search").above({By.ID: "password"})
+
+locate_with(By.ID, "search").below({By.ID: "email"})
+
+locate_with(By.ID, "search").to_left_of({By.ID: "submit"})
+
+locate_with(By.ID, "search").to_right_of({By.ID: "cancel"})
+
+locate_with(By.ID, "search").near({By.ID: "lbl-email"})
+    
+locate_with(By.TAG_NAME, "button").below({By.ID: "email"}).to_right_of({By.ID: "cancel"})
+
+
+#---------------------------------------------------------
+#---------------------------------------------------------
+from selenium.webdriver.common.by import By
+
 def test_search_text_field(self):
     search_field = self.driver.find_element(By.ID, "search")
 
-#Relative locator (multiple)    
 submit_button = locate_with(By.TAG_NAME, "button").below({By.ID: "email"}).to_right_of({By.ID: "cancel"})
-    
+#---------------------------------------------------------
+#---------------------------------------------------------    
 
-"""
--------------------------------------------------------------
+
+
+"""-------------------------------------------------------------
 Interactions     https://www.selenium.dev/documentation/webdriver/elements/interactions/
--------------------------------------------------------------
+-------------------------------------------------------------"""
+"""
 Instrucciones para manipura e interactuar
 
 5 basicos:
@@ -175,31 +258,92 @@ Instrucciones para manipura e interactuar
     clear       (text fields and content editable elements)
     submit      (send form elements)
     select      ()
-
-
-
 """
 
 
+.clear()
+
+.send_keys("pycon")
+
+.click()
+
+.submit()
 
 
-    
-"""
--------------------------------------------------------------
+
+#Keys  (nos provee de keys como RETURN, F1, ALT etc)
+from selenium.webdriver.common.keys import Keys
+
+.send_keys(Keys.RETURN)
+
+.send_keys(" and some", Keys.ARROW_DOWN)
+
+
+#Select
+from selenium.webdriver.support.ui import Select
+
+select = Select(driver.find_element(By.NAME, 'name'))
+
+select.select_by_index(index)
+
+select.select_by_visible_text("text")
+
+select.select_by_value(value)    
+
+select.deselect_all()
+
+
+#Drag and drop 
+from selenium.webdriver import ActionChains
+
+element = driver.find_element(By.NAME, "source")
+
+target = driver.find_element(By.NAME, "target")
+
+action_chains = ActionChains(driver)
+
+action_chains.drag_and_drop(element, target).perform()
+
+
+
+
+"""-------------------------------------------------------------
 Assertions    (valdacion)
--------------------------------------------------------------
+-------------------------------------------------------------"""
+"""
 Validar que un valor en la ejecucion del test sea correcto
 Si falso = Test se para
 Si Verdadero = Test continua
-
 """
 
-"""
--------------------------------------------------------------
+self.assertIn("Python", driver.title)
+self.assertNotIn("No results found.", driver.page_source)
+
+
+
+"""-------------------------------------------------------------
 waits     
--------------------------------------------------------------
-
+------------------------------------------------------------"""
+"""
 Implicit wait
 Explicit wait
 
 """
+
+
+
+
+"""-------------------------------------------------------------
+Cookies
+------------------------------------------------------------"""
+
+
+# Go to the correct domain
+driver.get("http://www.example.com")
+
+# Now set the cookie. This one's valid for the entire domain
+cookie = {'name' : 'foo', 'value' : 'bar'}
+driver.add_cookie(cookie)
+
+# And now output all the available cookies for the current URL
+driver.get_cookies()
